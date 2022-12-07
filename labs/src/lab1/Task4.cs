@@ -3,16 +3,15 @@ using labs.entities;
 
 namespace labs.lab1;
 
-public sealed class Task1 :
+public sealed class Task4 :
     LabTask<int>
 {
-    private double m_M;
-    private double m_N;
+    private double m_X;
 
-    public Task1(string name = "lab1.task1", string description = "") 
-        : base(1, name)
+    public Task4(string name = "lab1.task4", string description = "") 
+        : base(4, name)
     {
-        m_M = m_N = 0;
+        m_X = 0;
         
         Description = description;
         
@@ -23,7 +22,7 @@ public sealed class Task1 :
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(): {TaskExpression(ref m_M, ref m_N)}"))
+                .Delegator(() => Console.WriteLine($"f(x): {TaskExpression(m_X)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
@@ -39,11 +38,11 @@ public sealed class Task1 :
 
     public void OutputData()
     {
-        Console.WriteLine($"M: {m_M} \nN: {m_N}");
+        Console.WriteLine($"X = {m_X}");
     }
 
-    public double TaskExpression(ref double m, ref double n)
+    public double TaskExpression(double x)
     {
-        return m - ++n;
+        return Math.Asin(Math.Abs(x + 1));
     }
 }

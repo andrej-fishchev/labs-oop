@@ -1,18 +1,24 @@
 using labs.builders;
 using labs.entities;
+using labs.lab1.utils;
 
 namespace labs.lab1;
 
-public sealed class Task1 :
+public sealed class Task5 :
     LabTask<int>
 {
-    private double m_M;
-    private double m_N;
+    public static readonly Circle CIRCLE = 
+        new Circle(5.0, (5.0, 0.0));
 
-    public Task1(string name = "lab1.task1", string description = "") 
-        : base(1, name)
+    public static readonly Triangle TRIANGLE =
+        new Triangle();
+        
+    private (double x, double y) m_X;
+    
+    public Task5(string name = "lab1.task5", string description = "") 
+        : base(5, name)
     {
-        m_M = m_N = 0;
+        m_X = default;
         
         Description = description;
         
@@ -23,7 +29,7 @@ public sealed class Task1 :
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(): {TaskExpression(ref m_M, ref m_N)}"))
+                .Delegator(() => Console.WriteLine($"f(x): {TaskExpression(m_X, CIRCLE, TRIANGLE)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
@@ -39,11 +45,11 @@ public sealed class Task1 :
 
     public void OutputData()
     {
-        Console.WriteLine($"M: {m_M} \nN: {m_N}");
+        Console.WriteLine($"Точка: {m_X}");
     }
 
-    public double TaskExpression(ref double m, ref double n)
+    public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)
     {
-        return m - ++n;
+        return circle.Contains(dot) || triangle.Contains(dot);
     }
 }
