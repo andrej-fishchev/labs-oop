@@ -4,9 +4,9 @@ namespace labs.entities;
 
 public sealed class LabTaskAction<T> :
     ILabEntity<T>,
-    IAction
+    IExecutable
 {
-    public Action Delegator
+    public Action ExecuteAction
     {
         private get;
         set;
@@ -18,12 +18,12 @@ public sealed class LabTaskAction<T> :
         Name = name;
         Description = "";
         
-        Delegator = action ?? (() => { });
+        ExecuteAction = action ?? (() => { });
     }
 
-    public void Invoke()
+    public void Execute()
     {
-        Delegator.Invoke();
+        ExecuteAction.Invoke();
     }
 
     public T Id { get; set; }

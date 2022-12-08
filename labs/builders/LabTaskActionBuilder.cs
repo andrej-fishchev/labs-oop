@@ -9,10 +9,10 @@ public sealed class LabTaskActionBuilder<T> :
         base(new LabTaskAction<T>(default!))
     { }
 
-    public LabTaskActionBuilder<T> Delegator (Action value)
+    public LabTaskActionBuilder<T> ExecuteAction (Action value)
     {
         Build<LabTaskAction<T>>()
-            .Delegator = value;
+            .ExecuteAction = value;
 
         return this;
     }
