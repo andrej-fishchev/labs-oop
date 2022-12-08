@@ -25,15 +25,15 @@ public sealed class Task5 :
         Actions = new List<LabTaskAction<int>>()
         {
             new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
-                .Delegator(InputData)
+                .ExecuteAction(InputData)
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(x): {TaskExpression(m_X, CIRCLE, TRIANGLE)}"))
+                .ExecuteAction(() => Console.WriteLine($"f(x): {TaskExpression(m_X, CIRCLE, TRIANGLE)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
-                .Delegator(OutputData)
+                .ExecuteAction(OutputData)
                 .Build<LabTaskAction<int>>()
         };
     }

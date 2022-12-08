@@ -18,15 +18,15 @@ public sealed class Task4 :
         Actions = new List<LabTaskAction<int>>()
         {
             new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
-                .Delegator(InputData)
+                .ExecuteAction(InputData)
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(x): {TaskExpression(m_X)}"))
+                .ExecuteAction(() => Console.WriteLine($"f(x): {TaskExpression(m_X)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
-                .Delegator(OutputData)
+                .ExecuteAction(OutputData)
                 .Build<LabTaskAction<int>>()
         };
     }

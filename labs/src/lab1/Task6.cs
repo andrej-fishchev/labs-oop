@@ -20,12 +20,12 @@ public sealed class Task6 :
         Actions = new List<LabTaskAction<int>>()
         {
             new LabTaskActionBuilder<int>().Id(1).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(float):      {TaskExpression(m_FloatData)} " +
-                                                   $"\nf(double):   {TaskExpression(m_DoubleData)}"))
+                .ExecuteAction(() => Console.WriteLine($"f(float):      {TaskExpression(m_FloatData)} " +
+                                                       $"\nf(double):   {TaskExpression(m_DoubleData)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Вывод данных")
-                .Delegator(OutputData)
+                .ExecuteAction(OutputData)
                 .Build<LabTaskAction<int>>()
         };
     }

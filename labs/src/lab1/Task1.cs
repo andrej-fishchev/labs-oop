@@ -20,15 +20,15 @@ public sealed class Task1 :
         Actions = new List<LabTaskAction<int>>()
         {
             new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
-                .Delegator(InputData)
+                .ExecuteAction(InputData)
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .Delegator(() => Console.WriteLine($"f(): {TaskExpression(ref m_M, ref m_N)}"))
+                .ExecuteAction(() => Console.WriteLine($"f(): {TaskExpression(ref m_M, ref m_N)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
-                .Delegator(OutputData)
+                .ExecuteAction(OutputData)
                 .Build<LabTaskAction<int>>()
         };
     }
