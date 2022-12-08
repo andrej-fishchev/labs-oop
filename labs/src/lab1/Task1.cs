@@ -1,5 +1,6 @@
 using labs.builders;
 using labs.entities;
+using labs.IO;
 
 namespace labs.lab1;
 
@@ -12,7 +13,7 @@ public sealed class Task1 :
     public Task1(string name = "lab1.task1", string description = "") 
         : base(1, name)
     {
-        m_M = m_N = 0;
+        m_M = m_N = default;
         
         Description = description;
         
@@ -34,7 +35,34 @@ public sealed class Task1 :
 
     public void InputData()
     {
-        // TODO: asd
+        // TODO: simplification and minimization
+        ConsoleNumericIOResponse<double> response;
+        
+        do
+        {
+            response = (ConsoleNumericIOResponse<double>) 
+                new ConsoleNumericIORequest<double>(
+                "Введите M: ",
+                (string? data, out string? error) =>
+                    {
+                        error = null;
+                        
+                        double result;
+                        
+                        if (!double.TryParse(data, out result))
+                            error = $"Ошибка: Ожидалось вещественное значение, но получено '{data}'";
+
+                        return result;
+                    })
+                    .Request(_ => true);
+            
+            if(response.Error != null)
+                Console.WriteLine(response.Error);
+
+        } while (response.Error != null);
+        
+        // TODO: m_N :/
+        m_M = response.Data;
     }
 
     public void OutputData()
