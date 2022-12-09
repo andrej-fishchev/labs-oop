@@ -10,6 +10,19 @@ public sealed class Task1 :
     private double m_M;
     private double m_N;
 
+    private static readonly ConsoleDataRequest<double> m_UserDataRequest =
+        new("", (string? data, out string? error) =>
+        {
+            error = null;
+
+            double value;
+
+            if (!double.TryParse(data, out value))
+                error = $"ожидалось вещественное число, но получено {data}";
+
+            return value;
+        });
+
     public Task1(string name = "lab1.task1", string description = "") 
         : base(1, name)
     {
@@ -35,34 +48,22 @@ public sealed class Task1 :
 
     public void InputData()
     {
-        // TODO: simplification and minimization
-        ConsoleNumericIOResponse<double> response;
-        
-        do
-        {
-            response = (ConsoleNumericIOResponse<double>) 
-                new ConsoleNumericIORequest<double>(
-                "Введите M: ",
-                (string? data, out string? error) =>
-                    {
-                        error = null;
-                        
-                        double result;
-                        
-                        if (!double.TryParse(data, out result))
-                            error = $"Ошибка: Ожидалось вещественное значение, но получено '{data}'";
+        m_M = RequestData("Введите M: ");
+        m_N = RequestData("Введите N: ");
+    }
 
-                        return result;
-                    })
-                    .Request(_ => true);
+    public double RequestData(string message)
+    {
+        m_UserDataRequest.Message = message;
+        
+        ConsoleDataResponse<double> response;
             
-            if(response.Error != null)
-                Console.WriteLine(response.Error);
-
-        } while (response.Error != null);
+        while((response = (ConsoleDataResponse<double>)m_UserDataRequest
+                  .Request(new DataIoConverter<double>(new ConsoleDataResponse<double>())))
+                  .Error is { } msg)
+            m_UserDataRequest.ConsoleTarget.Write(msg);
         
-        // TODO: m_N :/
-        m_M = response.Data;
+        return response.Data;
     }
 
     public void OutputData()
