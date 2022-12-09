@@ -1,6 +1,6 @@
 namespace labs.interfaces;
 
-public interface IDataIOResponse<T>
+public interface IDataIoResponse<T>
 {
     public T? Data { get; set; }
     

@@ -2,10 +2,10 @@ using labs.interfaces;
 
 namespace labs.IO;
 
-public class ConsoleNumericIOResponse<T> :
-    IDataIOResponse<T>
+public class ConsoleDataResponse<T> :
+    IDataIoResponse<T>
 {
-    public ConsoleNumericIOResponse(T? data, string? error = null)
+    public ConsoleDataResponse(T? data = default, string? error = default)
     {
         Data = data;
         Error = error;
