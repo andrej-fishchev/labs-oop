@@ -48,7 +48,11 @@ public sealed class Task1 :
 
     public void InputData()
     {
-        m_M = RequestData("Введите M: ");
+        m_UserDataRequest.ConsoleTarget
+            .Write($"Ввод может быть прекращен в любое удобное время." +
+                   $"Введите '{m_UserDataRequest.RejectInputMessage}' для незамедлительного прекращения исполнения задачи");
+        
+        m_M = RequestData($"Введите M: ");
         m_N = RequestData("Введите N: ");
     }
 
@@ -60,8 +64,12 @@ public sealed class Task1 :
             
         while((response = (ConsoleDataResponse<double>)m_UserDataRequest
                   .Request(new DataIoConverter<double>(new ConsoleDataResponse<double>())))
-                  .Error is { } msg)
+                  .Error is { } msg 
+                  && response.Code != (int) ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
             m_UserDataRequest.ConsoleTarget.Write(msg);
+
+        if (response.Code == (int)ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
+            response.Data = 0;
         
         return response.Data;
     }
