@@ -14,6 +14,8 @@ namespace labs.IO
 
         public IDataIoResponse<TOut> Convert<T>(IDataIoResponse<T> data, DataConverter<T, TOut> converter)
         {
+            OuterData.Code = data.Code;
+            
             if (data.Error != null)
                 OuterData.Error = data.Error;
 
@@ -26,6 +28,4 @@ namespace labs.IO
             return OuterData;
         }
     }
-    
-    
 }
