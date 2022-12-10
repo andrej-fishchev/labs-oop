@@ -1,23 +1,24 @@
 using labs.builders;
 using labs.entities;
 using labs.IO;
+using labs.utils;
 
 namespace labs.lab1;
 
 public sealed class Task1 :
     LabTask<int>
 {
-    private double m_M;
-    private double m_N;
+    private double m;
+    private double n;
 
-    private static readonly ConsoleDataRequest<double> m_UserDataRequest =
+    private static readonly ConsoleDataRequest<double> UserDataRequest =
         new("", (string? data, out string? error) =>
         {
             error = null;
 
             double value;
 
-            if (!double.TryParse(data, out value))
+            if(!DoubleParseUtils.TryWithInvariant(data, out value))
                 error = $"ожидалось вещественное число, но получено {data}";
 
             return value;
@@ -26,7 +27,7 @@ public sealed class Task1 :
     public Task1(string name = "lab1.task1", string description = "") 
         : base(1, name)
     {
-        m_M = m_N = default;
+        m = n = default;
         
         Description = description;
         
@@ -37,7 +38,8 @@ public sealed class Task1 :
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Console.WriteLine($"f(): {TaskExpression(ref m_M, ref m_N)}"))
+                .ExecuteAction(() => UserDataRequest.ConsoleTarget
+                    .Write($"f(): {TaskExpression(ref m, ref n)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
@@ -48,39 +50,24 @@ public sealed class Task1 :
 
     public void InputData()
     {
-        m_UserDataRequest.ConsoleTarget
+        UserDataRequest.ConsoleTarget
             .Write($"Ввод может быть прекращен в любое удобное время." +
-                   $"Введите '{m_UserDataRequest.RejectInputMessage}' для незамедлительного прекращения исполнения задачи");
+                   $"Введите '{UserDataRequest.RejectMessage}' для незамедлительного прекращения исполнения задачи");
         
-        m_M = RequestData($"Введите M: ");
-        m_N = RequestData("Введите N: ");
-    }
-
-    public double RequestData(string message)
-    {
-        m_UserDataRequest.Message = message;
+        m = ConsoleIoDataUtils
+            .RequestDoubleData(UserDataRequest, $"Введите M: ").Data;
         
-        ConsoleDataResponse<double> response;
-            
-        while((response = (ConsoleDataResponse<double>)m_UserDataRequest
-                  .Request(new DataIoConverter<double>(new ConsoleDataResponse<double>())))
-                  .Error is { } msg 
-                  && response.Code != (int) ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
-            m_UserDataRequest.ConsoleTarget.Write(msg);
-
-        if (response.Code == (int)ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
-            response.Data = 0;
-        
-        return response.Data;
+        n = ConsoleIoDataUtils
+            .RequestDoubleData(UserDataRequest, $"Введите M: ").Data;
     }
 
     public void OutputData()
     {
-        Console.WriteLine($"M: {m_M} \nN: {m_N}");
+        UserDataRequest.ConsoleTarget.Write($"M: {m} \nN: {n}");
     }
 
-    public double TaskExpression(ref double m, ref double n)
+    public double TaskExpression(ref double left, ref double right)
     {
-        return m - ++n;
+        return left - ++right;
     }
 }

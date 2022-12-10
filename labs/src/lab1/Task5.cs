@@ -1,24 +1,38 @@
 using labs.builders;
 using labs.entities;
-using labs.lab1.utils;
+using labs.IO;
+using labs.utils;
 
 namespace labs.lab1;
 
 public sealed class Task5 :
     LabTask<int>
 {
-    public static readonly Circle CIRCLE = 
-        new Circle(5.0, (5.0, 0.0));
+    public static readonly Circle Circle = 
+        new(5.0, (5.0, 0.0));
 
-    public static readonly Triangle TRIANGLE =
-        new Triangle();
+    public static readonly Triangle Triangle = 
+        new();
+    
+    private static readonly ConsoleDataRequest<double> UserDataRequest =
+        new("", (string? data, out string? error) =>
+        {
+            error = null;
+
+            double value;
+
+            if(!DoubleParseUtils.TryWithInvariant(data, out value))
+                error = $"ожидалось вещественное число, но получено {data}";
+
+            return value;
+        });
         
-    private (double x, double y) m_X;
+    private (double x, double y) point;
     
     public Task5(string name = "lab1.task5", string description = "") 
         : base(5, name)
     {
-        m_X = default;
+        point = default;
         
         Description = description;
         
@@ -29,7 +43,8 @@ public sealed class Task5 :
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Console.WriteLine($"f(x): {TaskExpression(m_X, CIRCLE, TRIANGLE)}"))
+                .ExecuteAction(() => UserDataRequest.ConsoleTarget
+                    .Write($"f(x): {TaskExpression(point, Circle, Triangle)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
@@ -40,12 +55,19 @@ public sealed class Task5 :
 
     public void InputData()
     {
-        // TODO: asd
+        point.x = ConsoleIoDataUtils.RequestDoubleData(
+            UserDataRequest, $"Введите x координату: ")
+            .Data;
+        
+        point.y = ConsoleIoDataUtils.RequestDoubleData(
+            UserDataRequest, $"Введите y координату: ")
+            .Data;
     }
 
     public void OutputData()
     {
-        Console.WriteLine($"Точка: {m_X}");
+        UserDataRequest.ConsoleTarget
+            .Write($"Точка: {point}");
     }
 
     public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)

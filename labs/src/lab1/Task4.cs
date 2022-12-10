@@ -1,17 +1,32 @@
 using labs.builders;
 using labs.entities;
+using labs.IO;
+using labs.utils;
 
 namespace labs.lab1;
 
 public sealed class Task4 :
     LabTask<int>
 {
-    private double m_X;
+    private double x;
 
+    private static readonly ConsoleDataRequest<double> UserDataRequest =
+        new("", (string? data, out string? error) =>
+        {
+            error = null;
+
+            double value;
+
+            if(!DoubleParseUtils.TryWithInvariant(data, out value))
+                error = $"ожидалось вещественное число, но получено {data}";
+
+            return value;
+        });
+    
     public Task4(string name = "lab1.task4", string description = "") 
         : base(4, name)
     {
-        m_X = 0;
+        x = default;
         
         Description = description;
         
@@ -22,7 +37,8 @@ public sealed class Task4 :
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Console.WriteLine($"f(x): {TaskExpression(m_X)}"))
+                .ExecuteAction(() => UserDataRequest.ConsoleTarget
+                    .Write($"f(x): {TaskExpression(x)}"))
                 .Build<LabTaskAction<int>>(),
             
             new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
@@ -33,12 +49,23 @@ public sealed class Task4 :
 
     public void InputData()
     {
-        // TODO: asd
+        UserDataRequest.ConsoleTarget
+            .Write($"Ввод может быть прекращен в любое удобное время." +
+                   $"Введите '{UserDataRequest.RejectMessage}' для незамедлительного прекращения исполнения задачи");
+        
+        x = ConsoleIoDataUtils.RequestDoubleDataWithValidator(
+            UserDataRequest,
+            "Введите X из отрезка [-2.0; 0.0]: ",
+            new DataIoValidator<double>(
+                (value) => value >= -2.0 && value <= 0.0)
+        ).Data;
     }
 
     public void OutputData()
     {
-        Console.WriteLine($"X = {m_X}");
+        UserDataRequest
+            .ConsoleTarget
+            .Write($"X = {x}");
     }
 
     public double TaskExpression(double x)
