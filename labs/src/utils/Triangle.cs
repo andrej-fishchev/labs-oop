@@ -1,4 +1,4 @@
-namespace labs.lab1.utils;
+namespace labs.utils;
 
 public class Triangle
 {
