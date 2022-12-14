@@ -1,6 +1,6 @@
 namespace labs.interfaces;
 
-public interface IBuildable
+public interface IBuildable<out T>
 {
-    public T Build<T>();
+    public T Build();
 }
