@@ -18,7 +18,7 @@ public class ConsoleDataRequest<T> :
         ConsoleIoTarget? consoleTarget = default)
     {
         Message = message;
-        RejectMessage = "--stop";
+        RejectMessage = "...";
         ConsoleDataConverter = converter;
         ConsoleTarget = consoleTarget ?? new ConsoleIoTarget();
     }
@@ -32,13 +32,13 @@ public class ConsoleDataRequest<T> :
         if (response.Data == null)
         {
             response.Error = "ввод прекращен";
-            response.Code = (int)ConsoleDataResponseCode.CONSOLE_TERMINATED;
+            response.Code = (int)ConsoleDataResponseCode.ConsoleTerminated;
         }
 
         if (RejectMessage.Length != 0
-            && response.Code == (int)ConsoleDataResponseCode.CONSOLE_OK
+            && response.Code == (int)ConsoleDataResponseCode.ConsoleOk
             && response.Data!.Trim().Equals(RejectMessage))
-            response.Code = (int)ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED;
+            response.Code = (int)ConsoleDataResponseCode.ConsoleInputRejected;
         
         return converter.Convert(response, ConsoleDataConverter);
     }

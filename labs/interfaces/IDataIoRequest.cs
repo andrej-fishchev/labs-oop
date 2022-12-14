@@ -1,5 +1,3 @@
-using labs.IO;
-
 namespace labs.interfaces;
 
 public interface IDataIoRequest<T>

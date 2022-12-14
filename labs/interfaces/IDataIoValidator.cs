@@ -1,6 +1,4 @@
-using labs.interfaces;
-
-namespace labs.IO
+namespace labs.interfaces
 {
     public interface IDataIoValidator<T>
     {
