@@ -2,33 +2,48 @@ using labs.interfaces;
 
 namespace labs.entities;
 
-public sealed class LabTaskAction<T> :
-    ILabEntity<T>,
+public sealed class LabTaskAction :
+    ILabEntity<int>,
     IExecutable
 {
     public Action ExecuteAction
     {
-        private get;
+        private get; 
         set;
     }
 
-    public LabTaskAction(T id, string name = "", Action? action = null)
+    private ILabEntity<int> entity;
+
+    public LabTaskAction(ILabEntity<int>? iface = default, Action? excute = default)
     {
-        Id = id;
-        Name = name;
-        Description = "";
-        
-        ExecuteAction = action ?? (() => { });
+        entity = iface ?? new IntLabEntity();
+        ExecuteAction = excute ?? (() => {});
     }
 
+    public LabTaskAction(int id, string name = "", string description = "") :
+        this(new IntLabEntity(id, name, description))
+    { }
+
+    public int Id
+    {
+        get => entity.Id; 
+        set => entity.Id = value;
+    }
+
+    public string Name
+    {
+        get => entity.Name; 
+        set => entity.Name = value;
+    }
+
+    public string Description
+    {
+        get => entity.Description; 
+        set => entity.Description = value;
+    }
+    
     public void Execute()
     {
         ExecuteAction.Invoke();
     }
-
-    public T Id { get; set; }
-    
-    public string Name { get; set; }
-    
-    public string Description { get; set; }
 }

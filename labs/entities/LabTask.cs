@@ -2,28 +2,47 @@ using labs.interfaces;
 
 namespace labs.entities;
 
-public abstract class LabTask<T> :
-    ILabEntity<T>
+
+public abstract class LabTask :
+    ILabEntity<int>
 {
-    public IList<LabTaskAction<T>> Actions
+    public IList<ILabEntity<int>> Actions
     {
-        get;
+        get; 
         set;
     }
 
-    protected LabTask(T id, 
-        string name = "unknown", 
-        IList<LabTaskAction<T>>? actions = default)
+    private ILabEntity<int> entity;
+
+    public LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
     {
-        Id = id;
-        Name = name;
-        Description = Name;
-        Actions = actions ?? new List<LabTaskAction<T>>();
+        entity = iface ?? new IntLabEntity();
+        Actions = (actions != null)
+            ? actions.Distinct()
+                .Select(x => (ILabEntity<int>)x)
+                .ToList()
+            : new List<ILabEntity<int>>();
     }
 
-    public T Id { get; set; }
-    
-    public string Name { get; set; }
-    
-    public string Description { get; set; }
+    public LabTask(int id, string name = "", string description = "") :
+        this(new IntLabEntity(id, name, description))
+    { }
+
+    public int Id
+    {
+        get => entity.Id; 
+        set => entity.Id = value;
+    }
+
+    public string Name
+    {
+        get => entity.Name; 
+        set => entity.Name = value;
+    }
+
+    public string Description
+    {
+        get => entity.Description; 
+        set => entity.Description = value;
+    }
 }

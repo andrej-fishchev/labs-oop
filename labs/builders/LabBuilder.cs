@@ -1,34 +1,38 @@
+using labs.abstracts;
 using labs.entities;
+using labs.interfaces;
 
 namespace labs.builders;
 
-public class LabBuilder<T> :
-    LabEntityBuilder<T>
+public sealed class LabBuilder :
+    LabEntityBuilder<int>
 {
-    public LabBuilder() : 
-        base(new Lab<T>(default!))
+    public LabBuilder(Lab? lab = default) : 
+        base(lab ?? new Lab())
     { }
 
-    public LabBuilder<T> Tasks (IList<LabTask<T>> value)
+    public LabBuilder Tasks (IList<LabTask> value)
     {
-        Build<Lab<T>>()
-            .Tasks = value;
+        ((Lab)Build()).Tasks = value
+                .Distinct()
+                .Select(x => (ILabEntity<int>)x)
+                .ToList();
 
         return this;
     }
 
-    public override LabBuilder<T> Id(T value)
+    public override LabBuilder Id(int value)
     {
-        return (LabBuilder<T>)base.Id(value);
+        return (LabBuilder) base.Id(value);
     }
 
-    public override LabBuilder<T> Name(string value)
+    public override LabBuilder Name(string value)
     {
-        return (LabBuilder<T>)base.Name(value);
+        return (LabBuilder) base.Name(value);
     }
 
-    public override LabBuilder<T> Description(string value)
+    public override LabBuilder Description(string value)
     {
-        return (LabBuilder<T>)base.Description(value);
+        return (LabBuilder) base.Description(value);
     }
 }
