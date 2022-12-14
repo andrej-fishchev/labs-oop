@@ -1,4 +1,6 @@
-namespace lab_exec;
+using labs.abstracts;
+
+namespace labs.interfaces;
 
 public interface IMenuDisplay<TK, TV> 
     where TK : notnull
