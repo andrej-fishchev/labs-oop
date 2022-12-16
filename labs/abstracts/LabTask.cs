@@ -1,6 +1,7 @@
+using labs.entities;
 using labs.interfaces;
 
-namespace labs.entities;
+namespace labs.abstracts;
 
 
 public abstract class LabTask :
