@@ -1,39 +1,39 @@
-using labs.interfaces;
 using labs.IO;
 
 namespace labs.utils;
 
 public static class ConsoleIoDataUtils
 {
-    public static ConsoleDataResponse<double> RequestDoubleData(ConsoleDataRequest<double> request, string message)
+    public static ConsoleDataResponse<T> RequestData<T>(ConsoleDataRequest<T> request, string message)
     {
         request.Message = message;
         
-        ConsoleDataResponse<double> response;
+        ConsoleDataResponse<T> response;
             
-        while((response = (ConsoleDataResponse<double>)request
-                  .Request(new DataIoConverter<double>(new ConsoleDataResponse<double>())))
+        while((response = (ConsoleDataResponse<T>)request
+                  .Request(new DataIoConverter<T>(new ConsoleDataResponse<T>())))
               .Error is { } msg 
-              && response.Code != (int) ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
-            request.ConsoleTarget.Write(msg);
-
-        if (response.Code == (int)ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
-            response.Data = 0;
+              && response.Code != (int) ConsoleDataResponseCode.ConsoleInputRejected)
+            request.ConsoleTarget.Write($"Ошибка: {msg} \n");
+        
+        if (response.Code == (int)ConsoleDataResponseCode.ConsoleInputRejected)
+            response.Data = default;
         
         return response;
     }
 
-    public static ConsoleDataResponse<double> 
-        RequestDoubleDataWithValidator(
-            ConsoleDataRequest<double> request, 
-            string message, 
-            DataIoValidator<double> validator)
+    public static ConsoleDataResponse<T> 
+        RequestDataWithValidator<T>(
+            string requestMessage, 
+            ConsoleDataRequest<T> request,
+            string validatorMessage,
+            DataIoValidator<T> validator)
     {
-        ConsoleDataResponse<double> value;
+        ConsoleDataResponse<T> value;
 
-        while (!validator.Validate((value = RequestDoubleData(request, message))) 
-               && value.Code != (int)ConsoleDataResponseCode.CONSOLE_INPUT_REJECTED)
-            request.ConsoleTarget.Write($"Ошибка: значение '{value}' не прошло валидацию");
+        while (!validator.Validate(value = RequestData(request, requestMessage)) 
+               && value.Code != (int)ConsoleDataResponseCode.ConsoleInputRejected)
+            request.ConsoleTarget.Write($"Ошибка: {validatorMessage} \n");
 
         return value;
     }
