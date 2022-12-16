@@ -7,7 +7,7 @@ namespace labs.factories;
 public static class ConsoleMenuFactory
 {
     public static ConsoleMenu<TV> 
-        MakeConsoleMenu<TV>(string title, string exitButton, MenuKeyGenerator<TV, string> keyGenerator, List<TV> entities)
+        MakeConsoleMenu<TV>(string title, string exitButton, MenuKeyGenerator<TV, string> keyGenerator, IList<TV> entities)
     {
         return (ConsoleMenu<TV>)
             new ConsoleMenuBuilder<TV>()
