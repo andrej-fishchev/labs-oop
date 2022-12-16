@@ -1,9 +1,11 @@
 using System.Text;
+using labs.abstracts;
 using labs.adapters;
 using labs.builders;
 using labs.entities;
 using labs.factories;
 using labs.interfaces;
+using labs.IO;
 using labs.menu;
 
 namespace lab_exec;
@@ -13,7 +15,7 @@ public static class Program
     public static MenuKeyGenerator<ILabEntity<int>, string> KeyGen = 
         (ent, _) => ent.Id.ToString();
 
-    public static string ExitSay = "---";
+    public static string ExitSay = "...";
     
     public static ConsoleMenuAction<ILabEntity<int>> LabEntityMenuAction =
         (ConsoleMenuAction<ILabEntity<int>>)
@@ -23,14 +25,16 @@ public static class Program
             .OnClose(MenuActionClose)
             .Build();
 
-
+    public static ConsoleIoTarget consoleTarget = new();
+    
     public static void Main()
     {
-        GetMenu("Лабораторные работы", MetaData.LabList)
+        GetMenu("Лабораторные работы", 
+                MetaData.LabList)
             .Display(LabEntityMenuAction);
     }
 
-    public static ConsoleMenu<ILabEntity<int>> GetMenu(string name, List<ILabEntity<int>> entities)
+    public static ConsoleMenu<ILabEntity<int>> GetMenu(string name, IList<ILabEntity<int>> entities)
     {
         return ConsoleMenuFactory.MakeConsoleMenu(
                 name,
@@ -47,10 +51,14 @@ public static class Program
 
         foreach (var keyValuePair in obj.Items)
             builder.Append($"{keyValuePair.Key}. {keyValuePair.Value.Name} \n");
+
+        if (obj.Items.Count == 0)
+            builder.Append("Список пуст\n");
         
-        Console.WriteLine(builder
-            .Append($"\nSay '{obj.Exit}' to exit ... \n\nОжидается ввод: ")
-            .ToString());
+        consoleTarget.Write(builder
+                .Append($"\nВведите '{obj.Exit}' для закрытия \n\nОжидается ввод: ")
+                .ToString()
+        );
     }
     
     public static void MenuActionSelect(IMenu<string, ILabEntity<int>> arg1, string arg2)
@@ -63,7 +71,7 @@ public static class Program
             return;
         }
         
-        List<ILabEntity<int>> ents = (List<ILabEntity<int>>)
+        IList<ILabEntity<int>> ents =
             (item is LabTask
                 ? ((LabTask) item).Actions
                 : ((Lab) item).Tasks);
@@ -77,6 +85,6 @@ public static class Program
     
     public static void MenuActionClose(IMenu<string, ILabEntity<int>> obj)
     {
-        Console.WriteLine($"Закрытие: {obj.Title}");
+        consoleTarget.Write($"Закрытие: {obj.Title} \n");
     }
 }

@@ -1,3 +1,4 @@
+using labs.abstracts;
 using labs.builders;
 using labs.entities;
 using labs.interfaces;
@@ -25,6 +26,14 @@ public static class MetaData
         new LabBuilder()
             .Id(3)
             .Name("Рекурентные соотношения")
-            .Build()
+            .Build(),
+        
+        new LabBuilder()
+            .Id(4)
+            .Name("Массивы")
+            .Tasks(new List<LabTask>
+            {
+                new labs.lab4.Task1()
+            }).Build()
     };
 }
