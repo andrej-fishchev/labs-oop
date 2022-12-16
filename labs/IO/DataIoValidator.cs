@@ -12,8 +12,11 @@ public class DataIoValidator<T> :
         Expression = ioValidator;
     }
 
-    public bool Validate(IDataIoResponse<T> data)
+    public IDataIoResponse<T> Validate(IDataIoResponse<T> data, string outerText)
     {
-        return data.Data != null && Expression.Invoke(data.Data);
+        if (data.Data == null || !Expression.Invoke(data.Data))
+            data.Error = outerText;
+
+        return data;
     }
 }
