@@ -1,75 +1,58 @@
+using labs.abstracts;
 using labs.builders;
-using labs.entities;
+using labs.interfaces;
 using labs.IO;
 using labs.utils;
 
 namespace labs.lab1;
 
 public sealed class Task4 :
-    LabTask<int>
+    LabTask
 {
-    private double x;
+    private ConsoleDataResponse<double> x;
 
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", (string? data, out string? error) =>
-        {
-            error = null;
-
-            double value;
-
-            if(!DoubleParseUtils.TryWithInvariant(data, out value))
-                error = $"ожидалось вещественное число, но получено {data}";
-
-            return value;
-        });
+        new("Введите X из отрезка [-2.0; 0.0]: ", new DataIoConverter<string?, double>(
+            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
     
     public Task4(string name = "lab1.task4", string description = "") 
-        : base(4, name)
+        : base(4, name, description)
     {
-        x = default;
+        x = new ConsoleDataResponse<double>();
         
         Description = description;
         
-        Actions = new List<LabTaskAction<int>>()
+        Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
+            new LabTaskActionBuilder().Id(1).Name("Ввод данных")
                 .ExecuteAction(InputData)
-                .Build<LabTaskAction<int>>(),
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserDataRequest.ConsoleTarget
-                    .Write($"f(x): {TaskExpression(x)}"))
-                .Build<LabTaskAction<int>>(),
+            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
+                .ExecuteAction(() => UserDataRequest.Target
+                    .Write($"f(x): {TaskExpression(x.Data)} \n"))
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
+            new LabTaskActionBuilder().Id(3).Name("Вывод данных")
                 .ExecuteAction(OutputData)
-                .Build<LabTaskAction<int>>()
+                .Build()
         };
     }
 
     public void InputData()
     {
-        UserDataRequest.ConsoleTarget
-            .Write($"Ввод может быть прекращен в любое удобное время." +
-                   $"Введите '{UserDataRequest.RejectMessage}' для незамедлительного прекращения исполнения задачи");
-        
-        x = ConsoleIoDataUtils.RequestDoubleDataWithValidator(
-            UserDataRequest,
-            "Введите X из отрезка [-2.0; 0.0]: ",
-            new DataIoValidator<double>(
-                (value) => value >= -2.0 && value <= 0.0)
-        ).Data;
+        x = (ConsoleDataResponse<double>)UserDataRequest.Request(new DataIoValidator<double>(
+            (data) => data >= -2.0 && data <= 0));
     }
 
     public void OutputData()
     {
-        UserDataRequest
-            .ConsoleTarget
-            .Write($"X = {x}");
+        UserDataRequest.Target
+            .Write($"X = {x} \n");
     }
 
-    public double TaskExpression(double x)
+    public double TaskExpression(double value)
     {
-        return Math.Asin(Math.Abs(x + 1));
+        return Math.Asin(Math.Abs(value + 1));
     }
 }

@@ -1,10 +1,11 @@
+using labs.abstracts;
 using labs.builders;
-using labs.entities;
+using labs.interfaces;
 
 namespace labs.lab1;
 
 public sealed class Task6 :
-    LabTask<int>
+    LabTask
 {
     private (float a, float b) floatData;
     private (double a, double b) doubleData;
@@ -17,16 +18,16 @@ public sealed class Task6 :
         
         Description = description;
         
-        Actions = new List<LabTaskAction<int>>()
+        Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder<int>().Id(1).Name("Выполнить задачу")
+            new LabTaskActionBuilder().Id(1).Name("Выполнить задачу")
                 .ExecuteAction(() => Console.WriteLine($"f(float):      {TaskExpression(floatData)} " +
                                                        $"\nf(double):   {TaskExpression(doubleData)}"))
-                .Build<LabTaskAction<int>>(),
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(2).Name("Вывод данных")
+            new LabTaskActionBuilder().Id(2).Name("Вывод данных")
                 .ExecuteAction(OutputData)
-                .Build<LabTaskAction<int>>()
+                .Build()
         };
     }
 
@@ -51,7 +52,7 @@ public sealed class Task6 :
         Console.WriteLine($"4. 3 * pow(y,2) * x = { (threeQuadraticYAndX = 3 * Math.Pow(data.b, 2.0) * data.a) }");
         
         double threeQuadraticXAndY;
-        Console.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * Math.Pow(data.a, 2.0) * data.b) }");
+        Console.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * Math.Pow(data.a, 2.0) * data.b) } \n");
         
         return (cubeDiffXy - (xCube + threeQuadraticYAndX))
                            /((-threeQuadraticXAndY) - yCube);
@@ -72,7 +73,7 @@ public sealed class Task6 :
         Console.WriteLine($"4. 3 * pow(y,2) * x = { (threeQuadraticYAndX = 3 * MathF.Pow(data.b, 2.0f) * data.a) }");
         
         float threeQuadraticXAndY;
-        Console.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * MathF.Pow(data.a, 2.0f) * data.b) }");
+        Console.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * MathF.Pow(data.a, 2.0f) * data.b) } \n");
         
         return (cubeDiffXy - (xCube + threeQuadraticYAndX))
                /((-threeQuadraticXAndY) - yCube);

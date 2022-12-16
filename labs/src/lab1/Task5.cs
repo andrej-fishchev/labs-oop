@@ -1,12 +1,13 @@
+using labs.abstracts;
 using labs.builders;
-using labs.entities;
+using labs.interfaces;
 using labs.IO;
 using labs.utils;
 
 namespace labs.lab1;
 
 public sealed class Task5 :
-    LabTask<int>
+    LabTask
 {
     public static readonly Circle Circle = 
         new(5.0, (5.0, 0.0));
@@ -15,59 +16,53 @@ public sealed class Task5 :
         new();
     
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", (string? data, out string? error) =>
-        {
-            error = null;
-
-            double value;
-
-            if(!DoubleParseUtils.TryWithInvariant(data, out value))
-                error = $"ожидалось вещественное число, но получено {data}";
-
-            return value;
-        });
-        
-    private (double x, double y) point;
+        new("", new DataIoConverter<string?, double>(
+            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
     
+    private ConsoleDataResponse<double> x;
+    private ConsoleDataResponse<double> y;
+
     public Task5(string name = "lab1.task5", string description = "") 
-        : base(5, name)
+        : base(5, name, description)
     {
-        point = default;
+        x = new ConsoleDataResponse<double>(); 
+        y = new ConsoleDataResponse<double>();
         
         Description = description;
         
-        Actions = new List<LabTaskAction<int>>()
+        Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
+            new LabTaskActionBuilder().Id(1).Name("Ввод данных")
                 .ExecuteAction(InputData)
-                .Build<LabTaskAction<int>>(),
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserDataRequest.ConsoleTarget
-                    .Write($"f(x): {TaskExpression(point, Circle, Triangle)}"))
-                .Build<LabTaskAction<int>>(),
+            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
+                .ExecuteAction(() => UserDataRequest.Target
+                    .Write($"f(x): {TaskExpression((x.Data, y.Data), Circle, Triangle)} \n"))
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
+            new LabTaskActionBuilder().Id(3).Name("Вывод данных")
                 .ExecuteAction(OutputData)
-                .Build<LabTaskAction<int>>()
+                .Build()
         };
     }
 
     public void InputData()
     {
-        point.x = ConsoleIoDataUtils.RequestDoubleData(
-            UserDataRequest, $"Введите x координату: ")
-            .Data;
+        UserDataRequest.DisplayMessage = "Введите X координату: ";
+        x = (ConsoleDataResponse<double>)UserDataRequest.Request();
         
-        point.y = ConsoleIoDataUtils.RequestDoubleData(
-            UserDataRequest, $"Введите y координату: ")
-            .Data;
+        if(x.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+            return;
+        
+        UserDataRequest.DisplayMessage = "Введите Y координату: ";
+        y = (ConsoleDataResponse<double>)UserDataRequest.Request(sendRejectMessage: false);
     }
 
     public void OutputData()
     {
-        UserDataRequest.ConsoleTarget
-            .Write($"Точка: {point}");
+        UserDataRequest.Target
+            .Write($"Точка: {(x.Data, y.Data)} \n");
     }
 
     public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)

@@ -1,74 +1,72 @@
+using labs.abstracts;
 using labs.builders;
 using labs.entities;
+using labs.interfaces;
 using labs.IO;
 using labs.utils;
 
 namespace labs.lab1;
 
-public sealed class Task2 :
-    LabTask<int>
+public sealed class Task2 : LabTask
 {
-    private double m;
-    private double n;
+    private ConsoleDataResponse<double> m;
+    private ConsoleDataResponse<double> n;
 
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", (string? data, out string? error) =>
-        {
-            error = null;
-
-            double value;
-
-            if(!DoubleParseUtils.TryWithInvariant(data, out value))
-                error = $"ожидалось вещественное число, но получено {data}";
-
-            return value;
-        });
+        new("", new DataIoConverter<string?, double>(
+            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
     
-    public Task2(string name = "lab1.task2", string description = "") 
-        : base(2, name)
+    public Task2(string name = "lab1.task2", 
+        string description = "Вычислить значение выражения и его аргументов: (m++ > --n)") : 
+        base(2, name, description)
     {
-        m = n = 0;
+        m = new ConsoleDataResponse<double>(); 
+        n = new ConsoleDataResponse<double>();
         
         Description = description;
         
-        Actions = new List<LabTaskAction<int>>()
+        Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder<int>().Id(1).Name("Ввод данных")
+            new LabTaskActionBuilder().Id(1).Name("Ввод данных")
                 .ExecuteAction(InputData)
-                .Build<LabTaskAction<int>>(),
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserDataRequest.ConsoleTarget
-                    .Write($"f(): {TaskExpression(ref m, ref n)}"))
-                .Build<LabTaskAction<int>>(),
+            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
+                .ExecuteAction(() =>
+                {
+                    UserDataRequest.Target
+                        .Write($"f(): {TaskExpression()} \n");
+                    
+                    OutputData();
+                })
+                .Build(),
             
-            new LabTaskActionBuilder<int>().Id(3).Name("Вывод данных")
+            new LabTaskActionBuilder().Id(3).Name("Вывод данных")
                 .ExecuteAction(OutputData)
-                .Build<LabTaskAction<int>>()
+                .Build()
         };
     }
 
     public void InputData()
     {
-        UserDataRequest.ConsoleTarget
-            .Write($"Ввод может быть прекращен в любое удобное время." +
-                   $"Введите '{UserDataRequest.RejectMessage}' для незамедлительного прекращения исполнения задачи");
+        UserDataRequest.DisplayMessage = "Введите M: ";
+        m = (ConsoleDataResponse<double>)UserDataRequest.Request();
         
-        m = ConsoleIoDataUtils
-            .RequestDoubleData(UserDataRequest, $"Введите M: ").Data;
+        if(m.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+            return;
         
-        n = ConsoleIoDataUtils
-            .RequestDoubleData(UserDataRequest, $"Введите M: ").Data;
+        UserDataRequest.DisplayMessage = "Введите N: ";
+        n = (ConsoleDataResponse<double>)UserDataRequest.Request(sendRejectMessage: false);
     }
     
     public void OutputData()
     {
-        UserDataRequest.ConsoleTarget
-            .Write($"M: {m} \nN: {n}");
+        UserDataRequest.Target
+            .Write($"M: {m.Data} \nN: {n.Data}\n");
     }
 
-    public bool TaskExpression(ref double left, ref double right)
+    public bool TaskExpression()
     {
-        return (left++ > --right);
+        return (m.Data++ > --n.Data);
     }
 }
