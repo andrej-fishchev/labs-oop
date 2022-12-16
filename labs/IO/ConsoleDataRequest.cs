@@ -5,41 +5,56 @@ namespace labs.IO;
 public class ConsoleDataRequest<T> :
     IDataIoRequest<T>
 {
-    public ConsoleIoTarget ConsoleTarget { get; set; }
+    public string DisplayMessage { get; set; }
     
-    public DataConverter<string?, T> ConsoleDataConverter { get; set; }
+    public ConsoleIoTarget Target { get; set; }
+    
+    public IDataIoResponseConverter<string?, T> Converter { get; set; }
 
-    public string Message { get; set; }
+    public string RejectRequestMessage { get; set; }
     
-    public string RejectMessage { get; set; }
-    
-    public ConsoleDataRequest(string message, 
-        DataConverter<string?, T> converter, 
-        ConsoleIoTarget? consoleTarget = default)
+    public ConsoleDataRequest(string message, IDataIoResponseConverter<string?, T> converter, string rejectRequestMessage = "...")
     {
-        Message = message;
-        RejectMessage = "...";
-        ConsoleDataConverter = converter;
-        ConsoleTarget = consoleTarget ?? new ConsoleIoTarget();
+        DisplayMessage = message;
+        Converter = converter;
+        RejectRequestMessage = rejectRequestMessage;
+        Target = new ConsoleIoTarget();
     }
     
-    public IDataIoResponse<T> Request(IDataIoResponseConverter<T> converter)
+    public IDataIoResponse<T> Request(IDataIoValidator<T>? validator = default, bool sendRejectMessage = true)
     {
-        ConsoleTarget.Write(Message);
+        string? buffer = "";
 
-        var response = new ConsoleDataResponse<string?>(ConsoleTarget.Read());
-
-        if (response.Data == null)
-        {
-            response.Error = "ввод прекращен";
-            response.Code = (int)ConsoleDataResponseCode.ConsoleTerminated;
-        }
-
-        if (RejectMessage.Length != 0
-            && response.Code == (int)ConsoleDataResponseCode.ConsoleOk
-            && response.Data!.Trim().Equals(RejectMessage))
-            response.Code = (int)ConsoleDataResponseCode.ConsoleInputRejected;
+        ConsoleDataResponse<T> outputResponse = 
+            new ConsoleDataResponse<T>();
         
-        return converter.Convert(response, ConsoleDataConverter);
+        if(sendRejectMessage)
+            Target.Write("Ввод может быть прекращен в любое удобное время. \n" + 
+                     $"Введите '{RejectRequestMessage}' для незамедлительного прекращения\n\n");
+
+        while(buffer != null)
+        {
+            Target.Write(DisplayMessage);
+
+            if ((buffer = Target.Read()) == null)
+                return Converter.Convert(new ConsoleDataResponse<string?>(
+                    buffer, code: (int)ConsoleDataResponseCode.ConsoleTerminated));
+
+            if (buffer.Trim().Equals(RejectRequestMessage))
+                return Converter.Convert(new ConsoleDataResponse<string?>(
+                    default, code: (int)ConsoleDataResponseCode.ConsoleInputRejected));
+
+            outputResponse = (ConsoleDataResponse<T>)Converter
+                .Convert(new ConsoleDataResponse<string?>(buffer, code: (int)ConsoleDataResponseCode.ConsoleOk));
+
+            if ((buffer = outputResponse.Error) == null && validator != null)
+                buffer = (outputResponse = (ConsoleDataResponse<T>) validator.Validate(
+                    outputResponse, $"значение '{outputResponse.Data}' не удовлетворяет условиям")).Error;
+            
+            if(buffer != null)
+                Target.Write($"Ошибка: {buffer} \n");
+        } 
+        
+        return outputResponse;
     }
 }

@@ -2,5 +2,5 @@ namespace labs.interfaces;
 
 public interface IDataIoRequest<T>
 {
-    public IDataIoResponse<T> Request(IDataIoResponseConverter<T> converter);
+    public IDataIoResponse<T> Request(IDataIoValidator<T>? validator = default, bool sendRejectMessage = true);
 }
