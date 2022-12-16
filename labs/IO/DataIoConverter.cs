@@ -2,17 +2,20 @@ using labs.interfaces;
 
 namespace labs.IO;
 
-public class DataIoConverter<TOut> :
-    IDataIoResponseConverter<TOut>
+public class DataIoConverter<TIn, TOut> :
+    IDataIoResponseConverter<TIn, TOut>
 {
     public IDataIoResponse<TOut> OuterData { get; set; } 
-            
-    public DataIoConverter(IDataIoResponse<TOut> emptyObject)
+    
+    public DataConverter<TIn, TOut> Converter { get; set; }
+
+    public DataIoConverter(DataConverter<TIn, TOut> converter, IDataIoResponse<TOut> emptyObject)
     {
         OuterData = emptyObject;
+        Converter = converter;
     }
 
-    public IDataIoResponse<TOut> Convert<T>(IDataIoResponse<T> data, DataConverter<T, TOut> converter)
+    public IDataIoResponse<TOut> Convert(IDataIoResponse<TIn> data)
     {
         OuterData.Code = data.Code;
             
@@ -22,7 +25,7 @@ public class DataIoConverter<TOut> :
         if (data.Data == null)
             return OuterData;
 
-        OuterData.Data = converter.Invoke(data.Data, out var error);
+        OuterData.Data = Converter.Invoke(data.Data, out var error);
         OuterData.Error = error;
 
         return OuterData;

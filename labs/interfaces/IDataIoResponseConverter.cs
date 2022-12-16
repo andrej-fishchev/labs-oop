@@ -1,8 +1,8 @@
 namespace labs.interfaces;
 
-public interface IDataIoResponseConverter<TO>
+public interface IDataIoResponseConverter<TIn, TOut>
 {
-    public IDataIoResponse<TO> Convert<T>(IDataIoResponse<T> data, DataConverter<T, TO> converter);
+    public IDataIoResponse<TOut> Convert(IDataIoResponse<TIn> data);
 }
     
 public delegate TO DataConverter<in TI, out TO>(TI data, out string? error);
