@@ -31,4 +31,14 @@ public static class DataConverterUtils
 
         return value;
     }
+
+    public static uint ToUint(string? data, out string? error)
+    {
+        error = null;
+        
+        if(!ParseUtils.TryUint(data, out var value))
+            error = UseMessagePattern("целое беззнаковое", $"{data}");
+
+        return value;
+    }
 }

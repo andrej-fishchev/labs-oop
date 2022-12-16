@@ -18,4 +18,9 @@ public static class ParseUtils
     {
         return int.TryParse(data, out value);
     }
+    
+    public static bool TryUint(string? data, out uint value)
+    {
+        return uint.TryParse(data, out value);
+    }
 }
