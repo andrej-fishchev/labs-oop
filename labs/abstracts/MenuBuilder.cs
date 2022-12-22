@@ -5,36 +5,36 @@ namespace labs.abstracts;
 public abstract class MenuBuilder<TK, TV> :
     IBuildable<IMenu<TK, TV>> where TK : notnull
 {
-    private readonly IMenu<TK, TV> m_Entity;
+    private readonly IMenu<TK, TV> entity;
 
     protected MenuBuilder(IMenu<TK, TV> entity)
     {
-        m_Entity = entity;
+        this.entity = entity;
     }
 
     public virtual MenuBuilder<TK, TV> Title(string value)
     {
-        m_Entity.Title = value;
+        entity.Title = value;
 
         return this;
     }
     
     public virtual MenuBuilder<TK, TV> Exit(TK value)
     {
-        m_Entity.Exit = value;
+        entity.Exit = value;
 
         return this;
     }
 
     public virtual MenuBuilder<TK, TV> Items(IMenuItemDictionary<TK, TV> value)
     {
-        m_Entity.Items = value;
+        entity.Items = value;
 
         return this;
     }
     
     public IMenu<TK, TV> Build()
     {
-        return m_Entity;
+        return entity;
     }
 }

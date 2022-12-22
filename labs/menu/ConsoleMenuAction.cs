@@ -13,18 +13,6 @@ public sealed class ConsoleMenuAction<TV> :
 
         OnSelect = (_, _) => { };
     }
-    
-    public ConsoleMenuAction(
-        Action<IMenu<string, TV>> onDisplay, 
-        Action<IMenu<string, TV>> onDraw, 
-        Action<IMenu<string, TV>, string> onSelect, 
-        Action<IMenu<string, TV>> onClose)
-    {
-        OnDisplay = onDisplay;
-        OnDraw = onDraw;
-        OnSelect = onSelect;
-        OnClose = onClose;
-    }
 
     public override Action<IMenu<string, TV>> OnDisplay { get; set; }
     

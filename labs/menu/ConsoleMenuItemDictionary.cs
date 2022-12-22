@@ -76,7 +76,7 @@ public sealed class ConsoleMenuItemDictionary<TV> :
 
     public bool TryGetValue(string key, out TV value)
     {
-        return dict.TryGetValue(key, out value);
+        return dict.TryGetValue(key, out value!);
     }
 
     public TV this[string key]

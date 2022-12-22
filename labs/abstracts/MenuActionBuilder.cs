@@ -6,43 +6,43 @@ public abstract class MenuActionBuilder<TK, TV> :
     IBuildable<MenuAction<TK, TV>> 
     where TK : notnull
 {
-    private readonly MenuAction<TK, TV> m_Entity;
+    private readonly MenuAction<TK, TV> entity;
 
     protected MenuActionBuilder(MenuAction<TK, TV> entity)
     {
-        m_Entity = entity;
+        this.entity = entity;
     }
 
     public virtual MenuActionBuilder<TK, TV> OnDraw(Action<IMenu<TK, TV>> value)
     {
-        m_Entity.OnDraw = value;
+        entity.OnDraw = value;
 
         return this;
     }
     
     public virtual MenuActionBuilder<TK, TV> OnDisplay(Action<IMenu<TK, TV>> value)
     {
-        m_Entity.OnDisplay = value;
+        entity.OnDisplay = value;
 
         return this;
     }
 
     public virtual MenuActionBuilder<TK, TV> OnClose(Action<IMenu<TK, TV>> value)
     {
-        m_Entity.OnClose = value;
+        entity.OnClose = value;
 
         return this;
     }
     
     public virtual MenuActionBuilder<TK, TV> OnSelect(Action<IMenu<TK, TV>, TK> value)
     {
-        m_Entity.OnSelect = value;
+        entity.OnSelect = value;
 
         return this;
     }
     
     public MenuAction<TK, TV> Build()
     {
-        return m_Entity;
+        return entity;
     }
 }
