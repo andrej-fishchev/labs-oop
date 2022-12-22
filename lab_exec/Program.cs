@@ -25,7 +25,7 @@ public static class Program
             .OnClose(MenuActionClose)
             .Build();
 
-    public static ConsoleIoTarget consoleTarget = new();
+    public static readonly ConsoleTarget ConsoleTarget = new();
     
     public static void Main()
     {
@@ -55,7 +55,7 @@ public static class Program
         if (obj.Items.Count == 0)
             builder.Append("Список пуст\n");
         
-        consoleTarget.Write(builder
+        ConsoleTarget.Write(builder
                 .Append($"\nВведите '{obj.Exit}' для закрытия \n\nОжидается ввод: ")
                 .ToString()
         );
@@ -75,16 +75,12 @@ public static class Program
             (item is LabTask
                 ? ((LabTask) item).Actions
                 : ((Lab) item).Tasks);
-        
-        string name = (item is Lab)
-            ? "Список задач"
-            : "Список действий";
-        
-        GetMenu(name, ents).Display(LabEntityMenuAction);
+
+        GetMenu($"{item.Name} \n{item.Description}", ents).Display(LabEntityMenuAction);
     }
     
     public static void MenuActionClose(IMenu<string, ILabEntity<int>> obj)
     {
-        consoleTarget.Write($"Закрытие: {obj.Title} \n");
+        ConsoleTarget.Write($"Закрытие: {obj.Title} \n");
     }
 }
