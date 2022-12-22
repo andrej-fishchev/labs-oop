@@ -1,6 +1,6 @@
 namespace labs.interfaces;
 
-public interface IDataIoTarget<TI, TO>
+public interface IDataTarget<TI, TO>
     where TI: notnull
     where TO: notnull
 {

@@ -1,8 +1,8 @@
 namespace labs.interfaces;
 
-public interface IDataIoResponse<T>
+public interface IDataResponse<T>
 {
-    public T? Data { get; set; }
+    public T Data { get; set; }
     
     public string? Error { get; set; }
     

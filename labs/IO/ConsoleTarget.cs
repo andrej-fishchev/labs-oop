@@ -2,13 +2,13 @@ using labs.interfaces;
 
 namespace labs.IO;
 
-public class ConsoleIoTarget :
-    IDataIoTarget<TextReader, TextWriter>,
+public class ConsoleTarget :
+    IDataTarget<TextReader, TextWriter>,
     IReader<string?>,
     IWriter<string>
 {
     
-    public ConsoleIoTarget(TextReader? input = default, TextWriter? output = default)
+    public ConsoleTarget(TextReader? input = default, TextWriter? output = default)
     {
         Input = input ?? Console.In;
         Output = output ?? Console.Out;

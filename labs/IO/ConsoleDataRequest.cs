@@ -3,26 +3,32 @@ using labs.interfaces;
 namespace labs.IO;
 
 public class ConsoleDataRequest<T> :
-    IDataIoRequest<T>
+    IDataRequest<T>,
+    ICloneable
 {
     public string DisplayMessage { get; set; }
     
-    public ConsoleIoTarget Target { get; set; }
+    public ConsoleTarget Target { get; set; }
     
-    public IDataIoResponseConverter<string?, T> Converter { get; set; }
+    public ConsoleDataConverter<T> Converter { get; set; }
 
     public string RejectRequestMessage { get; set; }
     
-    public ConsoleDataRequest(string message, IDataIoResponseConverter<string?, T> converter, string rejectRequestMessage = "...")
+    public ConsoleDataRequest(string message, ConsoleDataConverter<T> converter, 
+        string rejectRequestMessage = "...")
     {
         DisplayMessage = message;
         Converter = converter;
         RejectRequestMessage = rejectRequestMessage;
-        Target = new ConsoleIoTarget();
+        
+        Target = new ConsoleTarget();
     }
-    
-    public IDataIoResponse<T> Request(IDataIoValidator<T>? validator = default, bool sendRejectMessage = true)
+
+    public IDataResponse<T> Request(IDataValidator<T>? validator = default, bool sendRejectMessage = true)
     {
+        if (validator != null &&  validator is not ConsoleDataValidator<T>)
+            throw new InvalidCastException("Ожидался объект типа ConsoleDataValidator");
+        
         string? buffer = "";
 
         ConsoleDataResponse<T> outputResponse = 
@@ -48,13 +54,18 @@ public class ConsoleDataRequest<T> :
                 .Convert(new ConsoleDataResponse<string?>(buffer, code: (int)ConsoleDataResponseCode.ConsoleOk));
 
             if ((buffer = outputResponse.Error) == null && validator != null)
-                buffer = (outputResponse = (ConsoleDataResponse<T>) validator.Validate(
-                    outputResponse, $"значение '{outputResponse.Data}' не удовлетворяет условиям")).Error;
+                buffer = (outputResponse = (ConsoleDataResponse<T>) validator
+                    .Validate(outputResponse)).Error;
             
             if(buffer != null)
                 Target.Write($"Ошибка: {buffer} \n");
         } 
         
         return outputResponse;
+    }
+
+    public object Clone()
+    {
+        return new ConsoleDataRequest<T>(DisplayMessage, Converter, RejectRequestMessage);
     }
 }
