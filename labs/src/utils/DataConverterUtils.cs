@@ -2,12 +2,12 @@ namespace labs.utils;
 
 public static class DataConverterUtils
 {
-    private static string failMessagePattern = 
+    private const string FailMessagePattern = 
         "ожидалось {type} число, но получено '{value}'";
 
     public static string UseMessagePattern(string type, string value)
     {
-        return failMessagePattern
+        return FailMessagePattern
             .Replace("{type}", type)
             .Replace("{value}", value);
     }
@@ -40,5 +40,11 @@ public static class DataConverterUtils
             error = UseMessagePattern("целое беззнаковое", $"{data}");
 
         return value;
+    }
+    
+    public static string ToString(string? data, out string? error)
+    {
+        error = null;
+        return data!;
     }
 }

@@ -12,8 +12,8 @@ public sealed class Task1 : LabTask
     private ConsoleDataResponse<double> n;
 
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", new DataIoConverter<string?, double>(
-            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
+        new("", new ConsoleDataConverter<double>(
+            DataConverterUtils.ToDoubleWithInvariant));
     
     public Task1(
         string name = "lab1.task1", string description = "Вычислить значение выражения и его аргументов: m - ++n") : 
@@ -40,12 +40,7 @@ public sealed class Task1 : LabTask
             
             new LabTaskActionBuilder().Id(3).Name("Вывод данных")
                 .ExecuteAction(OutputData)
-                .Build(),
-            
-            new LabTaskActionBuilder().Id(4).Name("Вывод описания задачи")
-            .ExecuteAction(() => UserDataRequest.Target
-                .Write($"{Description} \n"))
-            .Build()
+                .Build()
         };
 
     }

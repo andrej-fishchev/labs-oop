@@ -16,9 +16,9 @@ public sealed class Task5 :
         new();
     
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", new DataIoConverter<string?, double>(
-            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
-    
+        new("", new ConsoleDataConverter<double>(
+            DataConverterUtils.ToDoubleWithInvariant));
+
     private ConsoleDataResponse<double> x;
     private ConsoleDataResponse<double> y;
 

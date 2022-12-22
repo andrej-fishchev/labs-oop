@@ -12,8 +12,8 @@ public sealed class Task4 :
     private ConsoleDataResponse<double> x;
 
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("Введите X из отрезка [-2.0; 0.0]: ", new DataIoConverter<string?, double>(
-            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
+        new("Введите X из отрезка [-2.0; 0.0]: ", new ConsoleDataConverter<double>(
+            DataConverterUtils.ToDoubleWithInvariant));
     
     public Task4(string name = "lab1.task4", string description = "") 
         : base(4, name, description)
@@ -41,8 +41,10 @@ public sealed class Task4 :
 
     public void InputData()
     {
-        x = (ConsoleDataResponse<double>)UserDataRequest.Request(new DataIoValidator<double>(
-            (data) => data >= -2.0 && data <= 0));
+        x = (ConsoleDataResponse<double>)
+            UserDataRequest.Request(
+            new ConsoleDataValidator<double>(
+                (data) => data >= -2.0 && data <= 0));
     }
 
     public void OutputData()

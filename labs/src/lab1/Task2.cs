@@ -1,6 +1,5 @@
 using labs.abstracts;
 using labs.builders;
-using labs.entities;
 using labs.interfaces;
 using labs.IO;
 using labs.utils;
@@ -13,9 +12,9 @@ public sealed class Task2 : LabTask
     private ConsoleDataResponse<double> n;
 
     private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", new DataIoConverter<string?, double>(
-            DataConverterUtils.ToDoubleWithInvariant, new ConsoleDataResponse<double>()));
-    
+        new("", new ConsoleDataConverter<double>(
+            DataConverterUtils.ToDoubleWithInvariant));
+
     public Task2(string name = "lab1.task2", 
         string description = "Вычислить значение выражения и его аргументов: (m++ > --n)") : 
         base(2, name, description)
