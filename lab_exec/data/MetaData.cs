@@ -1,6 +1,5 @@
-using labs.abstracts;
 using labs.builders;
-using labs.interfaces;
+using labs.entities;
 using labs.lab1;
 
 namespace lab_exec;

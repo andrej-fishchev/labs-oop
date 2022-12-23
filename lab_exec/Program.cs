@@ -1,12 +1,10 @@
 using System.Text;
-using labs.abstracts;
+using IO.targets;
 using labs.adapters;
-using labs.builders;
 using labs.entities;
-using labs.factories;
-using labs.interfaces;
-using labs.IO;
-using labs.menu;
+using SimpleMenu;
+using SimpleMenu.actions;
+using SimpleMenu.items;
 
 namespace lab_exec;
 
@@ -36,12 +34,10 @@ public static class Program
 
     public static ConsoleMenu<ILabEntity<int>> GetMenu(string name, IList<ILabEntity<int>> entities)
     {
-        return ConsoleMenuFactory.MakeConsoleMenu(
-                name,
-                ExitSay,
-                KeyGen,
-                entities
-        );
+        return ConsoleMenuFactory.MakeConsoleMenu(name, ExitSay, 
+            (ConsoleMenuItemDictionary<ILabEntity<int>>)
+            LabEntityToConsoleMenuItemAdapter<ILabEntity<int>>
+                .Adapt(entities, KeyGen));
     }
 
     public static void MenuActionDisplay(IMenu<string, ILabEntity<int>> obj)
