@@ -1,6 +1,4 @@
-using labs.interfaces;
-
-namespace labs.IO;
+namespace IO.targets;
 
 public class ConsoleTarget :
     IDataTarget<TextReader, TextWriter>,

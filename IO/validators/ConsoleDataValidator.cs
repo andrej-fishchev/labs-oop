@@ -1,10 +1,9 @@
-using labs.delegates;
-using labs.interfaces;
+using IO.responses;
 
-namespace labs.IO;
+namespace IO.validators;
 
 public class ConsoleDataValidator<T> :
-    IDataValidator<T>,
+    IValidatableData<T>,
     ICloneable
 {
     public string ErrorMessage { get; set; }
@@ -17,15 +16,12 @@ public class ConsoleDataValidator<T> :
         ErrorMessage = errorMessage;
     }
 
-    public IDataResponse<T> Validate(IDataResponse<T> data)
+    public IResponsibleData<T> Validate(IResponsibleData<T> responsibleData)
     {
-        if (data is not ConsoleDataResponse<T>)
-            throw new InvalidCastException("Ожидался объект типа ConsoleDataResponse");
-        
-        if (data.Data == null || !Validator.Invoke(data.Data))
-            data.Error = ErrorMessage;
+        if (responsibleData.Data == null || !Validator.Invoke(responsibleData.Data))
+            responsibleData.Error = ErrorMessage;
 
-        return data;
+        return responsibleData;
     }
 
     public object Clone()

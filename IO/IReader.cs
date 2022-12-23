@@ -1,4 +1,4 @@
-namespace labs.interfaces;
+namespace IO;
 
 public interface IReader<out T>
 {

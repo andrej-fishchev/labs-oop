@@ -1,4 +1,4 @@
-namespace labs.interfaces;
+namespace IO.targets;
 
 public interface IDataTarget<TI, TO>
     where TI: notnull
