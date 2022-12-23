@@ -1,10 +1,11 @@
-using labs.abstracts;
-using labs.interfaces;
+using SimpleMenu.actions;
+using SimpleMenu.items;
 
-namespace labs.menu;
+namespace SimpleMenu;
 
 public sealed class ConsoleMenu<TV> :
-    IMenu<string, TV>
+    IMenu<string, TV>,
+    IMenuDisplay<string, TV>
 {
     private string exitButton;
 

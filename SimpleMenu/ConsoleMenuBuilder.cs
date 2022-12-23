@@ -1,8 +1,6 @@
-using labs.abstracts;
-using labs.interfaces;
-using labs.menu;
+using SimpleMenu.items;
 
-namespace labs.builders;
+namespace SimpleMenu;
 
 public class ConsoleMenuBuilder<TV> :
     MenuBuilder<string, TV>

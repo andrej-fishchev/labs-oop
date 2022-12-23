@@ -1,6 +1,6 @@
-using labs.interfaces;
+using SimpleMenu.items;
 
-namespace labs.abstracts;
+namespace SimpleMenu;
 
 public abstract class MenuBuilder<TK, TV> :
     IBuildable<IMenu<TK, TV>> where TK : notnull

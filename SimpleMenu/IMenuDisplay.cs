@@ -1,6 +1,6 @@
-using labs.abstracts;
+using SimpleMenu.actions;
 
-namespace labs.interfaces;
+namespace SimpleMenu;
 
 public interface IMenuDisplay<TK, TV> 
     where TK : notnull

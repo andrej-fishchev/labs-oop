@@ -1,4 +1,4 @@
-namespace labs.interfaces;
+namespace SimpleMenu.items;
 
 public interface IMenuItemDictionary<TK, TV> :
     IDictionary<TK, TV>

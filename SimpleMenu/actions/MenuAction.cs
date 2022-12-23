@@ -1,6 +1,4 @@
-using labs.interfaces;
-
-namespace labs.abstracts;
+namespace SimpleMenu.actions;
 
 // TODO: refactor
 public abstract class MenuAction<TK, TV> 

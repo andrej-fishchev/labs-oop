@@ -1,7 +1,8 @@
-namespace labs.interfaces;
+using SimpleMenu.items;
 
-public interface IMenu<TK, TV> :
-    IMenuDisplay<TK, TV> 
+namespace SimpleMenu;
+
+public interface IMenu<TK, TV>
     where TK : notnull
 {
     public string Title { get; set; }

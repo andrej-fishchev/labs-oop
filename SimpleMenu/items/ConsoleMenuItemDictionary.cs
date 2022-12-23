@@ -1,7 +1,6 @@
 using System.Collections;
-using labs.interfaces;
 
-namespace labs.menu;
+namespace SimpleMenu.items;
 
 public sealed class ConsoleMenuItemDictionary<TV> :
     IMenuItemDictionary<string, TV>

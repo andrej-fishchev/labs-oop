@@ -1,6 +1,4 @@
-using labs.interfaces;
-
-namespace labs.abstracts;
+namespace SimpleMenu.actions;
 
 public abstract class MenuActionBuilder<TK, TV> :
     IBuildable<MenuAction<TK, TV>> 

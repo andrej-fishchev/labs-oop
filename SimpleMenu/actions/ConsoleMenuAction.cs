@@ -1,7 +1,4 @@
-using labs.abstracts;
-using labs.interfaces;
-
-namespace labs.menu;
+namespace SimpleMenu.actions;
 
 public sealed class ConsoleMenuAction<TV> :
     MenuAction<string, TV>
