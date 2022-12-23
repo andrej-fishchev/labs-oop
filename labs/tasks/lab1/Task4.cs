@@ -1,24 +1,32 @@
-using labs.abstracts;
+using System.Globalization;
+using IO.converters;
+using IO.requests;
+using IO.responses;
+using IO.validators;
 using labs.builders;
-using labs.interfaces;
-using labs.IO;
-using labs.utils;
+using labs.entities;
 
 namespace labs.lab1;
 
 public sealed class Task4 :
     LabTask
 {
-    private ConsoleDataResponse<double> x;
+    private ConsoleResponseData<double> x;
 
-    private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("Введите X из отрезка [-2.0; 0.0]: ", new ConsoleDataConverter<double>(
-            DataConverterUtils.ToDoubleWithInvariant));
+    private static readonly ConsoleDataRequest<double> 
+        UserSimpleDataRequest = new("Введите X из отрезка [-2.0; 0.0]");
+
+    private static readonly FormattedConsoleNumberDataConverter<double>
+        ToDoubleConverter = ConsoleDataConverterFactory
+            .MakeFormattedNumberDataConverter<double>(
+                double.TryParse, 
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                NumberFormatInfo.InvariantInfo);
     
     public Task4(string name = "lab1.task4", string description = "") 
         : base(4, name, description)
     {
-        x = new ConsoleDataResponse<double>();
+        x = new ConsoleResponseData<double>();
         
         Description = description;
         
@@ -29,7 +37,7 @@ public sealed class Task4 :
                 .Build(),
             
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserDataRequest.Target
+                .ExecuteAction(() => UserSimpleDataRequest.Target
                     .Write($"f(x): {TaskExpression(x.Data)} \n"))
                 .Build(),
             
@@ -41,15 +49,15 @@ public sealed class Task4 :
 
     public void InputData()
     {
-        x = (ConsoleDataResponse<double>)
-            UserDataRequest.Request(
-            new ConsoleDataValidator<double>(
+        x = (ConsoleResponseData<double>)
+            UserSimpleDataRequest.Request(
+                ToDoubleConverter, new ConsoleDataValidator<double>(
                 (data) => data >= -2.0 && data <= 0));
     }
 
     public void OutputData()
     {
-        UserDataRequest.Target
+        UserSimpleDataRequest.Target
             .Write($"X = {x} \n");
     }
 

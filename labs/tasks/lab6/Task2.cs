@@ -1,25 +1,32 @@
 using System.Text.RegularExpressions;
-using labs.abstracts;
+using IO.converters;
+using IO.requests;
+using IO.responses;
 using labs.builders;
-using labs.interfaces;
-using labs.IO;
-using labs.utils;
+using labs.entities;
 
 namespace labs.lab6;
 
 public sealed class Task2 :
     LabTask
 {
-    public ConsoleDataResponse<string> TaskVariable;
+    public ConsoleResponseData<string> TaskVariable;
 
-    public readonly ConsoleDataRequest<string> Request = 
-        new("Введите произвольную строку: ",
-            new ConsoleDataConverter<string>(DataConverterUtils.ToString));
+    public readonly ConsoleDataRequest<string> 
+        Request = new("Введите произвольную строку: ");
+
+    public readonly SimpleConsoleDataConverter<string>
+        ToStringConverter = ConsoleDataConverterFactory
+            .MakeSimpleConverter((string? x, out string y) =>
+            {
+                y = x!;
+                return true;
+            });
 
     public Task2(string name = "lab6.task2", string description = "") : 
         base(2, name, description)
     {
-        TaskVariable = new ConsoleDataResponse<string>("");
+        TaskVariable = new ConsoleResponseData<string>("");
 
         Actions = new List<ILabEntity<int>>
         {
@@ -42,10 +49,10 @@ public sealed class Task2 :
     
     public void InputData()
     {
-        ConsoleDataResponse<string> buffer = (ConsoleDataResponse<string>)
-            Request.Request();
+        ConsoleResponseData<string> buffer = (ConsoleResponseData<string>)
+            Request.Request(ToStringConverter);
         
-        if(buffer.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
 
         TaskVariable = buffer;

@@ -1,7 +1,9 @@
-using labs.abstracts;
+using System.Globalization;
+using IO.converters;
+using IO.requests;
+using IO.responses;
 using labs.builders;
-using labs.interfaces;
-using labs.IO;
+using labs.entities;
 using labs.utils;
 
 namespace labs.lab1;
@@ -15,18 +17,24 @@ public sealed class Task5 :
     public static readonly Triangle Triangle = 
         new();
     
-    private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", new ConsoleDataConverter<double>(
-            DataConverterUtils.ToDoubleWithInvariant));
-
-    private ConsoleDataResponse<double> x;
-    private ConsoleDataResponse<double> y;
+    private static readonly ConsoleDataRequest<double> 
+        UserSimpleDataRequest = new("");
+    
+    private static readonly FormattedConsoleNumberDataConverter<double>
+        ToDoubleConverter = ConsoleDataConverterFactory
+            .MakeFormattedNumberDataConverter<double>(
+                double.TryParse, 
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                NumberFormatInfo.InvariantInfo);
+    
+    private ConsoleResponseData<double> x;
+    private ConsoleResponseData<double> y;
 
     public Task5(string name = "lab1.task5", string description = "") 
         : base(5, name, description)
     {
-        x = new ConsoleDataResponse<double>(); 
-        y = new ConsoleDataResponse<double>();
+        x = new ConsoleResponseData<double>(); 
+        y = new ConsoleResponseData<double>();
         
         Description = description;
         
@@ -37,7 +45,7 @@ public sealed class Task5 :
                 .Build(),
             
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserDataRequest.Target
+                .ExecuteAction(() => UserSimpleDataRequest.Target
                     .Write($"f(x): {TaskExpression((x.Data, y.Data), Circle, Triangle)} \n"))
                 .Build(),
             
@@ -49,19 +57,21 @@ public sealed class Task5 :
 
     public void InputData()
     {
-        UserDataRequest.DisplayMessage = "Введите X координату: ";
-        x = (ConsoleDataResponse<double>)UserDataRequest.Request();
+        UserSimpleDataRequest.DisplayMessage = "Введите X координату: ";
+        x = (ConsoleResponseData<double>)
+            UserSimpleDataRequest.Request(ToDoubleConverter);
         
-        if(x.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+        if(x.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
         
-        UserDataRequest.DisplayMessage = "Введите Y координату: ";
-        y = (ConsoleDataResponse<double>)UserDataRequest.Request(sendRejectMessage: false);
+        UserSimpleDataRequest.DisplayMessage = "Введите Y координату: ";
+        y = (ConsoleResponseData<double>)
+            UserSimpleDataRequest.Request(ToDoubleConverter, sendRejectMessage: false);
     }
 
     public void OutputData()
     {
-        UserDataRequest.Target
+        UserSimpleDataRequest.Target
             .Write($"Точка: {(x.Data, y.Data)} \n");
     }
 

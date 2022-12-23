@@ -1,26 +1,33 @@
-using labs.abstracts;
+using System.Globalization;
+using IO.converters;
+using IO.requests;
+using IO.responses;
 using labs.builders;
-using labs.interfaces;
-using labs.IO;
-using labs.utils;
+using labs.entities;
 
 namespace labs.lab1;
 
 public sealed class Task2 : LabTask
 {
-    private ConsoleDataResponse<double> m;
-    private ConsoleDataResponse<double> n;
+    private ConsoleResponseData<double> m;
+    private ConsoleResponseData<double> n;
 
-    private static readonly ConsoleDataRequest<double> UserDataRequest =
-        new("", new ConsoleDataConverter<double>(
-            DataConverterUtils.ToDoubleWithInvariant));
+    private static readonly ConsoleDataRequest<double> 
+        UserSimpleDataRequest = new("");
+
+    private static readonly FormattedConsoleNumberDataConverter<double>
+        ToDoubleConverter = ConsoleDataConverterFactory
+            .MakeFormattedNumberDataConverter<double>(
+                double.TryParse, 
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                NumberFormatInfo.InvariantInfo);
 
     public Task2(string name = "lab1.task2", 
         string description = "Вычислить значение выражения и его аргументов: (m++ > --n)") : 
         base(2, name, description)
     {
-        m = new ConsoleDataResponse<double>(); 
-        n = new ConsoleDataResponse<double>();
+        m = new ConsoleResponseData<double>(); 
+        n = new ConsoleResponseData<double>();
         
         Description = description;
         
@@ -33,7 +40,7 @@ public sealed class Task2 : LabTask
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
                 .ExecuteAction(() =>
                 {
-                    UserDataRequest.Target
+                    UserSimpleDataRequest.Target
                         .Write($"f(): {TaskExpression()} \n");
                     
                     OutputData();
@@ -48,19 +55,21 @@ public sealed class Task2 : LabTask
 
     public void InputData()
     {
-        UserDataRequest.DisplayMessage = "Введите M: ";
-        m = (ConsoleDataResponse<double>)UserDataRequest.Request();
+        UserSimpleDataRequest.DisplayMessage = "Введите M: ";
+        m = (ConsoleResponseData<double>)
+            UserSimpleDataRequest.Request(ToDoubleConverter);
         
-        if(m.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+        if(m.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
         
-        UserDataRequest.DisplayMessage = "Введите N: ";
-        n = (ConsoleDataResponse<double>)UserDataRequest.Request(sendRejectMessage: false);
+        UserSimpleDataRequest.DisplayMessage = "Введите N: ";
+        n = (ConsoleResponseData<double>)
+            UserSimpleDataRequest.Request(ToDoubleConverter, sendRejectMessage: false);
     }
     
     public void OutputData()
     {
-        UserDataRequest.Target
+        UserSimpleDataRequest.Target
             .Write($"M: {m.Data} \nN: {n.Data}\n");
     }
 

@@ -1,8 +1,9 @@
-using labs.abstracts;
+using IO.converters;
+using IO.requests;
+using IO.responses;
+using IO.validators;
 using labs.builders;
-using labs.factories;
-using labs.interfaces;
-using labs.IO;
+using labs.entities;
 using labs.utils;
 
 namespace labs.lab4;
@@ -10,17 +11,26 @@ namespace labs.lab4;
 public sealed class Task1 :
     LabTask
 {
-    public ConsoleDataResponse<int[]> IntArray { get; set; }
+    public ConsoleResponseData<int[]> IntArray { get; set; }
 
-    public readonly ConsoleArrayRequest<int> ArrayRequest = new(
-        new ConsoleDataRequest<int>(
-            "", new ConsoleDataConverter<int>(DataConverterUtils.ToInt)));
+    private readonly ConsoleArrayDataRequest<int> 
+        arrayRequest = new("");
+
+    private readonly SimpleConsoleDataConverter<int>
+        toIntConverter;
+
+    private readonly SimpleConsoleArrayDataConverter<int> 
+        arrayConverter;
 
     public Task1(string name = "lab4.task1", string description = "вариант 24") :
         base(1, name, description)
     {
-        IntArray = new ConsoleDataResponse<int[]>(new int[10]);
-
+        toIntConverter = new(int.TryParse);
+        
+        arrayConverter = new (toIntConverter);
+        
+        IntArray = new ConsoleResponseData<int[]>(new int[10]);
+        
         Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Id(1).Name("Ручное заполнение массива")
@@ -65,45 +75,42 @@ public sealed class Task1 :
         switch (type)
         {
             case ArrayGenerationType.UserInput:
-                ConsoleDataResponse<int[]> buffer = (ConsoleDataResponse<int[]>) 
-                    ArrayRequest.Request();
+                arrayRequest.DisplayMessage =
+                    $"Введите множество целых чисел через разделитель ({arrayConverter.Delimiter}): \n";
+                
+                ConsoleResponseData<int[]> buffer = (ConsoleResponseData<int[]>) 
+                    arrayRequest.Request(arrayConverter);
 
-                if (buffer.Code != (int)ConsoleDataResponseCode.ConsoleOk)
+                if (buffer.Code != (int)ConsoleResponseDataCode.ConsoleOk)
                     return;
 
-                IntArray = (ConsoleDataResponse<int[]>)
+                IntArray = (ConsoleResponseData<int[]>)
                     buffer.Clone();
                 
                 break;
             
             case ArrayGenerationType.Randomizer:
-                ConsoleDataResponse<int> size = (ConsoleDataResponse<int>)
-                    ArrayRequest.ArraySizeRequest.Request(ArrayRequest.ArraySizeValidator);
+                ConsoleResponseData<int> size;
                 
-                if(size.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+                if((size = RequestArraySize()).Code 
+                   != (int) ConsoleResponseDataCode.ConsoleOk)
                     return;
 
-                int[] borders = new int[2];
-                
-                ConsoleDataResponse<int>[] randomizerBordersResponse = 
-                    new ConsoleDataResponse<int>[borders.Length];
+                ConsoleResponseData<int>[] borders = 
+                    new ConsoleResponseData<int>[2];
                 
                 for (int i = 0; i < borders.Length; i++)
                 {
-                    randomizerBordersResponse[i] = (ConsoleDataResponse<int>) 
-                        ConsoleDataRequestFactory<int>
-                        .MakeConsoleDataRequestFromSelf(ArrayRequest.ArraySizeRequest, 
-                            $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ")
-                        .Request(((i == 0)
+                    borders[i] = (ConsoleResponseData<int>) 
+                        GetIntNumberRequest($"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ")
+                        .Request(toIntConverter, ((i == 0)
                             ? null
-                            : new ConsoleDataValidator<int>(data => data > borders[0], 
+                            : new ConsoleDataValidator<int>(data => data > borders[0].Data, 
                                 "значение правой границы ДСЧ не может быть больше или равно левой")), 
                             false);
                     
-                    if(randomizerBordersResponse[i].Code != (int) ConsoleDataResponseCode.ConsoleOk)
-                        break;
-                    
-                    borders[i] = randomizerBordersResponse[i].Data;
+                    if(borders[i].Code != (int) ConsoleResponseDataCode.ConsoleOk)
+                        return;
                 }
                 
                 IntArray.Data = new int[size.Data];
@@ -111,7 +118,7 @@ public sealed class Task1 :
                 Random random = new Random();
 
                 for (int i = 0; i < IntArray.Data.Length; i++)
-                    IntArray.Data[i] = random.Next(borders[0], borders[1]);
+                    IntArray.Data[i] = random.Next(borders[0].Data, borders[1].Data);
                 
                 break;
         }
@@ -131,13 +138,13 @@ public sealed class Task1 :
         
         OutputData();
 
-        ConsoleDataResponse<int> elementToAdd = (ConsoleDataResponse<int>) 
-            ConsoleDataRequestFactory<int>
-            .MakeConsoleDataRequestFromSelf(ArrayRequest.ArraySizeRequest, "Введите номер элемента: ")
-            .Request(new ConsoleDataValidator<int>(data => data > 0 && data <= IntArray.Data.Length, 
+        ConsoleResponseData<int> elementToAdd = (ConsoleResponseData<int>) 
+            GetIntNumberRequest("Введите номер элемента: ")
+            .Request(toIntConverter,
+                new ConsoleDataValidator<int>(data => data > 0 && data <= IntArray.Data.Length, 
             $"значение не может быть меньше 1 и больше {IntArray.Data.Length}"));
         
-        if(elementToAdd.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+        if(elementToAdd.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
 
         int[] buffer = new int[IntArray.Data.Length + 1];
@@ -149,8 +156,8 @@ public sealed class Task1 :
         
         IntArray.Data = buffer;
         
-        ArrayRequest.ArraySizeRequest.Target
-            .Write($"Элемент с номером {elementToAdd.Data} добавлен в конец массива. \n");
+        arrayRequest.Target.Write(
+            $"Элемент с номером {elementToAdd.Data} добавлен в конец массива. \n");
     }
 
     public void SearchElement()
@@ -171,10 +178,9 @@ public sealed class Task1 :
             }
         }
 
-        ArrayRequest.ArraySizeRequest.Target
-            .Write("Элемент - среднее арифметическое суммы элементов массива: " +
-                   $"{((result == -1) ? "не найден" : $"{IntArray.Data[result].ToString()}")}"
-            );
+        arrayRequest.Target.Write("Элемент - среднее арифметическое суммы элементов массива: " +
+            $"{((result == -1) ? "не найден" : $"{IntArray.Data[result].ToString()}")}"
+        );
     }
 
     public int[] InsertSort(int[] array)
@@ -205,13 +211,11 @@ public sealed class Task1 :
         if(IntArray.Data.Length == 0)
             return;
         
-        ConsoleDataResponse<int> shiftPower = (ConsoleDataResponse<int>) 
-            ConsoleDataRequestFactory<int>
-            .MakeConsoleDataRequestFromSelf(ArrayRequest.ArraySizeRequest, 
-                "Введите силу сдвига [+/- напрвление]: ")
-            .Request();
+        ConsoleResponseData<int> shiftPower = (ConsoleResponseData<int>) 
+            GetIntNumberRequest("Введите силу сдвига [+/- напрвление]: ")
+            .Request(toIntConverter);
         
-        if(shiftPower.Code != (int) ConsoleDataResponseCode.ConsoleOk)
+        if(shiftPower.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
 
         shiftPower.Data %= IntArray.Data.Length;
@@ -230,14 +234,29 @@ public sealed class Task1 :
     public void OutputData()
     {
         for (int i = 0; i < IntArray.Data.Length; i++)
-            ArrayRequest.ArraySizeRequest.Target.Write($"{i + 1}: {IntArray.Data[i]} \n");
+            arrayRequest.Target.Write($"{i + 1}: {IntArray.Data[i]} \n");
         
         if(IntArray.Data.Length == 0)
-            ArrayRequest.ArraySizeRequest.Target.Write("Массив пуст");
+            arrayRequest.Target.Write("Массив пуст");
     }
 
     public int ShiftingExpression(int index, int shiftPower, int length)
     {
         return (length + shiftPower + index) % length;
+    }
+
+    public ConsoleResponseData<int> RequestArraySize()
+    {
+        return (ConsoleResponseData<int>)
+            GetIntNumberRequest("Введите размер массива: ")
+            .Request(ConsoleDataConverterFactory
+                    .MakeSimpleConverter<int>(int.TryParse),
+                new ConsoleDataValidator<int>(data => data > 0, 
+                    "размер должен быть больше 0"));
+    }
+
+    public ConsoleDataRequest<int> GetIntNumberRequest(string message)
+    {
+        return ConsoleDataRequestFactory.MakeConsoleDataRequest<int>(message);
     }
 }
