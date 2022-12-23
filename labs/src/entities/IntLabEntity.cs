@@ -1,5 +1,3 @@
-using labs.interfaces;
-
 namespace labs.entities;
 
 public class IntLabEntity :

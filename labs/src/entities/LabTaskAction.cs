@@ -1,5 +1,3 @@
-using labs.interfaces;
-
 namespace labs.entities;
 
 public sealed class LabTaskAction :

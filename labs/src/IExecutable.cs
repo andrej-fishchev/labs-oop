@@ -1,4 +1,4 @@
-namespace labs.interfaces;
+namespace labs;
 
 public interface IExecutable
 {

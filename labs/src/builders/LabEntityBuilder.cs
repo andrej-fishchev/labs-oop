@@ -1,6 +1,7 @@
-using labs.interfaces;
+using labs.entities;
+using SimpleMenu;
 
-namespace labs.abstracts;
+namespace labs.builders;
 
 public abstract  class LabEntityBuilder<T> :
     IBuildable<ILabEntity<T>>

@@ -1,9 +1,8 @@
-using labs.interfaces;
-using labs.menu;
+using SimpleMenu.items;
 
 namespace labs.adapters;
 
-public delegate TO MenuKeyGenerator<TV, out TO>(TV ent, int index);
+public delegate TO MenuKeyGenerator<in TV, out TO>(TV ent, int index);
 
 public static class LabEntityToConsoleMenuItemAdapter<T>
 {

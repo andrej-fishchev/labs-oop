@@ -1,13 +1,9 @@
-using labs.entities;
-using labs.interfaces;
+namespace labs.entities;
 
-namespace labs.abstracts;
-
-
-public abstract class LabTask :
+public sealed class Lab :
     ILabEntity<int>
 {
-    public IList<ILabEntity<int>> Actions
+    public IList<ILabEntity<int>> Tasks
     {
         get; 
         set;
@@ -15,17 +11,17 @@ public abstract class LabTask :
 
     private ILabEntity<int> entity;
 
-    public LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
+    public Lab(ILabEntity<int>? iface = default, IList<LabTask>? tasks = default)
     {
         entity = iface ?? new IntLabEntity();
-        Actions = (actions != null)
-            ? actions.Distinct()
+        Tasks = (tasks != null)
+            ? tasks.Distinct()
                 .Select(x => (ILabEntity<int>)x)
                 .ToList()
             : new List<ILabEntity<int>>();
     }
 
-    public LabTask(int id, string name = "", string description = "") :
+    public Lab(int id, string name = "", string description = "") :
         this(new IntLabEntity(id, name, description))
     { }
 

@@ -1,4 +1,4 @@
-namespace labs.interfaces;
+namespace labs.entities;
 
 public interface ILabEntity<T>
 {
