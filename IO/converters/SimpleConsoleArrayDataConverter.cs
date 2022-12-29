@@ -49,12 +49,10 @@ public class SimpleConsoleArrayDataConverter<TOut> :
             .Split(Delimiter, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         if (buffer.Length == 0)
-        {
-            output.Error = "не удалось выполнить разбиение строки на элементы";
-            output.Code = (int) ConsoleResponseDataCode.ConsoleInvalidData;
-            
-            return output;
-        }
+            return new ConsoleResponseDataBuilder<TOut[]>(output)
+                .Code((int)ConsoleResponseDataCode.ConsoleInvalidData)
+                .Error($"не удалось разбить строку на элементы")
+                .Build();
 
         IResponsibleData<TOut> element;
         IList<TOut> outs = new List<TOut>();
@@ -71,6 +69,12 @@ public class SimpleConsoleArrayDataConverter<TOut> :
             
             outs.Add(element.Data);
         }
+
+        if (outs.Count == 0)
+            return new ConsoleResponseDataBuilder<TOut[]>(output)
+                .Code((int)ConsoleResponseDataCode.ConsoleInvalidData)
+                .Error($"ни один элемент не является типом '{typeof(TOut).Name}'")
+                .Build();
 
         output.Data = outs.ToArray();
         output.Error = null;
