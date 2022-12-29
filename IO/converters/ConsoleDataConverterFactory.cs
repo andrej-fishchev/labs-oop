@@ -1,4 +1,5 @@
 using System.Globalization;
+using IO.validators;
 
 namespace IO.converters;
 
@@ -21,5 +22,14 @@ public static class ConsoleDataConverterFactory
         MakeChainedConverter<TOut>(IList<IConvertibleData<string?, TOut>> chain)
     {
         return new ChainedConsoleDataConverter<TOut>(chain);
+    }
+
+    public static SimpleConsoleArrayDataConverter<TOut>
+        MakeSimpleArrayConverter<TOut>(
+            IConvertibleData<string?, TOut> nestedConverter,
+            IValidatableData<TOut>? nestedValidator = default,
+            string delimiter = ";")
+    {
+        return new SimpleConsoleArrayDataConverter<TOut>(nestedConverter, nestedValidator, delimiter);
     }
 }
