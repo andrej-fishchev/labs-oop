@@ -18,11 +18,14 @@ public class ChainedConsoleDataConverter<TOut> :
     {
         IResponsibleData<TOut> output = new ConsoleResponseData<TOut>(
             code: responsibleData.Code, error: responsibleData.Error);
+        
+        if (responsibleData.Code != (int)ConsoleResponseDataCode.ConsoleOk)
+            return output;
 
         for (int i = 0; i < list.Count; i++)
         {
             output = list[i].Convert(responsibleData);
-
+            
             if (output.Code == (int)ConsoleResponseDataCode.ConsoleOk)
                 return output;
         }

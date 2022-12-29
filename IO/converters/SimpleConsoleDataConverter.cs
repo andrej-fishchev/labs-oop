@@ -30,6 +30,8 @@ public class SimpleConsoleDataConverter<TOut> :
                 output.Error = $"не удалось привести '{responsibleData.Data}' к типу {declaringType.Name}";
 
             else output.Error = $"не удалось выполнить преобразование для '{responsibleData.Data}'";
+
+            output.Code = (int)ConsoleResponseDataCode.ConsoleInvalidData;
         }
 
         output.Data = value;

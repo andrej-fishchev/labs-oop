@@ -30,6 +30,9 @@ public class FormattedConsoleNumberDataConverter<TOut> :
         ConsoleResponseData<TOut> response = new ConsoleResponseData<TOut>(
             code: responsibleData.Code, error: responsibleData.Error);
         
+        if (responsibleData.Code != (int)ConsoleResponseDataCode.ConsoleOk)
+            return response;
+        
         TOut value;
         if (!Expression.Invoke(responsibleData.Data, Styles, Provider, out value))
         {
@@ -39,6 +42,8 @@ public class FormattedConsoleNumberDataConverter<TOut> :
                 response.Error = $"не удалось привести '{responsibleData.Data}' к типу {declaringType.Name}";
 
             else response.Error = $"не удалось выполнить преобразование для '{responsibleData.Data}'";
+
+            response.Code = (int)ConsoleResponseDataCode.ConsoleInvalidData;
         }
 
         response.Data = value;
