@@ -58,6 +58,16 @@ public static class MetaData
                 new labs.lab6.Task1("Сортировка элементов рванного массива", "Вариант №23"),
                 new labs.lab6.Task2("Переворот и сортировка слов предложения", "Вариант №24")
             })
+            .Build(),
+        
+        new LabBuilder()
+            .Id(9)
+            .Name("Лабораторная работа №9")
+            .Description("Классы и объекты")
+            .Tasks(new List<LabTask>()
+            {
+                new labs.lab9.Task1("Реализация класса Time и его коллекции", "Вариант №14")
+            })
             .Build()
     };
 }
