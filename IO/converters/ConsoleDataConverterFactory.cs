@@ -16,4 +16,10 @@ public static class ConsoleDataConverterFactory
     {
         return new FormattedConsoleNumberDataConverter<TOut>(expression, s, f);
     }
+
+    public static ChainedConsoleDataConverter<TOut>
+        MakeChainedConverter<TOut>(IList<IConvertibleData<string?, TOut>> chain)
+    {
+        return new ChainedConsoleDataConverter<TOut>(chain);
+    }
 }
