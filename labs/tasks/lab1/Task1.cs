@@ -1,7 +1,7 @@
-using System.Globalization;
-using IO.converters;
 using IO.requests;
 using IO.responses;
+using IO.targets;
+using IO.utils;
 using labs.builders;
 using labs.entities;
 
@@ -9,21 +9,13 @@ namespace labs.lab1;
 
 public sealed class Task1 : LabTask
 {
+    public readonly ConsoleTarget Target = new();
+    
     private ConsoleResponseData<double> m;
     private ConsoleResponseData<double> n;
 
-    private static readonly ConsoleDataRequest<double> 
-        UserSimpleDataRequest = new("");
-
-    private static readonly FormattedConsoleNumberDataConverter<double>
-        ToDoubleConverter = ConsoleDataConverterFactory
-            .MakeFormattedNumberDataConverter<double>(
-                double.TryParse, 
-                NumberStyles.Float | NumberStyles.AllowThousands,
-                NumberFormatInfo.InvariantInfo);
-
-    public Task1(
-        string name = "lab1.task1", string description = "Вычислить значение выражения и его аргументов: m - ++n") : 
+    public Task1(string name = "lab1.task1", 
+        string description = "Вычислить значение выражения и его аргументов: m - ++n") : 
         base(1, name, description)
     {
         m = new ConsoleResponseData<double>();
@@ -38,9 +30,7 @@ public sealed class Task1 : LabTask
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
                 .ExecuteAction(() =>
                 { 
-                    UserSimpleDataRequest.Target
-                        .Write($"f(): {TaskExpression()} \n");
-                    
+                    Target.Write($"f(): {TaskExpression()} \n");
                     OutputData();
                 })
                 .Build(),
@@ -54,22 +44,25 @@ public sealed class Task1 : LabTask
 
     public void InputData()
     {
-        UserSimpleDataRequest.DisplayMessage = "Введите M: ";
-        m = (ConsoleResponseData<double>) 
-            UserSimpleDataRequest.Request(ToDoubleConverter);
+        m = InputData("Введите M: ");
         
         if(m.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
         
-        UserSimpleDataRequest.DisplayMessage = "Введите N: ";
-        n = (ConsoleResponseData<double>) 
-            UserSimpleDataRequest.Request(ToDoubleConverter, sendRejectMessage: false);
+        n = InputData("Введите N: ", false);
     }
 
     public void OutputData()
     {
-        UserSimpleDataRequest.Target
-            .Write($"M: {m.Data} \nN: {n.Data}\n");
+        Target.Write($"M: {m.Data} \nN: {n.Data}\n");
+    }
+
+    private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
+    {
+        return (ConsoleResponseData<double>) new ConsoleDataRequest<double>(message)
+            .Request(BaseTypeDataConverterFactory
+                    .MakeChainedDoubleConverter(), 
+                sendRejectMessage: sendReject);
     }
 
     public double TaskExpression()

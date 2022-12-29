@@ -1,7 +1,7 @@
-using System.Globalization;
-using IO.converters;
 using IO.requests;
 using IO.responses;
+using IO.targets;
+using IO.utils;
 using labs.builders;
 using labs.entities;
 using labs.utils;
@@ -16,16 +16,8 @@ public sealed class Task5 :
 
     public static readonly Triangle Triangle = 
         new();
-    
-    private static readonly ConsoleDataRequest<double> 
-        UserSimpleDataRequest = new("");
-    
-    private static readonly FormattedConsoleNumberDataConverter<double>
-        ToDoubleConverter = ConsoleDataConverterFactory
-            .MakeFormattedNumberDataConverter<double>(
-                double.TryParse, 
-                NumberStyles.Float | NumberStyles.AllowThousands,
-                NumberFormatInfo.InvariantInfo);
+
+    public readonly ConsoleTarget Target = new();
     
     private ConsoleResponseData<double> x;
     private ConsoleResponseData<double> y;
@@ -45,7 +37,7 @@ public sealed class Task5 :
                 .Build(),
             
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => UserSimpleDataRequest.Target
+                .ExecuteAction(() => Target
                     .Write($"f(x): {TaskExpression((x.Data, y.Data), Circle, Triangle)} \n"))
                 .Build(),
             
@@ -57,22 +49,24 @@ public sealed class Task5 :
 
     public void InputData()
     {
-        UserSimpleDataRequest.DisplayMessage = "Введите X координату: ";
-        x = (ConsoleResponseData<double>)
-            UserSimpleDataRequest.Request(ToDoubleConverter);
+        x = InputData("Введите значение X координаты: ");
         
         if(x.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
         
-        UserSimpleDataRequest.DisplayMessage = "Введите Y координату: ";
-        y = (ConsoleResponseData<double>)
-            UserSimpleDataRequest.Request(ToDoubleConverter, sendRejectMessage: false);
+        y = InputData("Введите значение Y координаты", false);
+    }
+    
+    private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
+    {
+        return (ConsoleResponseData<double>) new ConsoleDataRequest<double>(message)
+            .Request(BaseTypeDataConverterFactory.MakeChainedDoubleConverter(), 
+                sendRejectMessage: sendReject);
     }
 
     public void OutputData()
     {
-        UserSimpleDataRequest.Target
-            .Write($"Точка: {(x.Data, y.Data)} \n");
+        Target.Write($"Точка: {(x.Data, y.Data)} \n");
     }
 
     public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)
