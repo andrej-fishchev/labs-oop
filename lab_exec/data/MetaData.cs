@@ -61,7 +61,7 @@ public static class MetaData
             .Build(),
         
         new LabBuilder()
-            .Id(9)
+            .Id(6)
             .Name("Лабораторная работа №9")
             .Description("Классы и объекты")
             .Tasks(new List<LabTask>()
