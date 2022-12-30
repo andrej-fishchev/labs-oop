@@ -1,6 +1,7 @@
 namespace labs.lab9.src;
 
 public class Time :
+    IComparable,
     ICloneable
 {
     private int minutes;
@@ -130,9 +131,29 @@ public class Time :
         return new Time(left.AsSeconds() + right.AsSeconds());
     }
     
+    public static Time operator -(Time left, Time right)
+    {
+        return new Time(left.AsSeconds() - right.AsSeconds());
+    }
+    
     public override string ToString()
     {
         return $"{Hours}:{Minutes}";
+    }
+
+    public int CompareTo(object? obj)
+    {
+        if (obj == null || obj is not Time)
+            throw new ArgumentException();
+
+        Time timeObj = (Time)obj;
+
+        if (timeObj.AsSeconds() == AsSeconds())
+            return 0;
+
+        return (AsSeconds() < timeObj.AsSeconds())
+            ? -1
+            : 1;
     }
 
     public object Clone()

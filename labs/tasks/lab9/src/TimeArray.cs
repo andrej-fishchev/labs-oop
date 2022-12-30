@@ -1,5 +1,4 @@
 using System.Collections;
-using IO.responses;
 
 namespace labs.lab9.src;
 
@@ -10,12 +9,9 @@ public class TimeArray :
     
     private Time[] times;
 
-    private int size;
-    
-    public TimeArray()
-    {
-        times = Array.Empty<Time>();
-    }
+    public TimeArray() :
+        this(DefaultCapacity)
+    {}
 
     public TimeArray(int capacity = 0)
     {
@@ -30,70 +26,134 @@ public class TimeArray :
     public TimeArray(Time[] data)
     {
         times = data ?? throw new ArgumentNullException();
-        size = times.Length;
     }
 
-    public IEnumerator<Time> GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+    public IEnumerator<Time> GetEnumerator() => new Enumerator(times);
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void Add(Time item)
-    {
-        throw new NotImplementedException();
-    }
+    public void Add(Time item) => Insert(times.Length, item);
 
-    public void Clear()
-    {
-        throw new NotImplementedException();
-    }
+    public void Clear() => Array.Clear(times);
 
-    public bool Contains(Time item)
-    {
-        throw new NotImplementedException();
-    }
+    public bool Contains(Time item) => IndexOf(item) != -1;
 
-    public void CopyTo(Time[] array, int arrayIndex)
-    {
-        throw new NotImplementedException();
-    }
+    public void CopyTo(Time[] array, int arrayIndex) =>
+        Array.Copy(times, 0, array, arrayIndex, times.Length);
 
     public bool Remove(Time item)
     {
-        throw new NotImplementedException();
+        int index;
+
+        if ((index = IndexOf(item)) == -1)
+            return false;
+
+        RemoveAt(index);
+        return true;
     }
 
-    public int Count { get; }
+    public int Count => times.Length;
     
-    public bool IsReadOnly { get; }
-    
-    public int IndexOf(Time item)
-    {
-        throw new NotImplementedException();
-    }
+    public bool IsReadOnly => false;
+
+    public int IndexOf(Time item) => Array.IndexOf(times, item, 0, times.Length);
 
     public void Insert(int index, Time item)
     {
-        throw new NotImplementedException();
+        int newSize = times.Length + 1;
+        
+        ThrowableInRange(0, index, newSize);
+
+        Resize((uint)newSize);
+        
+        Array.Copy(times, index, times, index + 1, newSize - index - 1);
+
+        times[index] = item;
     }
 
     public void RemoveAt(int index)
     {
-        throw new NotImplementedException();
+        ThrowableInRange(0, index, times.Length);
+
+        int size = times.Length;
+        
+        Array.Copy(times, index + 1, times, index, size - 1);
+        
+        Resize((uint)(size - 1));
     }
 
     public Time this[int index]
     {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
+        get
+        {
+            ThrowableInRange(0, index, times.Length);
+            return times[index];
+        }
+
+        set
+        {
+            ThrowableInRange(0, index, times.Length);
+            times[index] = value;
+        }
+    }
+
+    public class Enumerator : IEnumerator<Time>
+    {
+        private readonly Time[] array;
+
+        private Time? current;
+
+        private int index;
+        
+        internal Enumerator(Time[] array)
+        {
+            this.array = array;
+            index = -1;
+            current = default;
+        }
+        
+        public bool MoveNext()
+        {
+            ++index;
+            
+            if (index >= array.Length)
+            {
+                current = default;
+                return false;
+            }
+
+            current = array[index];
+            return true;
+        }
+
+        public void Reset()
+        {
+            index = -1;
+            current = default;
+        }
+
+        public Time Current => current!;
+        
+        object IEnumerator.Current
+        {
+            get
+            {
+                ThrowableInRange(0, index, array.Length);
+                
+                return Current;
+            }
+        }
+
+        public void Dispose()
+        { }
+    }
+
+    private void Resize(uint size)
+    {
+        Array.Resize(ref times, (int)size);
     }
     
-    private void ThrowableInRange(int left, int value, int right)
+    private static void ThrowableInRange(int left, int value, int right)
     {
         if (value < left || value >= right)
             throw new ArgumentOutOfRangeException();
