@@ -66,7 +66,7 @@ public static class MetaData
             .Description("Классы и объекты")
             .Tasks(new List<LabTask>()
             {
-                new labs.lab9.Task1("Реализация класса Time и его коллекции", "Вариант №14")
+                new labs.lab9.Task1("Реализация класса Time и TimeArray", "Вариант №14")
             })
             .Build()
     };
