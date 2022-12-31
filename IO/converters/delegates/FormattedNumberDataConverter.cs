@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace IO.converters;
+namespace IO.converters.delegates;
 
 public delegate bool FormattedNumberDataConverter<in TI, TO>(
     TI data, 
