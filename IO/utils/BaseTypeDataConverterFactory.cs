@@ -38,7 +38,7 @@ public static class BaseTypeDataConverterFactory
         return ConsoleDataConverterFactory.MakeFormattedNumberDataConverter<double>(double.TryParse, styles, provider);
     }
 
-    public static ConsoleDataConverterList<double> MakeChainedDoubleConverter()
+    public static ConsoleDataConverterList<double> MakeDoubleConverterList()
     {
         return ConsoleDataConverterFactory.MakeConverterList(
             new List<IConvertibleData<string?, double>>

@@ -59,15 +59,12 @@ public static class BaseTypeArrayDataConverterFactory
             delimiter);
     }
 
-    public static ConsoleArrayDataConverter<double> MakeListedConverterWithInvariant(
+    public static ConsoleArrayDataConverter<double> MakeDoubleArrayConverterList(
         IValidatableData<double>? nestedValidator = default,
         string delimiter = ";")
     {
         return ConsoleDataConverterFactory.MakeArrayConverter(ConsoleDataConverterFactory
-            .MakeConverterList(new List<IConvertibleData<string?, double>>
-        {
-            BaseTypeDataConverterFactory.MakeSimpleDoubleConverter(),
-            BaseTypeDataConverterFactory.MakeFormattedDoubleConverter(provider: NumberFormatInfo.InvariantInfo)
-        }), nestedValidator, delimiter);
+            .MakeConverterList(BaseTypeDataConverterFactory
+                .MakeDoubleConverterList()), nestedValidator, delimiter);
     }
 }
