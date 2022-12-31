@@ -9,11 +9,7 @@ public class TimeArray :
     
     private Time[] times;
 
-    public TimeArray() :
-        this(DefaultCapacity)
-    {}
-
-    public TimeArray(int capacity = 0)
+    public TimeArray(int capacity = DefaultCapacity)
     {
         ThrowableInRange(0, capacity, Int32.MaxValue);
 
