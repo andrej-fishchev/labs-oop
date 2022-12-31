@@ -6,56 +6,68 @@ namespace IO.utils;
 
 public static class BaseTypeArrayDataConverterFactory
 {
-    public static SimpleConsoleArrayDataConverter<int> MakeIntArrayConverter(
+    public static ConsoleArrayDataConverter<int> MakeIntArrayConverter(
         IValidatableData<int>? nestedValidator = default,
         string delimiter = ";")
     {
-        return new SimpleConsoleArrayDataConverter<int>(
+        return new ConsoleArrayDataConverter<int>(
             BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
             nestedValidator,
             delimiter);
     }
 
-    public static SimpleConsoleArrayDataConverter<double> MakeDoubleArrayConverter(
+    public static ConsoleArrayDataConverter<double> MakeDoubleArrayConverter(
         IValidatableData<double>? nestedValidator = default,
         string delimiter = ";")
 
     {
-        return new SimpleConsoleArrayDataConverter<double>(
+        return new ConsoleArrayDataConverter<double>(
             BaseTypeDataConverterFactory.MakeSimpleDoubleConverter(),
             nestedValidator,
             delimiter);
     }
     
-    public static SimpleConsoleArrayDataConverter<float> MakeFloatArrayConverter(
+    public static ConsoleArrayDataConverter<float> MakeFloatArrayConverter(
         IValidatableData<float>? nestedValidator = default,
         string delimiter = ";")
 
     {
-        return new SimpleConsoleArrayDataConverter<float>(
+        return new ConsoleArrayDataConverter<float>(
             BaseTypeDataConverterFactory.MakeSimpleFloatConverter(),
             nestedValidator,
             delimiter);
     }
     
-    public static SimpleConsoleArrayDataConverter<string> MakeStringArrayConverter(
+    public static ConsoleArrayDataConverter<string> MakeStringArrayConverter(
         IValidatableData<string>? nestedValidator = default,
         string delimiter = ";")
 
     {
-        return new SimpleConsoleArrayDataConverter<string>(
+        return new ConsoleArrayDataConverter<string>(
             BaseTypeDataConverterFactory.MakeSimpleStringConverter(),
             nestedValidator,
             delimiter);
     }
 
-    public static SimpleConsoleArrayDataConverter<double> MakeFormattedDoubleArrayConverter(
+    public static ConsoleArrayDataConverter<double> MakeFormattedDoubleArrayConverter(
         IValidatableData<double>? nestedValidator = default,
         string delimiter = ";")
     {
-        return new SimpleConsoleArrayDataConverter<double>(
+        return new ConsoleArrayDataConverter<double>(
             BaseTypeDataConverterFactory.MakeFormattedDoubleConverter(provider: NumberFormatInfo.InvariantInfo),
             nestedValidator,
             delimiter);
+    }
+
+    public static ConsoleArrayDataConverter<double> MakeListedConverterWithInvariant(
+        IValidatableData<double>? nestedValidator = default,
+        string delimiter = ";")
+    {
+        return ConsoleDataConverterFactory.MakeArrayConverter(ConsoleDataConverterFactory
+            .MakeConverterList(new List<IConvertibleData<string?, double>>
+        {
+            BaseTypeDataConverterFactory.MakeSimpleDoubleConverter(),
+            BaseTypeDataConverterFactory.MakeFormattedDoubleConverter(provider: NumberFormatInfo.InvariantInfo)
+        }), nestedValidator, delimiter);
     }
 }
