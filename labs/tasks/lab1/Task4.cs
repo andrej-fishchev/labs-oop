@@ -43,7 +43,7 @@ public sealed class Task4 :
     {
         x = (ConsoleResponseData<double>) 
             new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
-            .Request(BaseTypeDataConverterFactory.MakeChainedDoubleConverter(), 
+            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
                 new ConsoleDataValidator<double>(
                 (data) => data >= -2.0 && data <= 0, "значение выходит за допустимые границы"));
     }

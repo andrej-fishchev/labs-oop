@@ -58,7 +58,7 @@ public sealed class Task3 :
     private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
     {
         return (ConsoleResponseData<double>) new ConsoleDataRequest<double>(message)
-            .Request(BaseTypeDataConverterFactory.MakeChainedDoubleConverter(), 
+            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
                 sendRejectMessage: sendReject);
     }
     

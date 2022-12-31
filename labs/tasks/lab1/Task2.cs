@@ -56,7 +56,7 @@ public sealed class Task2 : LabTask
     private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
     {
         return (ConsoleResponseData<double>) new ConsoleDataRequest<double>(message)
-            .Request(BaseTypeDataConverterFactory.MakeChainedDoubleConverter(), 
+            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
                 sendRejectMessage: sendReject);
     }
     
