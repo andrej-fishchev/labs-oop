@@ -3,13 +3,13 @@ using IO.responses;
 
 namespace IO.converters;
 
-public class ChainedConsoleDataConverter<TOut> :
+public class ConsoleDataConverterList<TOut> :
     IList<IConvertibleData<string?, TOut>>,
     IConvertibleData<string?, TOut>
 {
     private readonly IList<IConvertibleData<string?, TOut>> list;
     
-    public ChainedConsoleDataConverter(IList<IConvertibleData<string?, TOut>>? list = default)
+    public ConsoleDataConverterList(IList<IConvertibleData<string?, TOut>>? list = default)
     {
         this.list = list ?? new List<IConvertibleData<string?, TOut>>();
     }
@@ -22,9 +22,9 @@ public class ChainedConsoleDataConverter<TOut> :
         if (responsibleData.Code != (int)ConsoleResponseDataCode.ConsoleOk)
             return output;
 
-        for (int i = 0; i < list.Count; i++)
+        foreach (var t in list)
         {
-            output = list[i].Convert(responsibleData);
+            output = t.Convert(responsibleData);
             
             if (output.Code == (int)ConsoleResponseDataCode.ConsoleOk)
                 return output;

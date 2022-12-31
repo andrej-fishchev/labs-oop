@@ -1,14 +1,15 @@
+using IO.converters.delegates;
 using IO.responses;
 
 namespace IO.converters;
 
-public class SimpleConsoleDataConverter<TOut> :
+public class ConsoleSimpleDataConverter<TOut> :
     IConvertibleData<string?, TOut>,
     ICloneable
 { 
     public SimpleDataConverter<string?, TOut> Expression { get; set; }
 
-    public SimpleConsoleDataConverter(SimpleDataConverter<string?, TOut> expression)
+    public ConsoleSimpleDataConverter(SimpleDataConverter<string?, TOut> expression)
     {
         Expression = expression;
     }
@@ -40,6 +41,6 @@ public class SimpleConsoleDataConverter<TOut> :
 
     public object Clone()
     {
-        return new SimpleConsoleDataConverter<TOut>(Expression);
+        return new ConsoleSimpleDataConverter<TOut>(Expression);
     }
 }

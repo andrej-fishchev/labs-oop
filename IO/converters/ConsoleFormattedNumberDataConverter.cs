@@ -1,9 +1,10 @@
 using System.Globalization;
+using IO.converters.delegates;
 using IO.responses;
 
 namespace IO.converters;
 
-public class FormattedConsoleNumberDataConverter<TOut> :
+public class ConsoleFormattedNumberDataConverter<TOut> :
     IConvertibleData<string?, TOut>,
     ICloneable
 {
@@ -17,7 +18,7 @@ public class FormattedConsoleNumberDataConverter<TOut> :
     
     public IFormatProvider? Provider { get; set; }
 
-    public FormattedConsoleNumberDataConverter(FormattedNumberDataConverter<string?, TOut> expression,
+    public ConsoleFormattedNumberDataConverter(FormattedNumberDataConverter<string?, TOut> expression,
         NumberStyles styles, IFormatProvider? provider = default)
     {
         Expression = expression;
@@ -52,6 +53,6 @@ public class FormattedConsoleNumberDataConverter<TOut> :
 
     public object Clone()
     {
-        return new FormattedConsoleNumberDataConverter<TOut>(Expression, Styles, Provider);
+        return new ConsoleFormattedNumberDataConverter<TOut>(Expression, Styles, Provider);
     }
 }

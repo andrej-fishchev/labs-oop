@@ -3,7 +3,7 @@ using IO.validators;
 
 namespace IO.converters;
 
-public class SimpleConsoleArrayDataConverter<TOut> :
+public class ConsoleArrayDataConverter<TOut> :
     IConvertibleData<string?, TOut[]>,
     ICloneable
 {
@@ -25,7 +25,7 @@ public class SimpleConsoleArrayDataConverter<TOut> :
     
     public IValidatableData<TOut>? ElementValidator { get; set; }
 
-    public SimpleConsoleArrayDataConverter(
+    public ConsoleArrayDataConverter(
         IConvertibleData<string?, TOut> nestedConverter,
         IValidatableData<TOut>? nestedValidator = default,
         string delimiter = ";"
@@ -84,7 +84,7 @@ public class SimpleConsoleArrayDataConverter<TOut> :
 
     public object Clone()
     {
-        return new SimpleConsoleArrayDataConverter<TOut>(
+        return new ConsoleArrayDataConverter<TOut>(
             ElementConverter, ElementValidator, Delimiter);
     }
 }
