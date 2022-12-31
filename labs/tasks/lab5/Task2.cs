@@ -67,7 +67,7 @@ public sealed class Task2 :
                 ConsoleResponseData<int[]>[] buffer = 
                     new ConsoleResponseData<int[]>[rows.Data];
 
-                SimpleConsoleArrayDataConverter<int> converter =
+                ConsoleArrayDataConverter<int> converter =
                     BaseTypeArrayDataConverterFactory.MakeIntArrayConverter(delimiter: ";");
 
                 for (int i = 0; i < buffer.Length; i++)
@@ -75,7 +75,7 @@ public sealed class Task2 :
                     Target.Write($"\n");
 
                     buffer[i] = (ConsoleResponseData<int[]>)
-                        new ConsoleArrayDataRequest<int>(
+                        new ConsoleDataRequest<int[]>(
                                 $"Введите множество целых чисел (через {converter.Delimiter}): \n")
                             .Request(converter, 
                                 ((i == 0) 
@@ -173,7 +173,7 @@ public sealed class Task2 :
             $"ожижалось '{IntArray[0].Data.Length}' элементов"
         );
 
-        SimpleConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
+        ConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
             .MakeIntArrayConverter();
 
         for (int i = 0, a = 0; i < buffer.Length; i++)
@@ -181,7 +181,7 @@ public sealed class Task2 :
             if (i == row)
             {        
                 buffer[i] = (ConsoleResponseData<int[]>)
-                    new ConsoleArrayDataRequest<int>(
+                    new ConsoleDataRequest<int[]>(
                         $"Введите множество целых значений (через {converter.Delimiter}): \n")
                         .Request(converter, validator);
                 

@@ -15,7 +15,7 @@ public sealed class Task2 :
     public readonly ConsoleDataRequest<string> 
         Request = new("Введите произвольную строку: ");
 
-    public readonly SimpleConsoleDataConverter<string>
+    public readonly ConsoleSimpleDataConverter<string>
         ToStringConverter = ConsoleDataConverterFactory
             .MakeSimpleConverter((string? x, out string y) =>
             {

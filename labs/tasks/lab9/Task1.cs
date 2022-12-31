@@ -65,14 +65,14 @@ public sealed class Task1 : LabTask
 
     public void InputData(ArrayGenerationType type)
     {
-        SimpleConsoleArrayDataConverter<Time> converter = ConsoleDataConverterFactory
-            .MakeSimpleArrayConverter(ConsoleDataConverterFactory
+        ConsoleArrayDataConverter<Time> converter = ConsoleDataConverterFactory
+            .MakeArrayConverter(ConsoleDataConverterFactory
                 .MakeSimpleConverter<Time>(Time.TryParse), delimiter: ";");
 
         if (type == ArrayGenerationType.UserInput)
         {
             ConsoleResponseData<Time[]> data = (ConsoleResponseData<Time[]>)
-                new ConsoleArrayDataRequest<Time>(
+                new ConsoleDataRequest<Time[]>(
                     $"Введите множество 'hh:mm' (через '{converter.Delimiter}'): \n")
                 .Request(converter);
 

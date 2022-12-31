@@ -72,7 +72,7 @@ public sealed class Task3 :
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     buffer[i] = (ConsoleResponseData<int[]>)
-                        new ConsoleArrayDataRequest<int>($"Введите {i + 1}'е множество целых чисел: \n")
+                        new ConsoleDataRequest<int[]>($"Введите {i + 1}'е множество целых чисел: \n")
                             .Request(BaseTypeArrayDataConverterFactory.MakeIntArrayConverter(),
                                 sendRejectMessage: false);
 
@@ -145,14 +145,14 @@ public sealed class Task3 :
         ConsoleResponseData<int[]>[] buffer = 
             new ConsoleResponseData<int[]>[IntArray.Length + 1];
 
-        SimpleConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
+        ConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
             .MakeIntArrayConverter(delimiter: ";");
 
         for (int i = 0, a = 0; i < buffer.Length; i++)
         {
             if (i == 0)
             {
-                buffer[i] = (ConsoleResponseData<int[]>) new ConsoleArrayDataRequest<int>(
+                buffer[i] = (ConsoleResponseData<int[]>) new ConsoleDataRequest<int[]>(
                         $"Введите множество целых чисел (через {converter.Delimiter}): \n")
                     .Request(converter);
                 

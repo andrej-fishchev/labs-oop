@@ -1,7 +1,7 @@
-using System.Globalization;
 using IO.converters;
 using IO.requests;
 using IO.responses;
+using IO.utils;
 using IO.validators;
 using labs.builders;
 using labs.entities;
@@ -14,25 +14,21 @@ public sealed class Task1 :
 {
     public ConsoleResponseData<double[]>[] IntArray { get; set; }
 
-    private readonly ConsoleArrayDataRequest<double> 
+    private readonly ConsoleDataRequest<double[]> 
         arrayRequest = new("");
     
-    private readonly SimpleConsoleArrayDataConverter<double>
+    private readonly ConsoleArrayDataConverter<double>
         toDoubleArrayConverter;
 
     public Task1(string name = "lab6.task1", string description = "") : 
         base(1, name, description)
     {
-        toDoubleArrayConverter = new SimpleConsoleArrayDataConverter<double>(
-            ConsoleDataConverterFactory.MakeFormattedNumberDataConverter<double>(
-                    double.TryParse, 
-                    NumberStyles.Float | NumberStyles.AllowThousands, 
-                    NumberFormatInfo.InvariantInfo)    
-        );
+        toDoubleArrayConverter = BaseTypeArrayDataConverterFactory
+            .MakeListedConverterWithInvariant();
 
         IntArray = new ConsoleResponseData<double[]>[]
         {
-            new(new double[1])
+            new(Array.Empty<double>())
         };
 
         Actions = new List<ILabEntity<int>>
@@ -166,12 +162,8 @@ public sealed class Task1 :
     public ConsoleResponseData<int> InitIntNumberRequest(ConsoleDataRequest<int> request, 
         ConsoleDataValidator<int>? validator = default, bool send = true)
     {
-        return (ConsoleResponseData<int>)
-                request
-                .Request(
-                    ConsoleDataConverterFactory
-                        .MakeSimpleConverter<int>(int.TryParse), 
-                    validator, send);
+        return (ConsoleResponseData<int>) request
+                .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), validator, send);
     }
 
     public ConsoleDataRequest<int> GetIntNumberRequest(string message)

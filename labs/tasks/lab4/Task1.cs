@@ -64,13 +64,13 @@ public sealed class Task1 :
 
     public void InputData(ArrayGenerationType type)
     {
-        SimpleConsoleArrayDataConverter<int> converter =
+        ConsoleArrayDataConverter<int> converter =
             BaseTypeArrayDataConverterFactory.MakeIntArrayConverter(delimiter: ";");
 
         if (type == ArrayGenerationType.UserInput)
         {
             ConsoleResponseData<int[]> buffer = (ConsoleResponseData<int[]>) 
-                new ConsoleArrayDataRequest<int>(
+                new ConsoleDataRequest<int[]>(
                     $"Введите множество целых чисел (через '{converter.Delimiter}'): \n")
                 .Request(converter);
 
