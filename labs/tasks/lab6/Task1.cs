@@ -24,7 +24,7 @@ public sealed class Task1 :
         base(1, name, description)
     {
         toDoubleArrayConverter = BaseTypeArrayDataConverterFactory
-            .MakeListedConverterWithInvariant();
+            .MakeDoubleArrayConverterList();
 
         IntArray = new ConsoleResponseData<double[]>[]
         {
