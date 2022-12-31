@@ -108,27 +108,26 @@ public class TimeArray :
         internal Enumerator(Time[] array)
         {
             this.array = array;
-            index = -1;
+            index = 0;
             current = default;
         }
         
         public bool MoveNext()
         {
-            ++index;
-            
             if (index >= array.Length)
             {
                 current = default;
                 return false;
             }
-
-            current = array[index];
+            
+            current = array[index++];
+            
             return true;
         }
 
         public void Reset()
         {
-            index = -1;
+            index = 0;
             current = default;
         }
 
