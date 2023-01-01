@@ -13,8 +13,6 @@ namespace labs.lab5;
 public sealed class Task1 :
     LabTask
 {
-    public readonly ConsoleTarget Target = new();
-    
     public ConsoleResponseData<int[]> IntArray { get; set; }
 
     public Task1(string name = "lab5.task1", string description = "") : 

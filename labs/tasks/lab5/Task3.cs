@@ -1,7 +1,6 @@
 using IO.converters;
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -10,16 +9,13 @@ using labs.utils;
 
 namespace labs.lab5;
 
-public sealed class Task3 :
-    LabTask
+public sealed class Task3 : LabTask
 {
     public ConsoleResponseData<int[]>[] IntArray 
     { 
         get; 
         private set; 
     }
-
-    public readonly ConsoleTarget Target = new();
 
     public Task3(string name = "lab5.task3", string description = "") : 
         base(3, name, description)
@@ -35,7 +31,7 @@ public sealed class Task3 :
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Создать рваный массива (автозаполнение)")
+            new LabTaskActionBuilder().Id(2).Name("Создать рваный массив [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
                 

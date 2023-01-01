@@ -20,7 +20,7 @@ public sealed class Task6 :
         Actions = new List<ILabEntity<int>>()
         {
             new LabTaskActionBuilder().Id(1).Name("Выполнить задачу")
-                .ExecuteAction(() => Console.WriteLine($"f(float):      {TaskExpression(floatData)} " +
+                .ExecuteAction(() => Target.Write($"f(float):      {TaskExpression(floatData)} " +
                                                        $"\nf(double):   {TaskExpression(doubleData)}"))
                 .Build(),
             

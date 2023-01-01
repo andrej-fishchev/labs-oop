@@ -6,8 +6,7 @@ namespace labs.lab3;
 public sealed class Task1 :
     LabTask
 {
-    public Task1(
-        string name = "lab3.task1", string description = "") : 
+    public Task1(string name = "lab3.task1", string description = "") : 
         base(1, name, description)
     {
         Actions = new List<ILabEntity<int>>

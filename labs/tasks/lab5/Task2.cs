@@ -18,8 +18,6 @@ public sealed class Task2 :
         get; 
         private set; 
     }
-
-    public readonly ConsoleTarget Target = new();
     
     public Task2(string name = "lab5.task2", string description = "") : 
         base(2, name, description)

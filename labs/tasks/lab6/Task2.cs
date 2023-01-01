@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using IO.converters;
 using IO.requests;
 using IO.responses;
+using IO.utils;
 using labs.builders;
 using labs.entities;
 
@@ -11,17 +12,6 @@ public sealed class Task2 :
     LabTask
 {
     public ConsoleResponseData<string> TaskVariable;
-
-    public readonly ConsoleDataRequest<string> 
-        Request = new("Введите произвольную строку: ");
-
-    public readonly ConsoleSimpleDataConverter<string>
-        ToStringConverter = ConsoleDataConverterFactory
-            .MakeSimpleConverter((string? x, out string y) =>
-            {
-                y = x!;
-                return true;
-            });
 
     public Task2(string name = "lab6.task2", string description = "") : 
         base(2, name, description)
@@ -35,14 +25,11 @@ public sealed class Task2 :
                 .Build(),
 
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() =>
-                {
-                    Request.Target.Write($"f(): {TaskExpression()} \n");
-                })
+                .ExecuteAction(() => Target.Write($"f(): {TaskExpression()} \n"))
                 .Build(),
 
             new LabTaskActionBuilder().Id(3).Name("Вывод исходной строки")
-                .ExecuteAction(() => Request.Target.Write($"Строка: {TaskVariable.Data} \n"))
+                .ExecuteAction(() => Target.Write($"Строка: {TaskVariable.Data} \n"))
                 .Build()
         };
     }
@@ -50,7 +37,8 @@ public sealed class Task2 :
     public void InputData()
     {
         ConsoleResponseData<string> buffer = (ConsoleResponseData<string>)
-            Request.Request(ToStringConverter);
+            new ConsoleDataRequest<string>("Введите произвольную строку: ")
+                .Request(BaseTypeDataConverterFactory.MakeSimpleStringConverter());
         
         if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
             return;
@@ -67,7 +55,7 @@ public sealed class Task2 :
 
         if ((expression = TryRegex(@"[A-Za-zА-Яа-я]{1,}")) == null)
         {
-            Request.Target.Write($"Ошибка: неверное регулярное выражение");
+            Target.Write("Ошибка: неверное регулярное выражение \n");
             return TaskVariable.Data;
         }
         

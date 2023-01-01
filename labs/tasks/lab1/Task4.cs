@@ -11,8 +11,6 @@ namespace labs.lab1;
 public sealed class Task4 :
     LabTask
 {
-    public readonly ConsoleTarget Target = new();
-    
     private ConsoleResponseData<double> x;
 
     public Task4(string name = "lab1.task4", string description = "") 

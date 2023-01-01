@@ -16,8 +16,6 @@ public sealed class Task5 :
 
     public static readonly Triangle Triangle = 
         new();
-
-    public readonly ConsoleTarget Target = new();
     
     private ConsoleResponseData<double> x;
     private ConsoleResponseData<double> y;

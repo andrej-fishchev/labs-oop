@@ -9,8 +9,6 @@ namespace labs.lab1;
 
 public sealed class Task2 : LabTask
 {
-    public readonly ConsoleTarget Target = new();
-    
     private ConsoleResponseData<double> m;
     private ConsoleResponseData<double> n;
 

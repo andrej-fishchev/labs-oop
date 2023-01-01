@@ -14,8 +14,6 @@ namespace labs.lab4;
 public sealed class Task1 :
     LabTask
 {
-    public readonly ConsoleTarget Target = new();
-    
     public ConsoleResponseData<int[]> IntArray { get; set; }
 
     public Task1(string name = "lab4.task1", string description = "вариант 24") :
