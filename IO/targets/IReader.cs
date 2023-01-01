@@ -1,4 +1,4 @@
-namespace IO;
+namespace IO.targets;
 
 public interface IReader<out T>
 {
