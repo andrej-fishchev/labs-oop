@@ -9,7 +9,7 @@ public sealed class Lab :
         set;
     }
 
-    private ILabEntity<int> entity;
+    private readonly ILabEntity<int> entity;
 
     public Lab(ILabEntity<int>? iface = default, IList<LabTask>? tasks = default)
     {
