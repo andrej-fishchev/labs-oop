@@ -1,17 +1,21 @@
+using IO.targets;
+
 namespace labs.entities;
 
 public abstract class LabTask :
     ILabEntity<int>
 {
+    public static readonly ConsoleTarget Target = new();
+    
+    private readonly ILabEntity<int> entity;
+    
     public IList<ILabEntity<int>> Actions
     {
         get; 
-        set;
+        protected init;
     }
-
-    private ILabEntity<int> entity;
-
-    public LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
+    
+    private LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
     {
         entity = iface ?? new IntLabEntity();
         Actions = (actions != null)
@@ -21,7 +25,7 @@ public abstract class LabTask :
             : new List<ILabEntity<int>>();
     }
 
-    public LabTask(int id, string name = "", string description = "") :
+    protected LabTask(int id, string name = "", string description = "") :
         this(new IntLabEntity(id, name, description))
     { }
 
