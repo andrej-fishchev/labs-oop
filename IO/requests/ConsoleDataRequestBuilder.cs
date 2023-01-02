@@ -18,7 +18,7 @@ public class ConsoleDataRequestBuilder<TOut> :
     public virtual ConsoleDataRequestBuilder<TOut> RejectKey(string value)
     {
         ((ConsoleDataRequest<TOut>)Build())
-            .RejectRequestMessage = value;
+            .RejectKey = value;
 
         return this;
     }

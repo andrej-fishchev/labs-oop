@@ -13,12 +13,12 @@ public class ConsoleDataRequest<TOut> :
     
     public string DisplayMessage { get; set; }
     
-    public string RejectRequestMessage { get; set; }
+    public string RejectKey { get; set; }
     
-    public ConsoleDataRequest(string message, string rejectRequestMessage = "...")
+    public ConsoleDataRequest(string message, string rejectInputKey = "...")
     {
         DisplayMessage = message;
-        RejectRequestMessage = rejectRequestMessage;
+        RejectKey = rejectInputKey;
     }
 
     public IResponsibleData<TOut> Request(
@@ -26,44 +26,48 @@ public class ConsoleDataRequest<TOut> :
         IValidatableData<TOut>? validator = default, 
         bool sendRejectMessage = true)
     {
-        string? buffer = "";
-
-        ConsoleResponseData<TOut> output = 
-            new ConsoleResponseData<TOut>();
-        
         if(sendRejectMessage)
-            Target.Write("Ввод может быть прекращен в любое удобное время. \n" + 
-                         $"Введите '{RejectRequestMessage}' для незамедлительного прекращения\n\n");
+            Target.Output
+                .WriteLine("Ввод может быть прекращен в любое удобное время. \n" 
+                           + $"Введите '{RejectKey}' для незамедлительного прекращения \n");
 
-        while(buffer != null)
+        ConsoleResponseData<TOut> output;
+
+        do
         {
-            Target.Write(DisplayMessage);
+            Target.Output.WriteLine(DisplayMessage);
 
-            if ((buffer = Target.Read()) == null)
-                return converter.Convert(new ConsoleResponseData<string?>(
-                    buffer, code: (int)ConsoleResponseDataCode.ConsoleTerminated));
+            // in: error is null already
+            string? buffer;
+            if ((buffer = Target.Input.ReadLine()) == null)
+                return converter.Convert(ConsoleResponseDataFactory.MakeResponse(
+                    buffer, code: ConsoleResponseDataCode.ConsoleTerminated));
 
-            if (buffer.Trim().Equals(RejectRequestMessage))
-                return converter.Convert(new ConsoleResponseData<string?>(
-                    buffer, code: (int) ConsoleResponseDataCode.ConsoleInputRejected));
+            // in: error is null already
+            if (buffer.Trim().Equals(RejectKey))
+                return converter.Convert(ConsoleResponseDataFactory.MakeResponse<string?>(
+                    buffer, code: ConsoleResponseDataCode.ConsoleInputRejected));
 
-            output = (ConsoleResponseData<TOut>) 
-                converter.Convert(new ConsoleResponseData<string?>(
-                    buffer, code: (int)ConsoleResponseDataCode.ConsoleOk));
+            // in: error is null already
+            // out: null or not null 
+            output = converter.Convert(ConsoleResponseDataFactory.MakeResponse<string?>(
+                    buffer, code: ConsoleResponseDataCode.ConsoleOk))
+                .As<ConsoleResponseData<TOut>>();
 
-            if ((buffer = output.Error) == null && validator != null)
-                buffer = (output = (ConsoleResponseData<TOut>) validator
-                    .Validate(output)).Error;
-            
-            if(buffer != null)
-                Target.Write($"Ошибка: {buffer} \n");
-        } 
+            if (output.IsOk() && validator != null)
+                output = validator.Validate(output).As<ConsoleResponseData<TOut>>();
+
+            if (output.Error() != String.Empty)
+                Target.Output
+                    .WriteLine($"Ошибка: {output.Error()} \n");
+
+        } while (!output.IsOk());
         
         return output;
     }
     
     public object Clone()
     {
-        return new ConsoleDataRequest<TOut>(DisplayMessage, RejectRequestMessage);
+        return new ConsoleDataRequest<TOut>(DisplayMessage, RejectKey);
     }
 }
