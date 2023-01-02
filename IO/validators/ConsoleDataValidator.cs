@@ -8,9 +8,9 @@ public class ConsoleDataValidator<T> :
 {
     public string ErrorMessage { get; set; }
     
-    public DataValidator<T> Validator { get; set; }
+    public Validator<T> Validator { get; set; }
 
-    public ConsoleDataValidator(DataValidator<T> ioValidator, string errorMessage = "")
+    public ConsoleDataValidator(Validator<T> ioValidator, string errorMessage = "")
     {
         Validator = ioValidator;
         ErrorMessage = errorMessage;
@@ -18,10 +18,16 @@ public class ConsoleDataValidator<T> :
 
     public IResponsibleData<T> Validate(IResponsibleData<T> responsibleData)
     {
-        if (responsibleData.Data == null || !Validator.Invoke(responsibleData.Data))
-            responsibleData.Error = ErrorMessage;
+        string error = Validator.Invoke(responsibleData.Data())
+            ? String.Empty
+            : ErrorMessage;
 
-        return responsibleData;
+        ConsoleResponseData<T> buffer = responsibleData
+            .As<ConsoleResponseData<T>>();
+
+        buffer |= error;
+        
+        return buffer;
     }
 
     public object Clone()
