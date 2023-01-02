@@ -1,7 +1,6 @@
 using IO.converters;
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -15,8 +14,7 @@ public sealed class Task2 :
 {
     public ConsoleResponseData<int[]>[] IntArray 
     { 
-        get; 
-        private set; 
+        get; private set; 
     }
     
     public Task2(string name = "lab5.task2", string description = "") : 
@@ -24,7 +22,7 @@ public sealed class Task2 :
     {
         IntArray = new ConsoleResponseData<int[]>[]
         {
-            new(new int[1])
+            new(Array.Empty<int>())
         };
 
         Actions = new List<ILabEntity<int>>
@@ -33,7 +31,7 @@ public sealed class Task2 :
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Создать двумерный массив (автозаполнение)")
+            new LabTaskActionBuilder().Id(2).Name("Создать двумерный массив [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
                 
@@ -52,38 +50,37 @@ public sealed class Task2 :
         ConsoleDataValidator<int> sizeValidator =
             new ConsoleDataValidator<int>(data => data > 0, "ожидалось значение больше 0");
         
-        ConsoleResponseData<int> rows = (ConsoleResponseData<int>)
-            new ConsoleDataRequest<int>("Введите количество строк: ")
-                .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator);
+        ConsoleResponseData<int> rows = new ConsoleDataRequest<int>("Введите количество строк: ")
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator)
+            .As<ConsoleResponseData<int>>();
 
-        if(rows.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!rows) return;
 
         switch (type)
         {
             case ArrayGenerationType.UserInput:
                 ConsoleResponseData<int[]>[] buffer = 
-                    new ConsoleResponseData<int[]>[rows.Data];
+                    new ConsoleResponseData<int[]>[rows.Data()];
 
                 ConsoleArrayDataConverter<int> converter =
                     BaseTypeArrayDataConverterFactory.MakeIntArrayConverter(delimiter: ";");
 
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    Target.Write($"\n");
+                    Target.Output.WriteLine();
 
-                    buffer[i] = (ConsoleResponseData<int[]>)
-                        new ConsoleDataRequest<int[]>(
-                                $"Введите множество целых чисел (через {converter.Delimiter}): \n")
-                            .Request(converter, 
-                                ((i == 0) 
-                                    ? null
-                                    : new ConsoleDataValidator<int[]>(
-                                        data => data.Length == buffer[0].Data.Length,
-                                        $"ожидалось '{buffer[0].Data.Length}' элементов")), 
-                                false);
+                    buffer[i] = new ConsoleDataRequest<int[]>(
+                            $"Введите множество целых чисел (через {converter.Delimiter}): \n")
+                        .Request(converter, 
+                            ((i == 0) 
+                                ? null
+                                : new ConsoleDataValidator<int[]>(
+                                    data => data.Length == buffer[0].Data().Length,
+                                    $"ожидалось '{buffer[0].Data().Length}' элементов")), 
+                            false)
+                        .As<ConsoleResponseData<int[]>>();
 
-                    if(buffer[i].Code != (int) ConsoleResponseDataCode.ConsoleOk)
+                    if(!buffer[i])
                         return;
                 }
 
@@ -92,13 +89,11 @@ public sealed class Task2 :
             
             case ArrayGenerationType.Randomizer:
                 
-                ConsoleResponseData<int> columns = (ConsoleResponseData<int>)
-                    new ConsoleDataRequest<int>("Введите количество элементов: ")
-                        .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), 
-                            sizeValidator,false);
+                ConsoleResponseData<int> columns = new ConsoleDataRequest<int>("Введите количество элементов: ")
+                    .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator,false)
+                    .As<ConsoleResponseData<int>>();
                 
-                if(columns.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-                    return;
+                if(!columns) return;
                 
                 ConsoleResponseData<int>[] borders = 
                     new ConsoleResponseData<int>[2];
@@ -114,24 +109,23 @@ public sealed class Task2 :
                                     if (i == 0)
                                         return true;
 
-                                    return data > borders[0].Data;
+                                    return data > borders[0].Data();
                                 }, "значение правой границы должно быть больше левой"),
                             false);
             
-                    if(borders[i].Code != (int)ConsoleResponseDataCode.ConsoleOk)
-                        return;
+                    if(!borders[i]) return;
                 }
                 
-                IntArray = new ConsoleResponseData<int[]>[rows.Data];
+                IntArray = new ConsoleResponseData<int[]>[rows.Data()];
 
                 Random random = new Random();
                 
                 for (int i = 0; i < IntArray.Length; i++)
                 {
-                    IntArray[i] = new ConsoleResponseData<int[]>(new int[columns.Data]);
+                    IntArray[i] = new ConsoleResponseData<int[]>(new int[columns.Data()]);
                     
-                    for(int j = 0; j < IntArray[i].Data.Length; j++)
-                        IntArray[i].Data[j] = random.Next(borders[0].Data, borders[1].Data);
+                    for(int j = 0; j < IntArray[i].Data().Length; j++)
+                        IntArray[i].Data()[j] = random.Next(borders[0].Data(), borders[1].Data());
                 }
                 
                 break;
@@ -150,11 +144,11 @@ public sealed class Task2 :
         {
             if (i == 0)
             {
-                max = IntArray[i].Data.Max();
+                max = IntArray[i].Data().Max();
                 continue;
             }
 
-            if (max < (buf = IntArray[i].Data.Max()))
+            if (max < (buf = IntArray[i].Data().Max()))
             {
                 max = buf;
                 row = i;
@@ -167,8 +161,8 @@ public sealed class Task2 :
             new ConsoleResponseData<int[]>[IntArray.Length + 1];
 
         ConsoleDataValidator<int[]> validator = new ConsoleDataValidator<int[]>(
-            data => data.Length == IntArray[0].Data.Length,
-            $"ожижалось '{IntArray[0].Data.Length}' элементов"
+            data => data.Length == IntArray[0].Data().Length,
+            $"ожижалось '{IntArray[0].Data().Length}' элементов"
         );
 
         ConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
@@ -178,13 +172,12 @@ public sealed class Task2 :
         {
             if (i == row)
             {        
-                buffer[i] = (ConsoleResponseData<int[]>)
-                    new ConsoleDataRequest<int[]>(
+                buffer[i] = new ConsoleDataRequest<int[]>(
                         $"Введите множество целых значений (через {converter.Delimiter}): \n")
-                        .Request(converter, validator);
+                    .Request(converter, validator)
+                    .As<ConsoleResponseData<int[]>>();
                 
-                if(buffer[i].Code != (int) ConsoleResponseDataCode.ConsoleOk)
-                    return;
+                if(!buffer[i]) return;
                 
                 continue;
             }
@@ -194,25 +187,25 @@ public sealed class Task2 :
 
         IntArray = buffer;
         
-        Target.Write($"\nСтрока добавлена после {row}'й строки\n");
+        Target.Output.WriteLine($"\nСтрока добавлена после {row}'й строки");
     }
     
     public void OutputData()
     {
         for (int i = 0; i < IntArray.Length; i++)
         {
-            for (int j = 0; j < IntArray[i].Data.Length; j++)
+            for (int j = 0; j < IntArray[i].Data().Length; j++)
             {
-                Target.Write($"{IntArray[i].Data[j]}");
+                Target.Output.Write($"{IntArray[i].Data()[j]}");
                 
-                if(j + 1 != IntArray[i].Data.Length)
-                    Target.Write("\t");
+                if(j + 1 != IntArray[i].Data().Length)
+                    Target.Output.WriteLine("\t");
             }
             
-            Target.Write("\n");
+            Target.Output.WriteLine();
         }
         
         if(IntArray.Length == 0)
-            Target.Write("Массив пуст");
+            Target.Output.WriteLine("Массив пуст");
     }
 }

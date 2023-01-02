@@ -1,6 +1,5 @@
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using labs.builders;
 using labs.entities;
@@ -30,16 +29,16 @@ public sealed class Task5 :
         
         Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder().Id(1).Name("Ввод данных")
+            new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Target
-                    .Write($"f(x): {TaskExpression((x.Data, y.Data), Circle, Triangle)} \n"))
+            new LabTaskActionBuilder().Name("Выполнить задачу")
+                .ExecuteAction(() => Target.Output
+                    .WriteLine($"f(x): {TaskExpression((x.Data(), y.Data()), Circle, Triangle)}"))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(3).Name("Вывод данных")
+            new LabTaskActionBuilder().Name("Вывод данных")
                 .ExecuteAction(OutputData)
                 .Build()
         };
@@ -49,22 +48,22 @@ public sealed class Task5 :
     {
         x = InputData("Введите значение X координаты: ");
         
-        if(x.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!x) return;
         
         y = InputData("Введите значение Y координаты", false);
     }
     
     private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
     {
-        return (ConsoleResponseData<double>) new ConsoleDataRequest<double>(message)
+        return new ConsoleDataRequest<double>(message)
             .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
-                sendRejectMessage: sendReject);
+                sendRejectMessage: sendReject)
+            .As<ConsoleResponseData<double>>();
     }
 
     public void OutputData()
     {
-        Target.Write($"Точка: {(x.Data, y.Data)} \n");
+        Target.Output.WriteLine($"Точка: {(x.Data(), y.Data())}");
     }
 
     public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)

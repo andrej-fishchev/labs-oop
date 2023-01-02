@@ -1,7 +1,6 @@
 using IO.converters;
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -16,45 +15,45 @@ public sealed class Task1 :
 {
     public ConsoleResponseData<int[]> IntArray { get; set; }
 
-    public Task1(string name = "lab4.task1", string description = "вариант 24") :
+    public Task1(string name = "lab4.task1", string description = "") :
         base(1, name, description)
     {
-        IntArray = new ConsoleResponseData<int[]>(new int[10]);
+        IntArray = new ConsoleResponseData<int[]>(Array.Empty<int>());
         
         Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder().Id(1).Name("Ручное заполнение массива")
+            new LabTaskActionBuilder().Name("Создать массива")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Автоматическое заполнение массива")
+            new LabTaskActionBuilder().Name("Создать массив [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
                 
-            new LabTaskActionBuilder().Id(3).Name("Удалить элементы с четными индексами")
+            new LabTaskActionBuilder().Name("Удалить элементы с четными индексами")
                 .ExecuteAction(DeleteElements)
                 .Build(),
 
-            new LabTaskActionBuilder().Id(4).Name("Добавить элемент с номером K")
+            new LabTaskActionBuilder().Name("Добавить элемент с номером K")
                 .ExecuteAction(AddElement)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(5).Name("Циклический сдвиг")
+            new LabTaskActionBuilder().Name("Циклический сдвиг")
                 .ExecuteAction(CyclicShift)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(6).Name("Найти элемент - среднее арифметическое элементов")
+            new LabTaskActionBuilder().Name("Найти элемент - среднее арифметическое элементов")
                 .ExecuteAction(SearchElement)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(7).Name("Сортировка вставкой")
+            new LabTaskActionBuilder().Name("Сортировка вставкой")
                 .ExecuteAction(() =>
                 {
-                    IntArray.Data = InsertSort(IntArray.Data);
+                    IntArray |= InsertSort(IntArray.Data());
                 })
                 .Build(),
             
-            new LabTaskActionBuilder().Id(8).Name("Вывод массива")
+            new LabTaskActionBuilder().Name("Вывод массива")
                 .ExecuteAction(OutputData)
                 .Build(),
         };
@@ -67,13 +66,12 @@ public sealed class Task1 :
 
         if (type == ArrayGenerationType.UserInput)
         {
-            ConsoleResponseData<int[]> buffer = (ConsoleResponseData<int[]>) 
-                new ConsoleDataRequest<int[]>(
+            ConsoleResponseData<int[]> buffer = new ConsoleDataRequest<int[]>(
                     $"Введите множество целых чисел (через '{converter.Delimiter}'): \n")
-                .Request(converter);
+                .Request(converter)
+                .As<ConsoleResponseData<int[]>>();
 
-            if (buffer.Code == (int)ConsoleResponseDataCode.ConsoleOk)
-                IntArray = buffer;
+            if (buffer) IntArray = buffer;
             
             return;
         }
@@ -81,9 +79,11 @@ public sealed class Task1 :
         ConsoleDataRequest<int> request = 
             new ConsoleDataRequest<int>("Введите резмер массива: ");
 
-        ConsoleResponseData<int> size = (ConsoleResponseData<int>)
-            request.Request(converter.ElementConverter, new ConsoleDataValidator<int>(
-                (data) => data > 0, "значение должно быть больше 0"));
+        ConsoleResponseData<int> size = request
+            .Request(converter.ElementConverter, 
+                new ConsoleDataValidator<int>(data => data > 0, 
+                    "значение должно быть больше 0"))
+            .As<ConsoleResponseData<int>>();
 
         ConsoleResponseData<int>[] borders = 
             new ConsoleResponseData<int>[2];
@@ -93,84 +93,83 @@ public sealed class Task1 :
             request.DisplayMessage = 
                 $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ";
 
-            borders[i] = (ConsoleResponseData<int>)
-                request.Request(converter.ElementConverter, new ConsoleDataValidator<int>(
-                        (data) =>
+            borders[i] = request
+                .Request(converter.ElementConverter, new ConsoleDataValidator<int>(
+                        data =>
                         {
                             if (i == 0)
                                 return true;
 
-                            return data > borders[0].Data;
+                            return data > borders[0].Data();
                         }, "значение правой границы должно быть больше левой"),
-                    false);
+                    false)
+                .As<ConsoleResponseData<int>>();
             
-            if(borders[i].Code != (int)ConsoleResponseDataCode.ConsoleOk)
-                return;
+            if(!borders[i]) return;
         }
 
-        IntArray.Data = new int[size.Data];
+        IntArray |= new int[size.Data()];
         
         Random random = new Random();
 
-        for (int i = 0; i < IntArray.Data.Length; i++)
-            IntArray.Data[i] = random.Next(borders[0].Data, borders[1].Data);
+        for (int i = 0; i < IntArray.Data().Length; i++)
+            IntArray.Data()[i] = random.Next(borders[0].Data(), borders[1].Data());
     }
 
     public void DeleteElements()
     {
-        IntArray.Data = IntArray.Data
+        IntArray |= IntArray.Data()
             .Where((_, index) => (index % 2) != 0)
             .ToArray();
     }
 
     public void AddElement()
     {
-        if(IntArray.Data.Length == 0)
+        if(IntArray.Data().Length == 0)
             return;
         
         OutputData();
 
-        ConsoleResponseData<int> elementToAdd = (ConsoleResponseData<int>) 
-            new ConsoleDataRequest<int>("Введите номер элемента: ")
-            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
-                new ConsoleDataValidator<int>(data => data > 0 && data <= IntArray.Data.Length, 
-            $"значение не может быть меньше 1 и больше {IntArray.Data.Length}"));
+        ConsoleResponseData<int> elementToAdd = new ConsoleDataRequest<int>("Введите номер элемента: ")
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), new ConsoleDataValidator<int>(
+                data => data > 0 && data <= IntArray.Data().Length, 
+                $"значение не может быть меньше 1 и больше {IntArray.Data().Length}"))
+            .As<ConsoleResponseData<int>>();
         
-        if(elementToAdd.Code != (int) ConsoleResponseDataCode.ConsoleOk)
+        if(!elementToAdd)
             return;
 
-        int[] buffer = new int[IntArray.Data.Length + 1];
+        int[] buffer = new int[IntArray.Data().Length + 1];
 
-        for (int i = 0; i < IntArray.Data.Length; i++)
-            buffer[i] = IntArray.Data[i];
+        for (int i = 0; i < IntArray.Data().Length; i++)
+            buffer[i] = IntArray.Data()[i];
 
-        buffer[^1] = buffer[elementToAdd.Data-1];
+        buffer[^1] = buffer[elementToAdd.Data()-1];
         
-        IntArray.Data = buffer;
+        IntArray |= buffer;
         
-        Target.Write($"Элемент с номером {elementToAdd.Data} добавлен в конец массива. \n");
+        Target.Output.WriteLine($"Элемент с номером {elementToAdd.Data()} добавлен в конец массива");
     }
 
     public void SearchElement()
     {
-        if (IntArray.Data.Length == 0)
+        if (IntArray.Data().Length == 0)
             return;
         
-        int sum = (int) 
-            IntArray.Data.Average();
+        int sum = (int) IntArray.Data().Average();
 
         int result = -1;
-        for (int i = 0; i < IntArray.Data.Length; i++)
+        for (int i = 0; i < IntArray.Data().Length; i++)
         {
-            if (IntArray.Data[i] == sum)
+            if (IntArray.Data()[i] == sum)
             {
                 result = i;
                 break;
             }
         }
 
-        Target.Write("Элемент - среднее арифметическое суммы элементов массива: " +
-            $"{((result == -1) ? "не найден" : $"{IntArray.Data[result].ToString()}")}"
+        Target.Output.WriteLine("Элемент - среднее арифметическое суммы элементов массива: " +
+            $"{((result == -1) ? "не найден" : $"{IntArray.Data()[result].ToString()}")}"
         );
     }
 
@@ -199,24 +198,24 @@ public sealed class Task1 :
 
     public void CyclicShift()
     {
-        if(IntArray.Data.Length == 0)
+        if(IntArray.Data().Length == 0)
             return;
         
-        ConsoleResponseData<int> shiftPower = (ConsoleResponseData<int>) 
+        ConsoleResponseData<int> shiftPower = 
             new ConsoleDataRequest<int>("Введите силу сдвига [+/- напрвление]: ")
-            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter());
+                .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter())
+                .As<ConsoleResponseData<int>>();
         
-        if(shiftPower.Code != (int) ConsoleResponseDataCode.ConsoleOk)
+        if(!shiftPower) return;
+
+        shiftPower |= shiftPower.Data() % IntArray.Data().Length;
+        
+        if(shiftPower.Data() == 0)
             return;
 
-        shiftPower.Data %= IntArray.Data.Length;
-        
-        if(shiftPower.Data == 0)
-            return;
-
-        IntArray.Data = IntArray.Data
+        IntArray |= IntArray.Data()
             .Select((x, index) =>
-                new { x, nextIndex = ShiftingExpression(index, shiftPower.Data, IntArray.Data.Length) })
+                new { x, nextIndex = ShiftingExpression(index, shiftPower.Data(), IntArray.Data().Length) })
             .OrderBy(x => x.nextIndex)
             .Select(x => x.x)
             .ToArray();
@@ -224,11 +223,11 @@ public sealed class Task1 :
 
     public void OutputData()
     {
-        for (int i = 0; i < IntArray.Data.Length; i++)
-            Target.Write($"{i + 1}: {IntArray.Data[i]} \n");
+        for (int i = 0; i < IntArray.Data().Length; i++)
+            Target.Output.WriteLine($"{i + 1}: {IntArray.Data()[i]}");
         
-        if(IntArray.Data.Length == 0)
-            Target.Write("Массив пуст");
+        if(IntArray.Data().Length == 0)
+            Target.Output.WriteLine("Массив пуст");
     }
 
     public int ShiftingExpression(int index, int shiftPower, int length)

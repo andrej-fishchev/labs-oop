@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using IO.converters;
 using IO.requests;
 using IO.responses;
 using IO.utils;
@@ -20,55 +19,56 @@ public sealed class Task2 :
 
         Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder().Id(1).Name("Ввод строки")
+            new LabTaskActionBuilder().Name("Ввод строки")
                 .ExecuteAction(InputData)
                 .Build(),
 
-            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Target.Write($"f(): {TaskExpression()} \n"))
+            new LabTaskActionBuilder().Name("Выполнить задачу")
+                .ExecuteAction(() => Target.Output.
+                    WriteLine($"f(): {TaskExpression()}"))
                 .Build(),
 
-            new LabTaskActionBuilder().Id(3).Name("Вывод исходной строки")
-                .ExecuteAction(() => Target.Write($"Строка: {TaskVariable.Data} \n"))
+            new LabTaskActionBuilder().Name("Вывод исходной строки")
+                .ExecuteAction(() => Target.Output
+                    .WriteLine($"Строка: {TaskVariable.Data()}"))
                 .Build()
         };
     }
     
     public void InputData()
     {
-        ConsoleResponseData<string> buffer = (ConsoleResponseData<string>)
-            new ConsoleDataRequest<string>("Введите произвольную строку: ")
-                .Request(BaseTypeDataConverterFactory.MakeSimpleStringConverter());
+        ConsoleResponseData<string> buffer = new ConsoleDataRequest<string>("Введите произвольную строку: ")
+            .Request(BaseTypeDataConverterFactory.MakeSimpleStringConverter())
+            .As<ConsoleResponseData<string>>();
         
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!buffer) return;
 
         TaskVariable = buffer;
     }
     
     public string TaskExpression()
     {
-        if(TaskVariable.Data.Length == 0)
-            return TaskVariable.Data;
+        if(TaskVariable.Data().Length == 0)
+            return TaskVariable.Data();
 
         Regex? expression;
 
         if ((expression = TryRegex(@"[A-Za-zА-Яа-я]{1,}")) == null)
         {
-            Target.Write("Ошибка: неверное регулярное выражение \n");
-            return TaskVariable.Data;
+            Target.Output.WriteLine("Ошибка: неверное регулярное выражение");
+            return TaskVariable.Data();
         }
         
         IList<string> words = 
             new List<string>();
 
         MatchCollection matches = 
-            expression.Matches(TaskVariable.Data);
+            expression.Matches(TaskVariable.Data());
         
         for(int i = 0; i < matches.Count; i++)
             words.Add(matches[i].Value);
 
-        string buffer = new string(TaskVariable.Data);
+        string buffer = new string(TaskVariable.Data());
 
         for (int i = 0, index; i < words.Count; i++)
         {

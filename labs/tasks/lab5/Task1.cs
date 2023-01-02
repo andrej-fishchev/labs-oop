@@ -1,7 +1,6 @@
 using IO.converters;
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -13,28 +12,31 @@ namespace labs.lab5;
 public sealed class Task1 :
     LabTask
 {
-    public ConsoleResponseData<int[]> IntArray { get; set; }
+    public ConsoleResponseData<int[]> IntArray
+    {
+        get; private set;
+    }
 
     public Task1(string name = "lab5.task1", string description = "") : 
         base(1, name, description)
     {
-        IntArray = new ConsoleResponseData<int[]>(new int[10]);
+        IntArray = new ConsoleResponseData<int[]>(Array.Empty<int>());
         
         Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder().Id(1).Name("Ручное заполнение массива")
+            new LabTaskActionBuilder().Name("Создать массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Автоматическое заполнение массива")
+            new LabTaskActionBuilder().Name("Создать массив [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
                 
-            new LabTaskActionBuilder().Id(3).Name("Удалить все нечетные элементы")
+            new LabTaskActionBuilder().Name("Удалить все нечетные элементы")
                 .ExecuteAction(TaskExpression)
                 .Build(),
 
-            new LabTaskActionBuilder().Id(4).Name("Вывод массива")
+            new LabTaskActionBuilder().Name("Вывод массива")
                 .ExecuteAction(OutputData)
                 .Build()
         };
@@ -47,12 +49,12 @@ public sealed class Task1 :
 
         if (type == ArrayGenerationType.UserInput)
         {
-            ConsoleResponseData<int[]> buffer = (ConsoleResponseData<int[]>) 
-                new ConsoleDataRequest<int[]>(
+            ConsoleResponseData<int[]> buffer = new ConsoleDataRequest<int[]>(
                     $"Введите множество целых чисел (через '{converter.Delimiter}'): \n")
-                .Request(converter);
+                .Request(converter)
+                .As<ConsoleResponseData<int[]>>();
 
-            if (buffer.Code == (int)ConsoleResponseDataCode.ConsoleOk)
+            if (buffer)
                 IntArray = buffer;
             
             return;
@@ -61,9 +63,10 @@ public sealed class Task1 :
         ConsoleDataRequest<int> request = 
             new ConsoleDataRequest<int>("Введите резмер массива: ");
 
-        ConsoleResponseData<int> size = (ConsoleResponseData<int>)
-            request.Request(converter.ElementConverter, new ConsoleDataValidator<int>(
-                (data) => data > 0, "значение должно быть больше 0"));
+        ConsoleResponseData<int> size = request
+            .Request(converter.ElementConverter, new ConsoleDataValidator<int>(
+                (data) => data > 0, "значение должно быть больше 0"))
+            .As<ConsoleResponseData<int>>();
 
         ConsoleResponseData<int>[] borders = 
             new ConsoleResponseData<int>[2];
@@ -73,46 +76,46 @@ public sealed class Task1 :
             request.DisplayMessage = 
                 $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ";
 
-            borders[i] = (ConsoleResponseData<int>)
-                request.Request(converter.ElementConverter, new ConsoleDataValidator<int>(
+            borders[i] = request
+                .Request(converter.ElementConverter, new ConsoleDataValidator<int>(
                         (data) =>
                         {
                             if (i == 0)
                                 return true;
 
-                            return data > borders[0].Data;
+                            return data > borders[0].Data();
                         }, "значение правой границы должно быть больше левой"),
-                    false);
+                    false)
+                .As<ConsoleResponseData<int>>();
             
-            if(borders[i].Code != (int)ConsoleResponseDataCode.ConsoleOk)
-                return;
+            if(!borders[i]) return;
         }
 
-        IntArray.Data = new int[size.Data];
+        IntArray |= new int[size.Data()];
         
         Random random = new Random();
 
-        for (int i = 0; i < IntArray.Data.Length; i++)
-            IntArray.Data[i] = random.Next(borders[0].Data, borders[1].Data);
+        for (int i = 0; i < IntArray.Data().Length; i++)
+            IntArray.Data()[i] = random.Next(borders[0].Data(), borders[1].Data());
     }
 
     // удаление нечетных элементов
     public void TaskExpression()
     {
-        if(IntArray.Data.Length == 0)
+        if(IntArray.Data().Length == 0)
             return;
 
-        IntArray.Data = IntArray.Data
+        IntArray |= IntArray.Data()
             .Where(x => (x % 2) == 0)
             .ToArray();
     }
     
     public void OutputData()
     {
-        for (int i = 0; i < IntArray.Data.Length; i++)
-            Target.Write($"{i + 1}: {IntArray.Data[i]} \n");
+        for (int i = 0; i < IntArray.Data().Length; i++)
+            Target.Output.WriteLine($"{i + 1}: {IntArray.Data()[i]}");
         
-        if(IntArray.Data.Length == 0)
-            Target.Write("Массив пуст");
+        if(IntArray.Data().Length == 0)
+            Target.Output.WriteLine("Массив пуст");
     }
 }

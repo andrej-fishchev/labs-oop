@@ -1,7 +1,6 @@
 using IO.converters;
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -13,50 +12,53 @@ namespace labs.lab9;
 
 public sealed class Task1 : LabTask
 {
-    public readonly ConsoleTarget Target = new();
-
     private ConsoleResponseData<TimeArray> Times { get; set; }
 
     public Task1(string name = "lab9.task1", string description = "") : 
         base(1, name, description)
     {
-        Times = new ConsoleResponseData<TimeArray>(new TimeArray(0));
+        Times = new ConsoleResponseData<TimeArray>(new TimeArray());
         
         Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder().Id(1).Name("Ввод множества объектов Time")
+            new LabTaskActionBuilder().Name("Ввод множества объектов Time")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Ввод множества объектов Time [автозаполнение]")
+            new LabTaskActionBuilder().Name("Ввод множества объектов Time [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(3).Name("Добавление объекта Time")
+            new LabTaskActionBuilder().Name("Добавление объекта Time")
                 .ExecuteAction(AddItem)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(4).Name("Удаление объекта Time")
+            new LabTaskActionBuilder().Name("Удаление объекта Time")
                 .ExecuteAction(RemoveItem)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(5).Name("Добавление/Вычитание минут к I-му объекту Time")
+            new LabTaskActionBuilder().Name("Добавление/Вычитание минут к I-му объекту Time")
                 .ExecuteAction(SetMinutesToTimeObject)
                 .Build(),
 
-            new LabTaskActionBuilder().Id(6).Name("Добавление времени к I-му объекту Time")
+            new LabTaskActionBuilder().Name("Добавление времени к I-му объекту Time")
                 .ExecuteAction(AddTimeToTimeObject)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(7).Name("Вычитание времени из I-го объекта Time")
+            new LabTaskActionBuilder().Name("Вычитание времени из I-го объекта Time")
                 .ExecuteAction(RemoveTimeFromTimeObject)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(8).Name("Вывод максимального объекта Time")
+            new LabTaskActionBuilder().Name("Вывод максимального объекта Time")
                 .ExecuteAction(DisplayMaxTimeObject)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(9).Name("Вывод множества объектов Time")
+            new LabTaskActionBuilder().Name("Вывод количества объектов типа Time")
+                .ExecuteAction(() => Target.Output
+                    .WriteLine($"Счетчик: {Time.Objects}"))
+                .Build(),
+            
+            new LabTaskActionBuilder().Name("Вывод множества объектов Time")
                 .ExecuteAction(OutputData)
                 .Build()
         };
@@ -76,130 +78,105 @@ public sealed class Task1 : LabTask
                     $"Введите множество 'hh:mm' (через '{converter.Delimiter}'): \n")
                 .Request(converter);
 
-            if (data.Code == (int)ConsoleResponseDataCode.ConsoleOk)
-                Times = (ConsoleResponseData<TimeArray>)
-                    new ConsoleResponseDataBuilder<TimeArray>()
-                        .Code(data.Code)
-                        .Data(new TimeArray(data.Data))
-                        .Build();
-            
+            if (data) Times = ConsoleResponseDataFactory
+                    .MakeResponse(new TimeArray(data.Data()));
+
             return;
         }
 
-        ConsoleResponseData<int> size = (ConsoleResponseData<int>)
-            new ConsoleDataRequest<int>("Введите количество элементов массива: ")
-                .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
-                    new ConsoleDataValidator<int>(data => data > 0, 
-                        "ожидалось значение больше 0"));
+        ConsoleResponseData<int> size = new ConsoleDataRequest<int>("Введите количество элементов массива: ")
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), new ConsoleDataValidator<int>(
+                data => data > 0, "ожидалось значение больше 0"))
+            .As<ConsoleResponseData<int>>();
         
-        if(size.Code != (int)ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!size) return;
 
         Random random = new Random();
 
-        Times.Data = new TimeArray(size.Data);
+        Times |= new TimeArray(size.Data());
 
-        for (int i = 0; i < Times.Data.Count; i++)
-            Times.Data[i] = new Time(random.Next(0, Int32.MaxValue / 2));
+        for (int i = 0; i < Times.Data().Count; i++)
+            Times.Data()[i] = new Time(random.Next(0, Int32.MaxValue % 604800));
     }
 
     public void AddItem()
     {
-        ConsoleResponseData<Time> buffer = (ConsoleResponseData<Time>)
-            new ConsoleDataRequest<Time>("Введите время (формат hh:mm): ")
-                .Request(ConsoleDataConverterFactory.MakeSimpleConverter<Time>(Time.TryParse));
+        ConsoleResponseData<Time> buffer = new ConsoleDataRequest<Time>("Введите время (формат hh:mm): ")
+            .Request(ConsoleDataConverterFactory.MakeSimpleConverter<Time>(Time.TryParse))
+            .As<ConsoleResponseData<Time>>();
         
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
-        
-        Times.Data.Add(buffer.Data);
+        if(buffer) Times.Data().Add(buffer.Data());
     }
 
     public void RemoveItem()
     {
         ConsoleResponseData<int> buffer = RequestIntData(
-            $"Введите номер элемента [1; {Times.Data.Count}]: ", 
-            GetIndexValidator());
+            $"Введите номер элемента [1; {Times.Data().Count}]: ", GetIndexValidator());
 
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
-        
-        Times.Data.RemoveAt(buffer.Data - 1);
+        if(buffer) Times.Data().RemoveAt(buffer.Data() - 1);
     }
     
     public void SetMinutesToTimeObject()
     {
-        ConsoleResponseData<int> buffer = RequestIntData(
-            $"Введите номер элемента [1; {Times.Data.Count}]: ", 
+        ConsoleResponseData<int> buffer = RequestIntData($"Введите номер элемента [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!buffer) return;
 
         ConsoleResponseData<int> minutes = 
             RequestIntData("Введите количество минут [+/- - добавить/вычесть]: ", 
-                GetMinuteValidator(Times.Data[buffer.Data - 1]), false);
+                GetMinuteValidator(Times.Data()[buffer.Data() - 1]), false);
         
-        if(minutes.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
-
-        Times.Data[buffer.Data - 1] += minutes.Data;
+        if(minutes) Times.Data()[buffer.Data() - 1] += minutes.Data();
     }
 
     public void DisplayMaxTimeObject()
     {
-        Time? max = Times.Data.Max();
+        Time? max = Times.Data().Max();
 
         if (max == null)
         {
-            Target.Write("Ошибка: Не удалось получить максимальный объект типа Time \n");
+            Target.Output.WriteLine("Ошибка: Не удалось получить максимальный объект типа Time");
             return;
         }
         
-        Target.Write($"Максимальное значение: {max}");
+        Target.Output.WriteLine($"Максимальное значение: {max}");
     }
     
     public void RemoveTimeFromTimeObject()
     {
         ConsoleResponseData<int> buffer = RequestIntData(
-            $"Введите номер элемента [1; {Times.Data.Count}]: ", 
+            $"Введите номер элемента [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!buffer) return;
 
-        ConsoleResponseData<Time> time = (ConsoleResponseData<Time>)
-                new ConsoleDataRequest<Time>("Введите отнимаемое время (формат hh:mm): ")
-                    .Request(ConsoleDataConverterFactory.MakeSimpleConverter<Time>(Time.TryParse),
-                        new ConsoleDataValidator<Time>(
-                            data => data.AsSeconds() <= Times.Data[buffer.Data - 1].AsSeconds(), 
-                $"не может превышать '{Times.Data[buffer.Data - 1]}'"), false
-                    );
+        ConsoleResponseData<Time> time = new ConsoleDataRequest<Time>(
+                "Введите отнимаемое время (формат hh:mm): ")
+            .Request(ConsoleDataConverterFactory.MakeSimpleConverter<Time>(Time.TryParse),
+                new ConsoleDataValidator<Time>(
+                    data => data.AsSeconds() <= Times.Data()[buffer.Data() - 1].AsSeconds(), 
+                    $"не может превышать '{Times.Data()[buffer.Data() - 1]}'"), 
+                false)
+            .As<ConsoleResponseData<Time>>();
         
-        if(time.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
-
-        Times.Data[buffer.Data - 1] -= time.Data;
+        if(time) Times.Data()[buffer.Data() - 1] -= time.Data();
     }
     
     public void AddTimeToTimeObject()
     {
-        ConsoleResponseData<int> buffer = RequestIntData(
-            $"Выберите объект [1; {Times.Data.Count}]: ", 
+        ConsoleResponseData<int> buffer = RequestIntData($"Выберите объект [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(buffer.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
+        if(!buffer) return;
 
-        ConsoleResponseData<Time> time = (ConsoleResponseData<Time>)
-            new ConsoleDataRequest<Time>("Введите добавочное время (формат hh:mm): ")
-                .Request(ConsoleDataConverterFactory
-                    .MakeSimpleConverter<Time>(Time.TryParse), sendRejectMessage: false);
+        ConsoleResponseData<Time> time = new ConsoleDataRequest<Time>(
+                "Введите добавочное время (формат hh:mm): ")
+            .Request(ConsoleDataConverterFactory
+                .MakeSimpleConverter<Time>(Time.TryParse), sendRejectMessage: false)
+            .As<ConsoleResponseData<Time>>();
         
-        if(time.Code != (int) ConsoleResponseDataCode.ConsoleOk)
-            return;
-
-        Times.Data[buffer.Data - 1] += time.Data;
+        if(time) Times.Data()[buffer.Data() - 1] += time.Data();
     }
 
     private ConsoleResponseData<int> 
@@ -207,16 +184,17 @@ public sealed class Task1 : LabTask
     {
         OutputData();
         
-        Target.Write("\n");
+        Target.Output.WriteLine();
         
-        return (ConsoleResponseData<int>) new ConsoleDataRequest<int>(message)
-                .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), validator, send);
+        return new ConsoleDataRequest<int>(message)
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), validator, send)
+            .As<ConsoleResponseData<int>>();
     }
 
     private IValidatableData<int> GetIndexValidator()
     {
         return new ConsoleDataValidator<int>(
-            data => data > 0 && data <= Times.Data.Count,
+            data => data > 0 && data <= Times.Data().Count,
             "выход за допустимые границы");
     }
 
@@ -228,15 +206,15 @@ public sealed class Task1 : LabTask
                 return true;
             
             return Math.Abs(data) <= obj.AsSeconds() / 60;
-        }, $"значение не может превышать '{obj.AsSeconds() / 60}'");
+        }, $"значение не может превышать '{obj.AsSeconds() / 60}' минут");
     }
 
     public void OutputData()
     {
-        for (int i = 0; i < Times.Data.Count; i++)
-            Target.Write($"{i + 1}: {Times.Data[i]} \n");
+        for (int i = 0; i < Times.Data().Count; i++)
+            Target.Output.WriteLine($"{i + 1}: {Times.Data()[i]}");
         
-        if(Times.Data.Count == 0)
-            Target.Write("Массив пуст \n");
+        if(Times.Data().Count == 0)
+            Target.Output.WriteLine("Массив пуст");
     }
 }

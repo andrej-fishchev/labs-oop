@@ -5,16 +5,16 @@ namespace labs.lab9.src;
 public class TimeArray :
     IList<Time>
 {
-    private const int DefaultCapacity = 4;
+    internal Time[] times;
     
-    private Time[] times;
+    private static readonly Time[] Empty = Array.Empty<Time>();
 
-    public TimeArray(int capacity = DefaultCapacity)
+    public TimeArray(int capacity = 0)
     {
         ThrowableInRange(0, capacity, Int32.MaxValue);
 
         if (capacity == 0)
-            times = Array.Empty<Time>();
+            times = Empty;
 
         else times = new Time[capacity];
     }
@@ -73,7 +73,7 @@ public class TimeArray :
 
         int size = times.Length;
         
-        Array.Copy(times, index + 1, times, index, size - 1);
+        Array.Copy(times, index + 1, times, index, size - 1 - index);
         
         Resize((uint)(size - 1));
     }
@@ -89,6 +89,7 @@ public class TimeArray :
         set
         {
             ThrowableInRange(0, index, times.Length);
+
             times[index] = value;
         }
     }

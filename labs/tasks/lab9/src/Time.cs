@@ -4,6 +4,13 @@ public class Time :
     IComparable,
     ICloneable
 {
+    public static int Objects
+    {
+        get; 
+        private set;
+    }
+
+    
     private int minutes;
     private int hours;
     
@@ -35,12 +42,16 @@ public class Time :
 
         Hours = seconds / 3600;
         Minutes = (seconds % 3600) / 60;
+
+        Objects++;
     }
 
     public Time(int hours = 0, int minutes = 0)
     {
         Hours = hours;
         Minutes = minutes;
+
+        Objects++;
     }
     
     public Time() :
@@ -50,6 +61,12 @@ public class Time :
     public Time(int[] data) :
         this(data[0], data[1])
     { }
+
+    ~Time()
+    {
+        if (Objects > 0)
+            Objects--;
+    }
     
     public static bool TryParse(string? data, out Time obj)
     {
@@ -80,7 +97,7 @@ public class Time :
         {
             return false;
         }
-        
+
         return true;
     }
 

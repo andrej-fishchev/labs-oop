@@ -1,6 +1,5 @@
 using IO.requests;
 using IO.responses;
-using IO.targets;
 using IO.utils;
 using IO.validators;
 using labs.builders;
@@ -27,8 +26,8 @@ public sealed class Task4 :
                 .Build(),
             
             new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
-                .ExecuteAction(() => Target
-                    .Write($"f(x): {TaskExpression(x.Data)} \n"))
+                .ExecuteAction(() => Target.Output
+                    .WriteLine($"f(x): {TaskExpression(x.Data())}"))
                 .Build(),
             
             new LabTaskActionBuilder().Id(3).Name("Вывод данных")
@@ -39,16 +38,16 @@ public sealed class Task4 :
 
     public void InputData()
     {
-        x = (ConsoleResponseData<double>) 
-            new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
+        x = new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
             .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
                 new ConsoleDataValidator<double>(
-                (data) => data >= -2.0 && data <= 0, "значение выходит за допустимые границы"));
+                (data) => data >= -2.0 && data <= 0, "значение выходит за допустимые границы"))
+            .As<ConsoleResponseData<double>>();
     }
 
     public void OutputData()
     {
-        Target.Write($"X = {x.Data} \n");
+        Target.Output.WriteLine($"X = {x.Data()}");
     }
 
     public double TaskExpression(double value)
