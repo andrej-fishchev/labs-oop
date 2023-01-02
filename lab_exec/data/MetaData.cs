@@ -9,7 +9,6 @@ public static class MetaData
     public static readonly List<ILabEntity<int>> LabList = new()
     {
         new LabBuilder()
-            .Id(1)
             .Name("Лабораторная работа №1")
             .Description("Организация ввода и вывода данных")
             .Tasks(new List<LabTask>
@@ -23,13 +22,11 @@ public static class MetaData
             }).Build(),
         
         new LabBuilder()
-            .Id(2)
             .Name("Лабораторная работа №3")
             .Description("Вычисление функций с использованием их разложения в степенной ряд")
             .Build(),
         
         new LabBuilder()
-            .Id(3)
             .Name("Лабораторная работа №4")
             .Description("Работа с одномерными массивами")
             .Tasks(new List<LabTask>
@@ -38,7 +35,6 @@ public static class MetaData
             }).Build(),
         
         new LabBuilder()
-            .Id(4)
             .Name("Лабораторная работа №5")
             .Description("Динамические массивы различных типов")
             .Tasks(new List<LabTask>()
@@ -50,7 +46,6 @@ public static class MetaData
             .Build(),
         
         new LabBuilder()
-            .Id(5)
             .Name("Лабораторная работа №6")
             .Description("Класс Array. Строки. Класс String")
             .Tasks(new List<LabTask>()
@@ -61,7 +56,6 @@ public static class MetaData
             .Build(),
         
         new LabBuilder()
-            .Id(6)
             .Name("Лабораторная работа №9")
             .Description("Классы и объекты")
             .Tasks(new List<LabTask>()
