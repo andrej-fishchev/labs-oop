@@ -28,27 +28,15 @@ public class ConsoleFormattedNumberDataConverter<TOut> :
 
     public IResponsibleData<TOut> Convert(IResponsibleData<string?> responsibleData)
     {
-        ConsoleResponseData<TOut> response = new ConsoleResponseData<TOut>(
-            code: responsibleData.Code, error: responsibleData.Error);
+        if (!responsibleData.IsOk())
+            return ConsoleResponseDataFactory.MakeResponse<TOut>(
+                error: responsibleData.Error(), code: (ConsoleResponseDataCode) responsibleData.Code());
         
-        if (responsibleData.Code != (int)ConsoleResponseDataCode.ConsoleOk)
-            return response;
-        
-        TOut value;
-        if (!Expression.Invoke(responsibleData.Data, Styles, Provider, out value))
-        {
-            var declaringType = typeof(TOut).DeclaringType;
+        if (!Expression.Invoke(responsibleData.Data(), Styles, Provider, out var value))
+            return ConsoleResponseDataFactory.MakeResponse<TOut>(
+                error: $"невозможно привести '{responsibleData.Data()} к '{typeof(TOut).Name}'");
 
-            if (declaringType != null)
-                response.Error = $"не удалось привести '{responsibleData.Data}' к типу {declaringType.Name}";
-
-            else response.Error = $"не удалось выполнить преобразование для '{responsibleData.Data}'";
-
-            response.Code = (int)ConsoleResponseDataCode.ConsoleInvalidData;
-        }
-
-        response.Data = value;
-        return response;
+        return ConsoleResponseDataFactory.MakeResponse(value);
     }
 
     public object Clone()

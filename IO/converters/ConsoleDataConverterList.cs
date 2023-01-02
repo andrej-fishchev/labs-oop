@@ -16,24 +16,17 @@ public class ConsoleDataConverterList<TOut> :
 
     public IResponsibleData<TOut> Convert(IResponsibleData<string?> responsibleData)
     {
-        IResponsibleData<TOut> output = new ConsoleResponseData<TOut>(
-            code: responsibleData.Code, error: responsibleData.Error);
-        
-        if (responsibleData.Code != (int)ConsoleResponseDataCode.ConsoleOk)
-            return output;
+        if (!responsibleData.IsOk())
+            return ConsoleResponseDataFactory.MakeResponse<TOut>(
+                error: responsibleData.Error(), code: (ConsoleResponseDataCode) responsibleData.Code());
 
+        ConsoleResponseData<TOut> buffer;
         foreach (var t in list)
-        {
-            output = t.Convert(responsibleData);
-            
-            if (output.Code == (int)ConsoleResponseDataCode.ConsoleOk)
-                return output;
-        }
+            if ((buffer = t.Convert(responsibleData).As<ConsoleResponseData<TOut>>()) == true)
+                return buffer;
 
-        output.Error = $"не удалось выполнить преобразование для '{responsibleData.Data}'";
-        output.Code = (int)ConsoleResponseDataCode.ConsoleInvalidData;
-
-        return output;
+        return ConsoleResponseDataFactory.MakeResponse<TOut>(
+            error: $"не удалось выполнить преобразование для '{responsibleData.Data()}'");
     }
 
     public IEnumerator<IConvertibleData<string?, TOut>> GetEnumerator()
