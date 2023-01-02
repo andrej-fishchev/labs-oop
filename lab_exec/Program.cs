@@ -11,7 +11,7 @@ namespace lab_exec;
 public static class Program
 {
     public static MenuKeyGenerator<ILabEntity<int>, string> KeyGen = 
-        (ent, _) => ent.Id.ToString();
+        (_, index) => (index + 1).ToString();
 
     public static string ExitSay = "...";
     
@@ -32,9 +32,9 @@ public static class Program
             .Display(LabEntityMenuAction);
     }
 
-    public static ConsoleMenu<ILabEntity<int>> GetMenu(string name, IList<ILabEntity<int>> entities)
+    public static ConsoleMenu<ILabEntity<int>> GetMenu(string title, IList<ILabEntity<int>> entities)
     {
-        return ConsoleMenuFactory.MakeConsoleMenu(name, ExitSay, 
+        return ConsoleMenuFactory.MakeConsoleMenu(title, ExitSay, 
             (ConsoleMenuItemDictionary<ILabEntity<int>>)
             LabEntityToConsoleMenuItemAdapter<ILabEntity<int>>
                 .Adapt(entities, KeyGen));
@@ -49,10 +49,10 @@ public static class Program
             builder.Append($"{keyValuePair.Key}. {keyValuePair.Value.Name} \n");
 
         if (obj.Items.Count == 0)
-            builder.Append("Список пуст\n");
+            builder.Append("Список пуст \n");
         
-        ConsoleTarget.Write(builder
-                .Append($"\nВведите '{obj.Exit}' для закрытия \n\nОжидается ввод: ")
+        ConsoleTarget.Output.Write(
+            builder.Append($"\nВведите '{obj.Exit}' для закрытия \n\nОжидается ввод: ")
                 .ToString()
         );
     }
@@ -77,6 +77,6 @@ public static class Program
     
     public static void MenuActionClose(IMenu<string, ILabEntity<int>> obj)
     {
-        ConsoleTarget.Write($"Закрытие: {obj.Title} \n");
+        ConsoleTarget.Output.WriteLine($"Закрытие: {obj.Title}");
     }
 }
