@@ -102,13 +102,14 @@ public sealed class Task3 : LabTask
 
                 for (int i = 0; i < borders.Length; i++)
                 {
+                    var i1 = i;
                     borders[i] = new ConsoleDataRequest<int>(
                             $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ")
                         .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), 
                             new ConsoleDataValidator<int>(
                                 (data) =>
                                 {
-                                    if (i == 0)
+                                    if (i1 == 0)
                                         return true;
 
                                     return data > borders[0].Data();

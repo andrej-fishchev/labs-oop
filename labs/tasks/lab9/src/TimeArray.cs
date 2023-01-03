@@ -5,7 +5,7 @@ namespace labs.lab9.src;
 public class TimeArray :
     IList<Time>
 {
-    internal Time[] times;
+    private Time[] times;
     
     private static readonly Time[] Empty = Array.Empty<Time>();
 

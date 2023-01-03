@@ -93,7 +93,7 @@ public sealed class Task1 : LabTask
 
         Random random = new Random();
 
-        Times |= new TimeArray(size.Data());
+        Times.Data(new TimeArray(size.Data()));
 
         for (int i = 0; i < Times.Data().Count; i++)
             Times.Data()[i] = new Time(random.Next(0, Int32.MaxValue % 604800));

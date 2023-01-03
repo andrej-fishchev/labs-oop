@@ -76,11 +76,12 @@ public sealed class Task1 :
             request.DisplayMessage = 
                 $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ";
 
+            var i1 = i;
             borders[i] = request
                 .Request(converter.ElementConverter, new ConsoleDataValidator<int>(
                         (data) =>
                         {
-                            if (i == 0)
+                            if (i1 == 0)
                                 return true;
 
                             return data > borders[0].Data();
@@ -91,7 +92,7 @@ public sealed class Task1 :
             if(!borders[i]) return;
         }
 
-        IntArray |= new int[size.Data()];
+        IntArray.Data(new int[size.Data()]);
         
         Random random = new Random();
 
@@ -105,9 +106,7 @@ public sealed class Task1 :
         if(IntArray.Data().Length == 0)
             return;
 
-        IntArray |= IntArray.Data()
-            .Where(x => (x % 2) == 0)
-            .ToArray();
+        IntArray.Data(IntArray.Data().Where(x => (x % 2) == 0).ToArray());
     }
     
     public void OutputData()

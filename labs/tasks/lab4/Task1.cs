@@ -47,10 +47,7 @@ public sealed class Task1 :
                 .Build(),
             
             new LabTaskActionBuilder().Name("Сортировка вставкой")
-                .ExecuteAction(() =>
-                {
-                    IntArray |= InsertSort(IntArray.Data());
-                })
+                .ExecuteAction(() => IntArray.Data(InsertSort(IntArray.Data())))
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод массива")
@@ -80,9 +77,8 @@ public sealed class Task1 :
             new ConsoleDataRequest<int>("Введите резмер массива: ");
 
         ConsoleResponseData<int> size = request
-            .Request(converter.ElementConverter, 
-                new ConsoleDataValidator<int>(data => data > 0, 
-                    "значение должно быть больше 0"))
+            .Request(converter.ElementConverter, BaseDataValidatorsFactory
+                .MakeComparableGreaterThanValidator(0, "значение должно быть больше 0"))
             .As<ConsoleResponseData<int>>();
 
         ConsoleResponseData<int>[] borders = 
@@ -93,11 +89,12 @@ public sealed class Task1 :
             request.DisplayMessage = 
                 $"Введите {((i == 0) ? "левую" : "правую")} границу ДСЧ: ";
 
+            var index = i;
             borders[i] = request
                 .Request(converter.ElementConverter, new ConsoleDataValidator<int>(
                         data =>
                         {
-                            if (i == 0)
+                            if (index == 0)
                                 return true;
 
                             return data > borders[0].Data();
@@ -108,7 +105,7 @@ public sealed class Task1 :
             if(!borders[i]) return;
         }
 
-        IntArray |= new int[size.Data()];
+        IntArray.Data(new int[size.Data()]);
         
         Random random = new Random();
 
@@ -116,12 +113,8 @@ public sealed class Task1 :
             IntArray.Data()[i] = random.Next(borders[0].Data(), borders[1].Data());
     }
 
-    public void DeleteElements()
-    {
-        IntArray |= IntArray.Data()
-            .Where((_, index) => (index % 2) != 0)
-            .ToArray();
-    }
+    public void DeleteElements() => 
+        IntArray.Data(IntArray.Data().Where((_, index) => (index % 2) != 0).ToArray());
 
     public void AddElement()
     {
@@ -131,8 +124,8 @@ public sealed class Task1 :
         OutputData();
 
         ConsoleResponseData<int> elementToAdd = new ConsoleDataRequest<int>("Введите номер элемента: ")
-            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), new ConsoleDataValidator<int>(
-                data => data > 0 && data <= IntArray.Data().Length, 
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), BaseDataValidatorsFactory
+                .MakeInRangeNotStrictValidator(1, IntArray.Data().Length,
                 $"значение не может быть меньше 1 и больше {IntArray.Data().Length}"))
             .As<ConsoleResponseData<int>>();
         
@@ -146,7 +139,7 @@ public sealed class Task1 :
 
         buffer[^1] = buffer[elementToAdd.Data()-1];
         
-        IntArray |= buffer;
+        IntArray.Data(buffer);
         
         Target.Output.WriteLine($"Элемент с номером {elementToAdd.Data()} добавлен в конец массива");
     }
@@ -208,17 +201,17 @@ public sealed class Task1 :
         
         if(!shiftPower) return;
 
-        shiftPower |= shiftPower.Data() % IntArray.Data().Length;
+        shiftPower.Data(shiftPower.Data() % IntArray.Data().Length);
         
         if(shiftPower.Data() == 0)
             return;
 
-        IntArray |= IntArray.Data()
+        IntArray.Data(IntArray.Data()
             .Select((x, index) =>
                 new { x, nextIndex = ShiftingExpression(index, shiftPower.Data(), IntArray.Data().Length) })
             .OrderBy(x => x.nextIndex)
             .Select(x => x.x)
-            .ToArray();
+            .ToArray());
     }
 
     public void OutputData()
@@ -230,8 +223,6 @@ public sealed class Task1 :
             Target.Output.WriteLine("Массив пуст");
     }
 
-    public int ShiftingExpression(int index, int shiftPower, int length)
-    {
-        return (length + shiftPower + index) % length;
-    }
+    public int ShiftingExpression(int index, int shiftPower, int length) => 
+        (length + shiftPower + index) % length;
 }

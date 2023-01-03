@@ -48,18 +48,14 @@ public sealed class Task1 : LabTask
         n = InputData("Введите N: ", false);
     }
 
-    public void OutputData()
-    {
+    public void OutputData() => 
         Target.Output.WriteLine($"M: {m.Data()} \nN: {n.Data()}");
-    }
 
-    private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
-    {
-        return new ConsoleDataRequest<double>(message)
+    private ConsoleResponseData<double> InputData(string message, bool sendReject = true) => 
+        new ConsoleDataRequest<double>(message)
             .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
                 sendRejectMessage: sendReject)
             .As<ConsoleResponseData<double>>();
-    }
 
     public void TaskExpression(bool receive = false)
     {
@@ -75,8 +71,8 @@ public sealed class Task1 : LabTask
 
         if (receive)
         {
-            m |= left;
-            n |= right;
+            m.Data(left);
+            n.Data(right);
         }
     }
 }

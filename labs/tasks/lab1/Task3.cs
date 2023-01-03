@@ -59,11 +59,9 @@ public sealed class Task3 :
             .As<ConsoleResponseData<double>>();
     }
     
-    public void OutputData()
-    {
+    public void OutputData() => 
         Target.Output.WriteLine($"M: {m.Data()} \nN: {n.Data()}");
-    }
-    
+
     public void TaskExpression(bool receive = false)
     {
         double left = m.Data();
@@ -78,8 +76,8 @@ public sealed class Task3 :
 
         if (receive)
         {
-            m |= left;
-            n |= right;
+            m.Data(left);
+            n.Data(right);
         }
     }
 }

@@ -21,16 +21,16 @@ public sealed class Task4 :
         
         Actions = new List<ILabEntity<int>>()
         {
-            new LabTaskActionBuilder().Id(1).Name("Ввод данных")
+            new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Выполнить задачу")
+            new LabTaskActionBuilder().Name("Выполнить задачу")
                 .ExecuteAction(() => Target.Output
                     .WriteLine($"f(x): {TaskExpression(x.Data())}"))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(3).Name("Вывод данных")
+            new LabTaskActionBuilder().Name("Вывод данных")
                 .ExecuteAction(OutputData)
                 .Build()
         };
@@ -39,9 +39,8 @@ public sealed class Task4 :
     public void InputData()
     {
         x = new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
-            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
-                new ConsoleDataValidator<double>(
-                (data) => data >= -2.0 && data <= 0, "значение выходит за допустимые границы"))
+            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), BaseDataValidatorsFactory
+                .MakeInRangeNotStrictValidator(-2D, 0D, "выход за допустимыеграницы"))
             .As<ConsoleResponseData<double>>();
     }
 
