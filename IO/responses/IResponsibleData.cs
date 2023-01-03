@@ -1,10 +1,9 @@
 namespace IO.responses;
 
-// immutable
 public interface IResponsibleData<T> :
     ICloneable
 {
-    public string? Error();
+    public string Error();
 
     public T Data();
 
@@ -14,8 +13,6 @@ public interface IResponsibleData<T> :
 
     public bool HasError();
 
-    public virtual TV As<TV>() where TV : class, IResponsibleData<T>
-    {
-        return (this as TV)!;
-    }
+    public virtual TV As<TV>() where TV : class, IResponsibleData<T> 
+        => (this as TV)!;
 }
