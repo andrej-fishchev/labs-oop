@@ -3,11 +3,11 @@ namespace IO.responses;
 public class ConsoleResponseData<T> :
     IResponsibleData<T>
 {
-    private readonly ConsoleResponseDataCode code;
+    private ConsoleResponseDataCode code;
  
-    private readonly T data;
+    private T data;
     
-    private readonly string error;
+    private string error;
     
     public ConsoleResponseData(T data = default!, string? error = default,
         ConsoleResponseDataCode code = ConsoleResponseDataCode.ConsoleOk)
@@ -17,77 +17,53 @@ public class ConsoleResponseData<T> :
         this.code = code;
     }
 
-    public string Error()
-    {
-        return error;
-    }
+    public string Error() => error;
 
-    public T Data()
-    {
-        return data;
-    }
+    public T Data() => data;
 
-    int IResponsibleData<T>.Code()
-    {
-        return (int)Code();
-    }
+    int IResponsibleData<T>.Code() => (int)Code();
 
-    public ConsoleResponseDataCode Code()
-    {
-        return code;
-    }
+    public ConsoleResponseDataCode Code() => code;
 
-    public bool IsOk()
-    {
-        return !HasError() && code == ConsoleResponseDataCode.ConsoleOk;
-    }
+    public void Code(ConsoleResponseDataCode value) => code = value;
 
-    public bool HasError()
-    {
-        return Error() != String.Empty;
-    }
-    
-    public static implicit operator bool(ConsoleResponseData<T> obj)
-    {
-        return obj.IsOk();
-    }
+    public void Error(string value) => error = value;
+
+    public void Data(T value) => data = value;
+
+    public bool IsOk() => 
+        !HasError() && Code() == ConsoleResponseDataCode.ConsoleOk;
+
+    public bool HasError() => Error() != String.Empty;
+
+    public static implicit operator bool(ConsoleResponseData<T> obj) 
+        => obj.IsOk();
 
     public static ConsoleResponseData<T> operator |(ConsoleResponseData<T> obj, ConsoleResponseDataCode code)
     {
-        return ConsoleResponseDataFactory.MakeResponse(obj.Data(), obj.Error(), code);
+        obj.Code(code);
+        return obj;
     }
     
     public static ConsoleResponseData<T> operator |(ConsoleResponseData<T> obj, string error)
     {
-        return ConsoleResponseDataFactory.MakeResponse(obj.Data(), error, obj.Code());
-    }
-    
-    public static ConsoleResponseData<T> operator |(ConsoleResponseData<T> obj, T data)
-    {
-        return ConsoleResponseDataFactory.MakeResponse(data, obj.Error(), obj.Code());
+        obj.Error(error);
+        return obj;
     }
 
-    public static bool operator !=(ConsoleResponseData<T> obj, ConsoleResponseDataCode code)
-    {
-        return obj.Code() != code;
-    }
+    public static bool operator !=(ConsoleResponseData<T> obj, ConsoleResponseDataCode code) 
+        => obj.Code() != code;
 
-    public static bool operator ==(ConsoleResponseData<T> obj, ConsoleResponseDataCode code)
-    {
-        return obj.Code() == code;
-    }
+    public static bool operator ==(ConsoleResponseData<T> obj, ConsoleResponseDataCode code) 
+        => obj.Code() == code;
 
-    public object Clone()
-    {
-        return ConsoleResponseDataFactory.MakeResponse(data, error, code);
-    }
-    
-    protected bool Equals(ConsoleResponseData<T> other)
-    {
-        return code == other.code 
-               && EqualityComparer<T>.Default.Equals(data, other.data) 
-               && error == other.error;
-    }
+    public object Clone() => ConsoleResponseDataFactory
+        .MakeResponse(data, error, code);
+
+    protected bool Equals(ConsoleResponseData<T> other) => 
+        Code() == other.Code() 
+    && EqualityComparer<T>.Default.Equals(Data(), other.Data()) 
+    && Error() == other.Error();
 
     public override bool Equals(object? obj)
     {
@@ -98,8 +74,6 @@ public class ConsoleResponseData<T> :
         return Equals((ConsoleResponseData<T>)obj);
     }
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine((int)code, data, error);
-    }
+    public override int GetHashCode() => 
+        HashCode.Combine((int)Code(), Data(), Error());
 }
