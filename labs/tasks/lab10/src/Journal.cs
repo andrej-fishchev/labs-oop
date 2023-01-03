@@ -7,7 +7,7 @@ public class Journal :
 {
     public string Period { get; set; }
     
-    public Journal(string name, string dateTime, string period = "1 month") :
+    public Journal(string name, DateOnly dateTime, string period = "1 month") :
         base(name, dateTime)
     {
         Period = period;
@@ -15,17 +15,13 @@ public class Journal :
     
     public override void Describe(TextWriter target)
     {
-        StringBuilder builder = new StringBuilder("Book: \n");
-
-        builder.Append($"Name: {Name} \n");
-        builder.Append($"Date: {Date}");
-        builder.Append($"Period: {Period}\n");
-        
-        target.Write(builder.ToString());
+        target.WriteLine($"Журнал: \n{ToString()}");
     }
 
-    public void NoOverridingDescribe(TextWriter t)
+    public override string ToString()
     {
-        Describe(t);
+        return new StringBuilder(base.ToString())
+            .Append($"Периодичность выпуска: {Period} \n")
+            .ToString();
     }
 }

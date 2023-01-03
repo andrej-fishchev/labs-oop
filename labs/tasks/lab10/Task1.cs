@@ -23,41 +23,41 @@ public sealed class Task1 : LabTask
     
     void RunTimeLinking()
     {
-        Publication book = new Book("Сборник сказок А.С. Пушкина", DateTime.Now.ToShortDateString(), new List<string>
-        {
-            "А.С. Пушкин"
-        });
-        
-        Book bookCopy = (Book)book;
-        
+        Publication publication = GetBookInstance();
+
+        Book book = GetBookInstance();
+
         Target.Output
             .WriteLine("Позднее связывание (переменная типа Publication проинициализированна как Book()):");
         
-        book.Describe(Target.Output);
+        publication.Describe(Target.Output);
         
         Target.Output
             .WriteLine("\nПозднее связывание (переменная типа Book проинициализированна и содержит ссылку на объект Book):");
         
-        bookCopy.Describe(Target.Output);
+        book.Describe(Target.Output);
     }
 
     void CompileTimeLinking()
     {
-        Publication book = new Book("Сборник сказок А.С. Пушкина", DateTime.Now.ToShortDateString(), new List<string>
-        {
-            "А.С. Пушкин"
-        });
+        Publication publication = GetBookInstance();
         
-        Book bookCopy = (Book)book;
+        Book book = GetBookInstance();
         
         Target.Output
             .WriteLine("Раннее связывание (переменная типа Publication проинициализированна как Book()):");
         
-        book.NoOverridingDescribe(Target.Output);
+        publication.NoOverridingDescribe(Target.Output);
         
         Target.Output
             .WriteLine("\nРаннее связывание (переменная типа Book проинициализированна и содержит ссылку на объект Book):");
         
-        bookCopy.NoOverridingDescribe(Target.Output);
+        book.NoOverridingDescribe(Target.Output);
     }
+    
+    public Book GetBookInstance() =>
+        new("Сборник сказок А.С. Пушкина", DateOnly.FromDateTime(DateTime.Now), new List<string>
+        {
+            "А.С. Пушкин"
+        });
 }

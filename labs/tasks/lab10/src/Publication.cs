@@ -1,4 +1,4 @@
-using IO.targets;
+using System.Text;
 
 namespace labs.lab10.src;
 
@@ -6,9 +6,9 @@ public abstract class Publication
 {
     public string Name { get; set; }
     
-    public String Date { get; set; }
+    public DateOnly Date { get; set; }
 
-    protected Publication(string name, string date)
+    protected Publication(string name, DateOnly date)
     {
         Name = name;
         Date = date;
@@ -16,11 +16,24 @@ public abstract class Publication
 
     public virtual void Describe(TextWriter target)
     {
-        target.WriteLine($"Release year of {Name} is {Date}");
+        target.WriteLine($"Печатное издание: {ToString()} \n");
     }
     
     public void NoOverridingDescribe(TextWriter target)
     {
-        target.WriteLine($"Release year of {Name} is {Date}");
+        StringBuilder builder = new StringBuilder("")
+            .Append($"Название: {Name} \n")
+            .Append($"Дата публикации: {Date.ToShortDateString()} \n");
+            
+        target.WriteLine($"Печатное издание: \n{ builder } \n");
+    }
+
+    public override string ToString()
+    {
+        StringBuilder builder = new StringBuilder("")
+            .Append($"Название: {Name} \n")
+            .Append($"Дата публикации: {Date.ToShortDateString()} \n");
+
+        return builder.ToString();
     }
 }
