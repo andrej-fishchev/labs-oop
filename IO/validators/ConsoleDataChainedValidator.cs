@@ -7,10 +7,8 @@ public class ConsoleDataChainedValidator<T> :
 { 
     public IList<IValidatableData<T>> Validators { get; set; }
 
-    public ConsoleDataChainedValidator(IList<IValidatableData<T>> validators)
-    {
+    public ConsoleDataChainedValidator(IList<IValidatableData<T>> validators) => 
         Validators = validators;
-    }
 
     public IResponsibleData<T> Validate(IResponsibleData<T> responsibleData)
     {
@@ -18,7 +16,7 @@ public class ConsoleDataChainedValidator<T> :
         
         using (IEnumerator<IValidatableData<T>> enumerator = Validators.GetEnumerator())
             while (enumerator.MoveNext())
-                if ((responsibleData = enumerator.Current.Validate(responsibleData)).Error() != null)
+                if ((responsibleData = enumerator.Current.Validate(responsibleData)).HasError())
                     return responsibleData;
 
         buffer |= ConsoleResponseDataCode.ConsoleOk;
@@ -27,12 +25,14 @@ public class ConsoleDataChainedValidator<T> :
         return buffer;
     }
 
-    public static ConsoleDataChainedValidator<T> 
-        operator +(ConsoleDataChainedValidator<T> obj, IValidatableData<T> validator)
+    public ConsoleDataChainedValidator<T> And(IValidatableData<T> validator)
     {
-        obj.Validators.Add(validator);
-        return obj;
+        Validators.Add(validator);
+        return this;
     }
+
+    public static ConsoleDataChainedValidator<T> 
+        operator +(ConsoleDataChainedValidator<T> obj, IValidatableData<T> validator) => obj.And(validator);
 
     public static ConsoleDataChainedValidator<T>
         operator +(ConsoleDataChainedValidator<T> obj, IList<IValidatableData<T>> validators)
