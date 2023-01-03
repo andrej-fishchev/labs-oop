@@ -62,6 +62,16 @@ public static class MetaData
             {
                 new labs.lab9.Task1("Реализация класса Time и TimeArray", "Вариант №14")
             })
+            .Build(),
+        
+        new LabBuilder()
+            .Name("Лабораторная работа №10")
+            .Description("Наследование и виртуальные функции")
+            .Tasks(new List<LabTask>
+            {
+                new labs.lab10.Task1("Демонстрация динамического полиморфизма", "Вариант №16"),
+                new labs.lab10.Task2("Динамическая идентификация типов", "Вариант №16")
+            })
             .Build()
     };
 }
