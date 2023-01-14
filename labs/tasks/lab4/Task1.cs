@@ -77,7 +77,7 @@ public sealed class Task1 :
             new ConsoleDataRequest<int>("Введите резмер массива: ");
 
         ConsoleResponseData<int> size = request
-            .Request(converter.ElementConverter, BaseDataValidatorsFactory
+            .Request(converter.ElementConverter, BaseComparableValidatorFactory
                 .MakeComparableGreaterThanValidator(0, "значение должно быть больше 0"))
             .As<ConsoleResponseData<int>>();
 
@@ -124,7 +124,7 @@ public sealed class Task1 :
         OutputData();
 
         ConsoleResponseData<int> elementToAdd = new ConsoleDataRequest<int>("Введите номер элемента: ")
-            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), BaseDataValidatorsFactory
+            .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), BaseComparableValidatorFactory
                 .MakeInRangeNotStrictValidator(1, IntArray.Data().Length,
                 $"значение не может быть меньше 1 и больше {IntArray.Data().Length}"))
             .As<ConsoleResponseData<int>>();

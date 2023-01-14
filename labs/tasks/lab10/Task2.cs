@@ -1,11 +1,8 @@
-using IO.converters;
-using IO.requests;
 using IO.responses;
-using IO.utils;
-using IO.validators;
 using labs.builders;
 using labs.entities;
 using labs.lab10.src;
+using labs.lab10.src.utils;
 
 namespace labs.lab10;
 
@@ -56,43 +53,16 @@ public sealed class Task2 : LabTask
 
     public void RequestBook()
     {
-        (string Name, DateOnly Date)? publication = RequestPublication();
-        
-        if(publication == null)
-            return;
-
-        ConsoleResponseData<string[]> authors = RequestAuthors(false);
-
-        if (authors) AddPublication(new Book(publication.Value.Name, publication.Value.Date, authors.Data()));
+        ConsoleResponseData<Book> book;
+        if((book = PublicationRequestFactory.MakeBook()).IsOk())
+            AddPublication(book.Data());
     }
 
     public void RequestJournal()
     {
-        (string Name, DateOnly Date)? publication = RequestPublication();
-        
-        if(publication == null)
-            return;
-
-        ConsoleResponseData<string> period = new ConsoleDataRequest<string>("Введите периодичность выпуска: ")
-            .Request(BaseTypeDataConverterFactory.MakeSimpleStringConverter(), sendRejectMessage: false)
-            .As<ConsoleResponseData<string>>();
-        
-        if(period) AddPublication(new Journal(publication.Value.Name, publication.Value.Date, period.Data()));
-    }
-    
-    public (string name, DateOnly date)? RequestPublication()
-    {
-        ConsoleResponseData<string> name = RequestName();
-
-        if (!name) return null;
-
-        ConsoleResponseData<DateOnly> date = new ConsoleDataRequest<DateOnly>("Введите дату публикации: ")
-            .Request(MakeDateOnlyConverter(), sendRejectMessage: false)
-            .As<ConsoleResponseData<DateOnly>>();
-
-        if (!date) return null;
-
-        return (name.Data(), date.Data());
+        ConsoleResponseData<Journal> journal;
+        if((journal = PublicationRequestFactory.MakeJournal()).IsOk())
+            AddPublication(journal.Data());
     }
     
     public void AddPublication(Publication publication)
@@ -103,11 +73,9 @@ public sealed class Task2 : LabTask
 
     public void DisplayAllBooksWhereDateLessThanUserDate()
     {
-        ConsoleResponseData<DateOnly> date = new ConsoleDataRequest<DateOnly>("Введите дату: ")
-            .Request(MakeDateOnlyConverter(), sendRejectMessage: false)
-            .As<ConsoleResponseData<DateOnly>>();
-        
-        if(!date) return;
+        ConsoleResponseData<DateOnly> date;
+        if(!(date = PublicationRequestFactory.RequestPublicationDate())) 
+            return;
 
         OutputPublications(
             Publications.Where((x) => x is Book && x.Date < date.Data()).ToList()
@@ -121,7 +89,7 @@ public sealed class Task2 : LabTask
     {
         ConsoleResponseData<string[]> authors;
         
-        if(!(authors = RequestAuthors()))
+        if(!(authors = PublicationRequestFactory.RequestAuthors()))
             return;
         
         OutputPublications(Publications
@@ -131,12 +99,10 @@ public sealed class Task2 : LabTask
     
     public void DeletePublicationByName()
     {
-        ConsoleResponseData<string> name = RequestName();
-
-        if (name)
+        ConsoleResponseData<string> name;
+        if ((name = PublicationRequestFactory.RequestPublicationName()).IsOk()) 
             Publications = Publications.Where(x => !x.Name.Equals(name.Data())).ToList();
     }
-        
     
     public void OutputPublications(IList<Publication> publications)
     {
@@ -148,39 +114,5 @@ public sealed class Task2 : LabTask
         
         if(publications.Count == 0)
             Target.Output.WriteLine("Список пуст");
-    }
-
-    private static ConsoleResponseData<string> RequestName(bool send = true)
-    {
-        ConsoleSimpleDataConverter<string> converter = BaseTypeDataConverterFactory
-            .MakeSimpleStringConverter();
-
-        ConsoleDataValidator<string> validator = new ConsoleDataValidator<string>(
-            data => data.Trim().Length > 0,
-            "значение не может быть пустым"
-        );
-
-        return new ConsoleDataRequest<string>("Введите название: ")
-            .Request(converter, validator, send)
-            .As<ConsoleResponseData<string>>();
-    }
-
-    private static ConsoleResponseData<string[]> RequestAuthors(bool send = true)
-    {
-        ConsoleArrayDataConverter<string> converter = ConsoleDataConverterFactory.MakeArrayConverter(
-            BaseTypeDataConverterFactory.MakeSimpleStringConverter(), new ConsoleDataValidator<string>(
-                data => data.Trim().Length > 0, "значение не может быть пустым"));
-        
-        ConsoleDataValidator<string[]> validator = new ConsoleDataValidator<string[]>(
-            data => data.Length > 0, "список авторов не может быть пустым");
-
-        return new ConsoleDataRequest<string[]>($"Ввведите авторов (через '{converter.Delimiter}'): ")
-                .Request(converter, validator, send)
-                .As<ConsoleResponseData<string[]>>();
-    }
-
-    private static ConsoleSimpleDataConverter<DateOnly> MakeDateOnlyConverter()
-    {
-        return ConsoleDataConverterFactory.MakeSimpleConverter<DateOnly>(DateOnly.TryParse);
     }
 }

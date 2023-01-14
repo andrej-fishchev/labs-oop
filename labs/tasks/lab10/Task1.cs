@@ -6,6 +6,10 @@ namespace labs.lab10;
 
 public sealed class Task1 : LabTask
 {
+    private static readonly Book BookInstance = 
+        new("Сборник сказок А.С. Пушкина", DateOnly.FromDateTime(DateTime.Now), 
+            new List<string> { "А.С. Пушкин" });
+    
     public Task1(string name = "lab10.task1", string description = "") :
         base(1, name, description)
     {
@@ -23,9 +27,9 @@ public sealed class Task1 : LabTask
     
     void RunTimeLinking()
     {
-        Publication publication = GetBookInstance();
+        Publication publication = BookInstance;
 
-        Book book = GetBookInstance();
+        Book book = BookInstance;
 
         Target.Output
             .WriteLine("Позднее связывание (переменная типа Publication проинициализированна как Book()):");
@@ -40,9 +44,9 @@ public sealed class Task1 : LabTask
 
     void CompileTimeLinking()
     {
-        Publication publication = GetBookInstance();
+        Publication publication = BookInstance;
         
-        Book book = GetBookInstance();
+        Book book = BookInstance;
         
         Target.Output
             .WriteLine("Раннее связывание (переменная типа Publication проинициализированна как Book()):");
@@ -54,10 +58,5 @@ public sealed class Task1 : LabTask
         
         book.NoOverridingDescribe(Target.Output);
     }
-    
-    public Book GetBookInstance() =>
-        new("Сборник сказок А.С. Пушкина", DateOnly.FromDateTime(DateTime.Now), new List<string>
-        {
-            "А.С. Пушкин"
-        });
+
 }

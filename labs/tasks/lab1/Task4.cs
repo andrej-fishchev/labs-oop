@@ -1,7 +1,6 @@
 using IO.requests;
 using IO.responses;
 using IO.utils;
-using IO.validators;
 using labs.builders;
 using labs.entities;
 
@@ -39,8 +38,8 @@ public sealed class Task4 :
     public void InputData()
     {
         x = new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
-            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), BaseDataValidatorsFactory
-                .MakeInRangeNotStrictValidator(-2D, 0D, "выход за допустимыеграницы"))
+            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), BaseComparableValidatorFactory
+                .MakeInRangeNotStrictValidator(-2D, 0D, "выход за допустимые границы"))
             .As<ConsoleResponseData<double>>();
     }
 

@@ -193,20 +193,17 @@ public sealed class Task1 : LabTask
 
     private IValidatableData<int> GetIndexValidator()
     {
-        return new ConsoleDataValidator<int>(
-            data => data > 0 && data <= Times.Data().Count,
-            "выход за допустимые границы");
+        return BaseComparableValidatorFactory.MakeInRangeNotStrictValidator(
+            1,Times.Data().Count, "выход за допустимые границы");
     }
 
     private IValidatableData<int> GetMinuteValidator(Time obj)
     {
-        return new ConsoleDataValidator<int>(data =>
-        {
-            if (data > 0)
-                return true;
-            
-            return Math.Abs(data) <= obj.AsSeconds() / 60;
-        }, $"значение не может превышать '{obj.AsSeconds() / 60}' минут");
+        const Int32 left = 0;
+        Int32 right = obj.AsSeconds() / 60;
+        
+        return BaseComparableValidatorFactory.MakeInRangeNotStrictValidator(
+            left, right, $"значение не может превышать '{obj.AsSeconds() / 60}' минут");
     }
 
     public void OutputData()

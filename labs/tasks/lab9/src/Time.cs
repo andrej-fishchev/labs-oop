@@ -168,9 +168,7 @@ public class Time :
         if (timeObj.AsSeconds() == AsSeconds())
             return 0;
 
-        return (AsSeconds() < timeObj.AsSeconds())
-            ? -1
-            : 1;
+        return AsSeconds() < timeObj.AsSeconds() ? -1 : 1;
     }
 
     public object Clone()

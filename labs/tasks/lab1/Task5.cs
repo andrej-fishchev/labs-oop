@@ -1,3 +1,4 @@
+using System.Numerics;
 using IO.requests;
 using IO.responses;
 using IO.utils;
@@ -13,8 +14,11 @@ public sealed class Task5 :
     public static readonly Circle Circle = 
         new(5.0, (5.0, 0.0));
 
-    public static readonly Triangle Triangle = 
-        new();
+    public static readonly Triangle Triangle = new(
+        new Vector<double>(new [] {0.0, 5.0}),
+        new Vector<double>(new [] {0.0, -5.0}),
+        new Vector<double>(new [] {10.0, 0.0})
+    );
     
     private ConsoleResponseData<double> x;
     private ConsoleResponseData<double> y;
@@ -68,6 +72,6 @@ public sealed class Task5 :
 
     public bool TaskExpression((double x, double y) dot, Circle circle, Triangle triangle)
     {
-        return circle.Contains(dot) || triangle.Contains(dot);
+        return circle.Contains(dot) || triangle.Contains(new Vector<double>(new Double[2] {dot.x, dot.y}));
     }
 }
