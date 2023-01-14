@@ -29,8 +29,8 @@ public class ConsoleDataValidator<T> :
         return buffer;
     }
 
-    public object Clone()
-    {
-        return new ConsoleDataValidator<T>(Validator, ErrorMessage);
-    }
+    public static implicit operator ConsoleDataValidator<T>((Validator<T> expression, string error) obj) 
+        => new(obj.expression, obj.error);
+
+    public object Clone() => new ConsoleDataValidator<T>(Validator, ErrorMessage);
 }
