@@ -22,10 +22,9 @@ public class ConsoleDataValidator<T> :
             ? String.Empty
             : ErrorMessage;
 
-        ConsoleResponseData<T> buffer = responsibleData
-            .As<ConsoleResponseData<T>>();
-
-        buffer |= error;
+        ConsoleResponseData<T> buffer;
+        (buffer = responsibleData.As<ConsoleResponseData<T>>())
+            .Error(error);
         
         return buffer;
     }

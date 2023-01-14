@@ -19,8 +19,8 @@ public class ConsoleDataChainedValidator<T> :
                 if ((responsibleData = enumerator.Current.Validate(responsibleData)).HasError())
                     return responsibleData;
 
-        buffer |= ConsoleResponseDataCode.ConsoleOk;
-        buffer |= String.Empty;
+        buffer.Code(ConsoleResponseDataCode.ConsoleOk);
+        buffer.Error(String.Empty);
         
         return buffer;
     }

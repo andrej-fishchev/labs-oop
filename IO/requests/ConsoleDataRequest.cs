@@ -49,7 +49,6 @@ public class ConsoleDataRequest<TOut> :
                     buffer, code: ConsoleResponseDataCode.ConsoleInputRejected));
 
             // in: error is null already
-            // out: null or not null 
             output = converter.Convert(ConsoleResponseDataFactory.MakeResponse<string?>(
                     buffer, code: ConsoleResponseDataCode.ConsoleOk))
                 .As<ConsoleResponseData<TOut>>();
@@ -57,9 +56,8 @@ public class ConsoleDataRequest<TOut> :
             if (output.IsOk() && validator != null)
                 output = validator.Validate(output).As<ConsoleResponseData<TOut>>();
 
-            if (output.Error() != String.Empty)
-                Target.Output
-                    .WriteLine($"Ошибка: {output.Error()} \n");
+            if (output.HasError())
+                Target.Output.WriteLine($"Ошибка: {output.Error()} \n");
 
         } while (!output.IsOk());
         
