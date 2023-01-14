@@ -1,4 +1,4 @@
-namespace labs;
+namespace tier1;
 
 public interface IExecutable
 {
