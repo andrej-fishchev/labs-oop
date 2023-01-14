@@ -22,7 +22,7 @@ public class ConsoleDataConverterList<TOut> :
 
         ConsoleResponseData<TOut> buffer;
         foreach (var t in list)
-            if ((buffer = t.Convert(responsibleData).As<ConsoleResponseData<TOut>>()) == true)
+            if ((buffer = t.Convert(responsibleData).As<ConsoleResponseData<TOut>>()).IsOk())
                 return buffer;
 
         return ConsoleResponseDataFactory.MakeResponse<TOut>(

@@ -56,7 +56,7 @@ public class ConsoleArrayDataConverter<TOut> :
             element = ElementConverter.Convert(ConsoleResponseDataFactory.MakeResponse(buffer[i])!)
                 .As<ConsoleResponseData<TOut>>();
 
-            if (!element)
+            if (!element.IsOk())
                 continue;
 
             if (ElementValidator != null)
@@ -64,7 +64,7 @@ public class ConsoleArrayDataConverter<TOut> :
                 element = ElementValidator.Validate(element)
                     .As<ConsoleResponseData<TOut>>();
 
-                if (!element)
+                if (!element.IsOk())
                     continue;
             }
             
