@@ -2,6 +2,7 @@ using SimpleMenu.items;
 
 namespace labs.adapters;
 
+// TODO: продумать
 public delegate TO MenuKeyGenerator<in TV, out TO>(TV ent, int index);
 
 public static class LabEntityToConsoleMenuItemAdapter<T>

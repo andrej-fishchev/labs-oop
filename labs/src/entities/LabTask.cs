@@ -18,6 +18,8 @@ public abstract class LabTask :
     private LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
     {
         entity = iface ?? new IntLabEntity();
+        
+        // TODO: продумать
         Actions = (actions != null)
             ? actions.Distinct()
                 .Select(x => (ILabEntity<int>)x)

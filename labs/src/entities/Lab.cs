@@ -14,6 +14,8 @@ public sealed class Lab :
     public Lab(ILabEntity<int>? iface = default, IList<LabTask>? tasks = default)
     {
         entity = iface ?? new IntLabEntity();
+        
+        // TODO: продумать
         Tasks = (tasks != null)
             ? tasks.Distinct()
                 .Select(x => (ILabEntity<int>)x)
