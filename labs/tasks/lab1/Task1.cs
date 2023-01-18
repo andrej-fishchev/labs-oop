@@ -1,4 +1,3 @@
-using System.Text;
 using IO.requests;
 using IO.responses;
 using IO.utils;
@@ -7,6 +6,7 @@ using labs.entities;
 
 namespace labs.lab1;
 
+// TODO: вынести static методы в класс утилит для текущей лабораторной
 public sealed class Task1 : LabTask
 {
     private ConsoleResponseData<double> m;
@@ -18,7 +18,7 @@ public sealed class Task1 : LabTask
         m = new ConsoleResponseData<double>();
         n = new ConsoleResponseData<double>();
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)
@@ -33,46 +33,66 @@ public sealed class Task1 : LabTask
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод данных")
-                .ExecuteAction(OutputData)
+                .ExecuteAction(() => OutputData(m.Data(), n.Data()))
                 .Build()
         };
-
     }
 
     public void InputData()
     {
-        m = InputData("Введите M: ");
-        
-        if(!m) return;
-        
-        n = InputData("Введите N: ", false);
+        if (TryReceiveWithNotify(ref m, InputData("Введите M")))
+            TryReceiveWithNotify(ref n, InputData("Введите N", false), true);
     }
-
-    public void OutputData() => 
-        Target.Output.WriteLine($"M: {m.Data()} \nN: {n.Data()}");
-
-    private ConsoleResponseData<double> InputData(string message, bool sendReject = true) => 
-        new ConsoleDataRequest<double>(message)
-            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
-                sendRejectMessage: sendReject)
-            .As<ConsoleResponseData<double>>();
-
+    
     public void TaskExpression(bool receive = false)
     {
         double left = m.Data();
         double right = n.Data();
 
-        StringBuilder builder = 
-            new StringBuilder($"f(m, n): {left - ++right} \n")
-                .Append($"M: {left} \n")
-                .Append($"N: {right}");
+        OutputData(left, right);
         
-        Target.Output.WriteLine(builder.ToString());
+        Target.Output.WriteLine($"m - ++n = {left - ++right}");
+        
+        OutputData(left, right);
 
         if (receive)
         {
             m.Data(left);
             n.Data(right);
         }
+    }
+    
+    public static void OutputData(double mValue, double nValue) => 
+        Target.Output.WriteLine($"m = {mValue}; n = {nValue}");
+    
+    public static ConsoleResponseData<double> InputData(string message, bool sendReject = true) => 
+        new ConsoleDataRequest<double>(message + $" (от {double.MinValue + 1} до {double.MaxValue}): ")
+            .Request(
+                BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
+                BaseComparableValidatorFactory.MakeInRangeStrictValidator(
+                    double.MinValue, 
+                    double.MaxValue, 
+                    "выход за допустимые границы"
+                ), sendReject
+            ).As<ConsoleResponseData<double>>();
+
+    // временно полезный трюк
+    // TODO: переделать :/
+    public static bool TryReceiveWithNotify<T>(
+        ref ConsoleResponseData<T> self, 
+        ConsoleResponseData<T> value, 
+        bool sendOnOk = false
+    )
+    {
+        if(!value.IsOk())
+            Target.Output.WriteLine("Ввод прекращен, значения не обновлены");
+        
+        else if(sendOnOk)
+            Target.Output.WriteLine("Ввод завершился успешно");
+
+        if (value.IsOk()) 
+            self = value;
+        
+        return value.IsOk();
     }
 }

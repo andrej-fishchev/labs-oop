@@ -32,12 +32,12 @@ public sealed class Task1 : LabTask
         Book book = BookInstance;
 
         Target.Output
-            .WriteLine("Позднее связывание (переменная типа Publication проинициализированна как Book()):");
+            .WriteLine("Позднее связывание (переменная типа Publication проинициализирована и содержит ссылку на объект Book):");
         
         publication.Describe(Target.Output);
         
         Target.Output
-            .WriteLine("\nПозднее связывание (переменная типа Book проинициализированна и содержит ссылку на объект Book):");
+            .WriteLine("\nПозднее связывание (переменная типа Book проинициализирована и содержит ссылку на объект Book):");
         
         book.Describe(Target.Output);
     }
@@ -49,12 +49,12 @@ public sealed class Task1 : LabTask
         Book book = BookInstance;
         
         Target.Output
-            .WriteLine("Раннее связывание (переменная типа Publication проинициализированна как Book()):");
+            .WriteLine("Раннее связывание (переменная типа Publication проинициализирована и содержит ссылку на объект Book):");
         
         publication.NoOverridingDescribe(Target.Output);
         
         Target.Output
-            .WriteLine("\nРаннее связывание (переменная типа Book проинициализированна и содержит ссылку на объект Book):");
+            .WriteLine("\nРаннее связывание (переменная типа Book проинициализирована и содержит ссылку на объект Book):");
         
         book.NoOverridingDescribe(Target.Output);
     }

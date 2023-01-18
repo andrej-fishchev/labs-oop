@@ -2,14 +2,14 @@ namespace labs.lab9.src;
 
 public class Time :
     IComparable,
-    ICloneable
+    ICloneable,
+    IComparable<Time>
 {
     public static int Objects
     {
         get; 
         private set;
     }
-
     
     private int minutes;
     private int hours;
@@ -174,5 +174,14 @@ public class Time :
     public object Clone()
     {
         return new Time(AsSeconds());
+    }
+
+    public int CompareTo(Time? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        var minutesComparison = minutes.CompareTo(other.minutes);
+        if (minutesComparison != 0) return minutesComparison;
+        return hours.CompareTo(other.hours);
     }
 }

@@ -56,7 +56,8 @@ public sealed class Task3 : LabTask
             .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator)
             .As<ConsoleResponseData<int>>();
 
-        if(!rows) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref rows, rows))
+            return;
 
         ConsoleResponseData<int[]>[] buffer = 
             new ConsoleResponseData<int[]>[rows.Data()];
@@ -67,11 +68,13 @@ public sealed class Task3 : LabTask
                 
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    buffer[i] = new ConsoleDataRequest<int[]>($"Введите {i + 1}'е множество целых чисел: \n")
+                    buffer[i] = new ConsoleDataRequest<int[]>($"Введите {i + 1}'е множество целых чисел:")
                         .Request(BaseTypeArrayDataConverterFactory.MakeIntArrayConverter(), sendRejectMessage: false)
                         .As<ConsoleResponseData<int[]>>();
 
-                    if(!buffer[i]) return;
+                    if(!lab1.Task1.TryReceiveWithNotify(ref buffer[i], buffer[i], 
+                           i + 1 == buffer.Length))
+                        return;
                 }
                 
                 break;
@@ -86,12 +89,13 @@ public sealed class Task3 : LabTask
                 for (int i = 0; i < rows.Data(); i++)
                 {
                     request.DisplayMessage = $"Введите количество элементов для {i + 1}'й строки: ";
+
+                    bufferedSize = request
+                        .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
+                            sizeValidator, false)
+                        .As<ConsoleResponseData<int>>();
                     
-                    if((bufferedSize = request
-                           .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
-                               sizeValidator, 
-                               sendRejectMessage: false)
-                           .As<ConsoleResponseData<int>>()) != true)
+                    if(!lab1.Task1.TryReceiveWithNotify(ref bufferedSize, bufferedSize))
                         return;
 
                     buffer[i] = new ConsoleResponseData<int[]>(new int[bufferedSize.Data()]);
@@ -117,7 +121,8 @@ public sealed class Task3 : LabTask
                             false)
                         .As<ConsoleResponseData<int>>();
             
-                    if(!borders[i]) return;
+                    if(!lab1.Task1.TryReceiveWithNotify(ref borders[i], borders[i], i != 0)) 
+                        return;
                 }
                 
                 Random random = new Random();
@@ -134,7 +139,7 @@ public sealed class Task3 : LabTask
     
     public void TaskExpression()
     {
-        if(IntArray.Length == 0)
+        if(lab4.Task1.IsValueZeroWithNotify(IntArray[0].Data().Length, "Ожидается создание массива"))
             return;
 
         ConsoleResponseData<int[]>[] buffer = 
@@ -148,12 +153,12 @@ public sealed class Task3 : LabTask
             if (i == 0)
             {
                 buffer[i] = new ConsoleDataRequest<int[]>(
-                        $"Введите множество целых чисел (через {converter.Delimiter}): \n")
+                        $"Введите множество целых чисел (через {converter.Delimiter}):")
                     .Request(converter)
                     .As<ConsoleResponseData<int[]>>();
                 
                 
-                if(!buffer[i])
+                if(!lab1.Task1.TryReceiveWithNotify(ref buffer[i], buffer[i], true)) 
                     return;
                 
                 continue;
@@ -165,10 +170,18 @@ public sealed class Task3 : LabTask
         IntArray = buffer;
         
         Target.Output.WriteLine("\nСтрока добавлена");
+        
+        OutputData();
     }
 
     public void OutputData()
     {
+        if (IntArray[0].Data().Length == 0)
+        {
+            Target.Output.WriteLine("Массив пуст");
+            return;
+        }
+        
         for (int i = 0; i < IntArray.Length; i++)
         {
             for (int j = 0; j < IntArray[i].Data().Length; j++)
@@ -182,8 +195,5 @@ public sealed class Task3 : LabTask
             
             Target.Output.WriteLine();
         }
-        
-        if(IntArray.Length == 0)
-            Target.Output.WriteLine("Массив пуст");
     }
 }

@@ -10,56 +10,87 @@ public static class PublicationRequestFactory
 {
     public static ConsoleResponseData<Book> MakeBook()
     {
-        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date)  
+        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date, ConsoleResponseData<string[]> authors)?  
             publication = RequestPublication();
 
-        if (!IsPublicationOk(publication))
-            return new ConsoleResponseData<Book>(error: publication.date.Error(), code: publication.date.Code());
-
-        ConsoleResponseData<string[]> authors = RequestAuthors(false);
-
-        if (!authors)
-            return new ConsoleResponseData<Book>(error: authors.Error(), code: authors.Code());
+        if (publication == null)
+            return new ConsoleResponseData<Book>(code: ConsoleResponseDataCode.ConsoleInputRejected);
 
         return new ConsoleResponseData<Book>(new Book(
-            publication.name.Data(), 
-            publication.date.Data(), 
-            authors.Data()
+            publication.Value.name.Data(), 
+            publication.Value.date.Data(), 
+            publication.Value.authors.Data().ToList()
         ));
+    }
+    
+    public static ConsoleResponseData<EducationalBook> MakeEduBook()
+    {
+        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date, ConsoleResponseData<string[]> authors)?  
+            publication = RequestPublication();
+        
+        if (publication == null)
+            return new ConsoleResponseData<EducationalBook>(code: ConsoleResponseDataCode.ConsoleInputRejected);
+
+        ConsoleResponseData<string> subject = RequestEduBookSubject(send: false);
+
+        if (subject) return new ConsoleResponseData<EducationalBook>(new EducationalBook(
+            publication.Value.name.Data(),
+            subject.Data(),
+            publication.Value.date.Data(),
+            publication.Value.authors.Data().ToList()
+        ));
+
+        return new ConsoleResponseData<EducationalBook>(error: subject.Error(), code: subject.Code());
     }
 
     public static ConsoleResponseData<Journal> MakeJournal()
     {
-        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date)  
+        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date, ConsoleResponseData<string[]> authors)?  
             publication = RequestPublication();
 
-        if (!IsPublicationOk(publication))
-            return new ConsoleResponseData<Journal>(error: publication.date.Error(), code: publication.date.Code());
+        if (publication == null)
+            return new ConsoleResponseData<Journal>(code: ConsoleResponseDataCode.ConsoleInputRejected);
 
-        ConsoleResponseData<string> period = RequestJournalPeriod();
+        ConsoleResponseData<string> period = RequestJournalPeriod(send: false);
 
         if (period) return new ConsoleResponseData<Journal>(new Journal(
-            publication.name.Data(), 
-            publication.date.Data(), 
-            period.Data()
+            publication.Value.name.Data(),
+            period.Data(),
+            publication.Value.date.Data(), 
+            publication.Value.authors.Data().ToList()
         ));
 
         return new ConsoleResponseData<Journal>(error: period.Error(), code: period.Code());
     }
 
-    private static bool IsPublicationOk(
-        (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date) publication) => 
-        publication.name && publication.date;
+    private static (ConsoleResponseData<string> name,
+        ConsoleResponseData<DateOnly> date,
+        ConsoleResponseData<string[]> authors)? RequestPublication()
+    {
+        ConsoleResponseData<string> name = RequestPublicationName();
 
-    private static (ConsoleResponseData<string> name, ConsoleResponseData<DateOnly> date) 
-        RequestPublication() => (RequestPublicationName(), RequestPublicationDate(false));
+        if (!name) return null;
 
+        ConsoleResponseData<DateOnly> date = RequestPublicationDate(false);
+
+        if (!date) return null;
+
+        ConsoleResponseData<string[]> authors = RequestAuthors(false);
+
+        if (!authors) return null;
+        
+        return (name, date, authors);
+    }
+    
     public static ConsoleResponseData<string> RequestPublicationName(bool send = true) =>
         RequestStringAttribute("Введите название: ", send: send);
 
     public static ConsoleResponseData<string> RequestJournalPeriod(bool send = true) =>
         RequestStringAttribute("Введите периодичность выпуска: ", send: send);
 
+    public static ConsoleResponseData<string> RequestEduBookSubject(bool send = true) =>
+        RequestStringAttribute("Введите предмет учебника: ", send: send);
+    
     public static ConsoleResponseData<DateOnly> RequestPublicationDate(bool send = true)
         => new ConsoleDataRequest<DateOnly>("Введите дату публикации: ")
                 .Request(ConsoleDataConverterFactory

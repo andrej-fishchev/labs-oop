@@ -14,7 +14,8 @@ public sealed class Task2 :
 {
     public ConsoleResponseData<int[]>[] IntArray 
     { 
-        get; private set; 
+        get; 
+        private set; 
     }
     
     public Task2(string name = "lab5.task2", string description = "") : 
@@ -27,19 +28,19 @@ public sealed class Task2 :
 
         Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder().Id(1).Name("Создать двумерный массив")
+            new LabTaskActionBuilder().Name("Создать двумерный массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
-            new LabTaskActionBuilder().Id(2).Name("Создать двумерный массив [автозаполнение]")
+            new LabTaskActionBuilder().Name("Создать двумерный массив [автозаполнение]")
                 .ExecuteAction(() => InputData(ArrayGenerationType.Randomizer))
                 .Build(),
                 
-            new LabTaskActionBuilder().Id(3).Name("Добавление строки после строки с наиб. элементом")
+            new LabTaskActionBuilder().Name("Добавление строки после строки с наиб. элементом")
                 .ExecuteAction(TaskExpression)
                 .Build(),
 
-            new LabTaskActionBuilder().Id(4).Name("Вывод массива")
+            new LabTaskActionBuilder().Name("Вывод массива")
                 .ExecuteAction(OutputData)
                 .Build()
         };
@@ -53,8 +54,9 @@ public sealed class Task2 :
         ConsoleResponseData<int> rows = new ConsoleDataRequest<int>("Введите количество строк: ")
             .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator)
             .As<ConsoleResponseData<int>>();
-
-        if(!rows) return;
+        
+        if(!lab1.Task1.TryReceiveWithNotify(ref rows, rows))
+            return;
 
         switch (type)
         {
@@ -70,7 +72,7 @@ public sealed class Task2 :
                     Target.Output.WriteLine();
 
                     buffer[i] = new ConsoleDataRequest<int[]>(
-                            $"Введите множество целых чисел (через {converter.Delimiter}): \n")
+                            $"Введите множество целых чисел (через {converter.Delimiter}): ")
                         .Request(converter, 
                             ((i == 0) 
                                 ? null
@@ -80,7 +82,8 @@ public sealed class Task2 :
                             false)
                         .As<ConsoleResponseData<int[]>>();
 
-                    if(!buffer[i])
+                    
+                    if(!lab1.Task1.TryReceiveWithNotify(ref buffer[i], buffer[i], i + 1 == buffer.Length))
                         return;
                 }
 
@@ -93,7 +96,8 @@ public sealed class Task2 :
                     .Request(BaseTypeDataConverterFactory.MakeSimpleIntConverter(), sizeValidator,false)
                     .As<ConsoleResponseData<int>>();
                 
-                if(!columns) return;
+                if(!lab1.Task1.TryReceiveWithNotify(ref columns, columns))
+                    return;
                 
                 ConsoleResponseData<int>[] borders = 
                     new ConsoleResponseData<int>[2];
@@ -114,7 +118,8 @@ public sealed class Task2 :
                                 }, "значение правой границы должно быть больше левой"),
                             false);
             
-                    if(!borders[i]) return;
+                    if(!lab1.Task1.TryReceiveWithNotify(ref borders[i], borders[i], i != 0)) 
+                        return;
                 }
                 
                 IntArray = new ConsoleResponseData<int[]>[rows.Data()];
@@ -136,7 +141,7 @@ public sealed class Task2 :
     
     public void TaskExpression()
     {
-        if(IntArray.Length == 0)
+        if(lab4.Task1.IsValueZeroWithNotify(IntArray[0].Data().Length, "Ожидается создаение массива"))
             return;
         
         int row = 0;
@@ -163,7 +168,7 @@ public sealed class Task2 :
 
         ConsoleDataValidator<int[]> validator = new ConsoleDataValidator<int[]>(
             data => data.Length == IntArray[0].Data().Length,
-            $"ожижалось '{IntArray[0].Data().Length}' элементов"
+            $"ожидалось '{IntArray[0].Data().Length}' элементов"
         );
 
         ConsoleArrayDataConverter<int> converter = BaseTypeArrayDataConverterFactory
@@ -174,11 +179,12 @@ public sealed class Task2 :
             if (i == row)
             {        
                 buffer[i] = new ConsoleDataRequest<int[]>(
-                        $"Введите множество целых значений (через {converter.Delimiter}): \n")
+                        $"Введите множество целых значений (через {converter.Delimiter}):")
                     .Request(converter, validator)
                     .As<ConsoleResponseData<int[]>>();
                 
-                if(!buffer[i]) return;
+                if(!lab1.Task1.TryReceiveWithNotify(ref buffer[i], buffer[i], true)) 
+                    return;
                 
                 continue;
             }
@@ -189,24 +195,31 @@ public sealed class Task2 :
         IntArray = buffer;
         
         Target.Output.WriteLine($"\nСтрока добавлена после {row}'й строки");
+        
+        OutputData();
     }
     
     public void OutputData()
     {
+        if (IntArray[0].Data().Length == 0)
+        {
+            Target.Output.WriteLine("Массив пуст");
+            return;
+        }
+        
         for (int i = 0; i < IntArray.Length; i++)
         {
+            Target.Output.Write($"{i + 1}:\t");
+            
             for (int j = 0; j < IntArray[i].Data().Length; j++)
             {
                 Target.Output.Write($"{IntArray[i].Data()[j]}");
                 
                 if(j + 1 != IntArray[i].Data().Length)
-                    Target.Output.WriteLine("\t");
+                    Target.Output.Write("\t");
             }
             
             Target.Output.WriteLine();
         }
-        
-        if(IntArray.Length == 0)
-            Target.Output.WriteLine("Массив пуст");
     }
 }

@@ -13,7 +13,11 @@ namespace labs.lab4;
 public sealed class Task1 :
     LabTask
 {
-    public ConsoleResponseData<int[]> IntArray { get; set; }
+    public ConsoleResponseData<int[]> IntArray
+    {
+        get; 
+        private set;
+    }
 
     public Task1(string name = "lab4.task1", string description = "") :
         base(1, name, description)
@@ -22,7 +26,7 @@ public sealed class Task1 :
         
         Actions = new List<ILabEntity<int>>
         {
-            new LabTaskActionBuilder().Name("Создать массива")
+            new LabTaskActionBuilder().Name("Создать массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
                 .Build(),
             
@@ -47,7 +51,15 @@ public sealed class Task1 :
                 .Build(),
             
             new LabTaskActionBuilder().Name("Сортировка вставкой")
-                .ExecuteAction(() => IntArray.Data(InsertSort(IntArray.Data())))
+                .ExecuteAction(() =>
+                {
+                    if(IsValueZeroWithNotify(IntArray.Data().Length, "Ожидается создание массива"))
+                        return;
+
+                    IntArray.Data(InsertSort(IntArray.Data()));
+                    
+                    OutputData();
+                })
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод массива")
@@ -64,11 +76,12 @@ public sealed class Task1 :
         if (type == ArrayGenerationType.UserInput)
         {
             ConsoleResponseData<int[]> buffer = new ConsoleDataRequest<int[]>(
-                    $"Введите множество целых чисел (через '{converter.Delimiter}'): \n")
+                    $"Введите множество целых чисел (через '{converter.Delimiter}'):")
                 .Request(converter)
                 .As<ConsoleResponseData<int[]>>();
 
-            if (buffer) IntArray = buffer;
+            if (lab1.Task1.TryReceiveWithNotify(ref buffer, buffer, true))
+                IntArray = buffer;
             
             return;
         }
@@ -80,6 +93,9 @@ public sealed class Task1 :
             .Request(converter.ElementConverter, BaseComparableValidatorFactory
                 .MakeComparableGreaterThanValidator(0, "значение должно быть больше 0"))
             .As<ConsoleResponseData<int>>();
+        
+        if(!lab1.Task1.TryReceiveWithNotify(ref size, size))
+            return;
 
         ConsoleResponseData<int>[] borders = 
             new ConsoleResponseData<int>[2];
@@ -102,7 +118,8 @@ public sealed class Task1 :
                     false)
                 .As<ConsoleResponseData<int>>();
             
-            if(!borders[i]) return;
+            if(!lab1.Task1.TryReceiveWithNotify(ref borders[i], borders[i], i != 0)) 
+                return;
         }
 
         IntArray.Data(new int[size.Data()]);
@@ -113,12 +130,19 @@ public sealed class Task1 :
             IntArray.Data()[i] = random.Next(borders[0].Data(), borders[1].Data());
     }
 
-    public void DeleteElements() => 
+    public void DeleteElements()
+    {
+        if(IsValueZeroWithNotify(IntArray.Data().Length, "Ожидается создаение массива"))
+            return;
+        
         IntArray.Data(IntArray.Data().Where((_, index) => (index % 2) != 0).ToArray());
+        
+        OutputData();
+    }
 
     public void AddElement()
     {
-        if(IntArray.Data().Length == 0)
+        if(IsValueZeroWithNotify(IntArray.Data().Length, "Ожидается создаение массива"))
             return;
         
         OutputData();
@@ -141,14 +165,14 @@ public sealed class Task1 :
         
         IntArray.Data(buffer);
         
-        Target.Output.WriteLine($"Элемент с номером {elementToAdd.Data()} добавлен в конец массива");
+        OutputData();
     }
 
     public void SearchElement()
     {
-        if (IntArray.Data().Length == 0)
+        if(IsValueZeroWithNotify(IntArray.Data().Length, "Ожидается создаение массива"))
             return;
-        
+
         int sum = (int) IntArray.Data().Average();
 
         int result = -1;
@@ -191,7 +215,7 @@ public sealed class Task1 :
 
     public void CyclicShift()
     {
-        if(IntArray.Data().Length == 0)
+        if(IsValueZeroWithNotify(IntArray.Data().Length, "Ожидается создаение массива"))
             return;
         
         ConsoleResponseData<int> shiftPower = 
@@ -212,6 +236,8 @@ public sealed class Task1 :
             .OrderBy(x => x.nextIndex)
             .Select(x => x.x)
             .ToArray());
+        
+        OutputData();
     }
 
     public void OutputData()
@@ -225,4 +251,12 @@ public sealed class Task1 :
 
     public int ShiftingExpression(int index, int shiftPower, int length) => 
         (length + shiftPower + index) % length;
+
+    public static bool IsValueZeroWithNotify(int value, string msg)
+    {
+        if(value == 0)
+            Target.Output.WriteLine(msg);
+
+        return value == 0;
+    }
 }

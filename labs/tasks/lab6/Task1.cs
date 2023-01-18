@@ -59,9 +59,10 @@ public sealed class Task1 :
         ConsoleResponseData<int> rows = 
             InitIntNumberRequest(GetIntNumberRequest("Введите количество строк: "),
             new ConsoleDataValidator<int>(data => data > 0,
-                "ожидается занчение больше 0"));
+                "ожидается значение больше 0"));
 
-        if(!rows) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref rows, rows)) 
+            return;
 
         ConsoleResponseData<double[]>[] buffer = 
             new ConsoleResponseData<double[]>[rows.Data()];
@@ -78,7 +79,9 @@ public sealed class Task1 :
                         .Request(toDoubleArrayConverter, sendRejectMessage: false)
                         .As<ConsoleResponseData<double[]>>();
 
-                    if(!buffer[i]) return;
+                    if(!lab1.Task1.TryReceiveWithNotify(ref buffer[i], buffer[i], 
+                           i + 1 == buffer.Length)) 
+                        return;
                 }
                 
                 break;
@@ -93,7 +96,7 @@ public sealed class Task1 :
                         new ConsoleDataValidator<int>(data => data > 0, 
                             "ожидалось значение больше 0"), false);
 
-                    if(!columns)
+                    if(!lab1.Task1.TryReceiveWithNotify(ref columns, columns)) 
                         return;
 
                     buffer[i] = new ConsoleResponseData<double[]>(new double[columns.Data()]);
@@ -112,7 +115,8 @@ public sealed class Task1 :
                                 "значение правой границы ДСЧ не может быть больше или равно левой")), 
                     false);
                     
-                    if(!borders[i]) return;
+                    if(!lab1.Task1.TryReceiveWithNotify(ref borders[i], borders[i], i != 0)) 
+                        return;
                 }
                 
                 Random random = new Random();
@@ -129,19 +133,27 @@ public sealed class Task1 :
     
     public void TaskExpression()
     {
-        if(IntArray.Length == 0)
+        if(lab4.Task1.IsValueZeroWithNotify(IntArray[0].Data().Length, 
+               "Ожидается создание массива"))
             return;
 
-        IntArray = IntArray
-            .OrderBy(x => x.Data().Length)
+        IntArray = IntArray.OrderBy(x => x.Data().Length)
             .ToArray();
 
         for (int i = 0; i < IntArray.Length; i++)
             Array.Sort(IntArray[i].Data());
+        
+        OutputData();
     }
 
     public void OutputData()
     {
+        if (IntArray[0].Data().Length == 0)
+        {
+            Target.Output.WriteLine("Массив пуст");
+            return;
+        }
+
         for (int i = 0; i < IntArray.Length; i++)
         {
             for (int j = 0; j < IntArray[i].Data().Length; j++)
@@ -155,9 +167,6 @@ public sealed class Task1 :
             
             Target.Output.WriteLine();
         }
-        
-        if(IntArray.Length == 0)
-            Target.Output.WriteLine("Массив пуст");
     }
     
     public ConsoleResponseData<int> InitIntNumberRequest(ConsoleDataRequest<int> request, 

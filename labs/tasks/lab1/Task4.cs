@@ -18,7 +18,7 @@ public sealed class Task4 :
         
         Description = description;
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)
@@ -26,7 +26,7 @@ public sealed class Task4 :
             
             new LabTaskActionBuilder().Name("Выполнить задачу")
                 .ExecuteAction(() => Target.Output
-                    .WriteLine($"f(x): {TaskExpression(x.Data())}"))
+                    .WriteLine($"arcsin(|x+1|) = arcsin(|{x.Data() + 1}|) = {TaskExpression(x.Data())}"))
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод данных")
@@ -37,19 +37,16 @@ public sealed class Task4 :
 
     public void InputData()
     {
-        x = new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
+        ConsoleResponseData<double> buffer = 
+            new ConsoleDataRequest<double>("Введите значение X из отрезка [-2.0; 0.0]: ")
             .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), BaseComparableValidatorFactory
                 .MakeInRangeNotStrictValidator(-2D, 0D, "выход за допустимые границы"))
             .As<ConsoleResponseData<double>>();
+
+        Task1.TryReceiveWithNotify(ref x, buffer, true);
     }
 
-    public void OutputData()
-    {
-        Target.Output.WriteLine($"X = {x.Data()}");
-    }
+    public void OutputData() => Target.Output.WriteLine($"X = {x.Data()}");
 
-    public double TaskExpression(double value)
-    {
-        return Math.Asin(Math.Abs(value + 1));
-    }
+    public double TaskExpression(double value) => Math.Asin(Math.Abs(value + 1));
 }

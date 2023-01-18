@@ -6,8 +6,8 @@ namespace labs.lab1;
 public sealed class Task6 :
     LabTask
 {
-    private (float a, float b) floatData;
-    private (double a, double b) doubleData;
+    private readonly (float a, float b) floatData;
+    private readonly (double a, double b) doubleData;
     
     public Task6(string name = "lab1.task6", string description = "") 
         : base(6, name)
@@ -17,11 +17,11 @@ public sealed class Task6 :
         
         Description = description;
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Name("Выполнить задачу")
-                .ExecuteAction(() => Target.Output.WriteLine($"f(float):      {TaskExpression(floatData)} " +
-                                                             $"\nf(double):   {TaskExpression(doubleData)}"))
+                .ExecuteAction(() => Target.Output
+                    .WriteLine($"f(float): {TaskExpression(floatData)}\nf(double): {TaskExpression(doubleData)}"))
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод данных")
@@ -30,11 +30,8 @@ public sealed class Task6 :
         };
     }
 
-    public void OutputData()
-    {
-        Target.Output.WriteLine($"Float: {floatData} " +
-                                $"\nDouble: {doubleData}");
-    }
+    public void OutputData() => 
+        Target.Output.WriteLine($"Float: {floatData} \nDouble: {doubleData}");
 
     public double TaskExpression((double a, double b) data)
     {
@@ -42,16 +39,16 @@ public sealed class Task6 :
         Target.Output.WriteLine($"1. pow(a, 3) = {(xCube = Math.Pow(data.a, 3.0)) }");
         
         double yCube;
-        Target.Output.WriteLine($"2. pow(y, 3) = { (yCube = Math.Pow(data.b, 3.0)) }");
+        Target.Output.WriteLine($"2. pow(b, 3) = { (yCube = Math.Pow(data.b, 3.0)) }");
         
         double cubeDiffXy;
-        Target.Output.WriteLine($"3. pow(x-y, 3) = { (cubeDiffXy = Math.Pow((data.a - data.b), 3.0)) }");
+        Target.Output.WriteLine($"3. pow(a-b, 3) = { (cubeDiffXy = Math.Pow((data.a - data.b), 3.0)) }");
         
         double threeQuadraticYAndX;
-        Target.Output.WriteLine($"4. 3 * pow(y,2) * x = { (threeQuadraticYAndX = 3 * Math.Pow(data.b, 2.0) * data.a) }");
+        Target.Output.WriteLine($"4. 3 * pow(b,2) * a = { (threeQuadraticYAndX = 3 * Math.Pow(data.b, 2.0) * data.a) }");
         
         double threeQuadraticXAndY;
-        Target.Output.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * Math.Pow(data.a, 2.0) * data.b) } \n");
+        Target.Output.WriteLine($"5. 3 * pow(a, 2) * b = { (threeQuadraticXAndY = 3 * Math.Pow(data.a, 2.0) * data.b) } \n");
         
         return (cubeDiffXy - (xCube + threeQuadraticYAndX))
                            /((-threeQuadraticXAndY) - yCube);
@@ -63,16 +60,16 @@ public sealed class Task6 :
         Target.Output.WriteLine($"1. pow(a, 3) = {(xCube = MathF.Pow(data.a, 3.0f)) }");
         
         float yCube;
-        Target.Output.WriteLine($"2. pow(y, 3) = { (yCube = MathF.Pow(data.b, 3.0f)) }");
+        Target.Output.WriteLine($"2. pow(b, 3) = { (yCube = MathF.Pow(data.b, 3.0f)) }");
         
         float cubeDiffXy;
-        Target.Output.WriteLine($"3. pow(x-y, 3) = { (cubeDiffXy = MathF.Pow((data.a - data.b), 3.0f)) }");
+        Target.Output.WriteLine($"3. pow(a-b, 3) = { (cubeDiffXy = MathF.Pow((data.a - data.b), 3.0f)) }");
         
         float threeQuadraticYAndX;
-        Target.Output.WriteLine($"4. 3 * pow(y,2) * x = { (threeQuadraticYAndX = 3 * MathF.Pow(data.b, 2.0f) * data.a) }");
+        Target.Output.WriteLine($"4. 3 * pow(b,2) * a = { (threeQuadraticYAndX = 3 * MathF.Pow(data.b, 2.0f) * data.a) }");
         
         float threeQuadraticXAndY;
-        Target.Output.WriteLine($"5. 3 * pow(x, 2) * y = { (threeQuadraticXAndY = 3 * MathF.Pow(data.a, 2.0f) * data.b) } \n");
+        Target.Output.WriteLine($"5. 3 * pow(a, 2) * b = { (threeQuadraticXAndY = 3 * MathF.Pow(data.a, 2.0f) * data.b) } \n");
         
         return (cubeDiffXy - (xCube + threeQuadraticYAndX))
                /((-threeQuadraticXAndY) - yCube);

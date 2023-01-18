@@ -19,7 +19,7 @@ public sealed class Task1 : LabTask
     {
         Times = new ConsoleResponseData<TimeArray>(new TimeArray());
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Name("Ввод множества объектов Time")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))
@@ -78,7 +78,10 @@ public sealed class Task1 : LabTask
                     $"Введите множество 'hh:mm' (через '{converter.Delimiter}'): \n")
                 .Request(converter);
 
-            if (data) Times = ConsoleResponseDataFactory
+            if(!lab1.Task1.TryReceiveWithNotify(ref data, data, true))
+                return;
+            
+            Times = ConsoleResponseDataFactory
                     .MakeResponse(new TimeArray(data.Data()));
 
             return;
@@ -89,7 +92,8 @@ public sealed class Task1 : LabTask
                 data => data > 0, "ожидалось значение больше 0"))
             .As<ConsoleResponseData<int>>();
         
-        if(!size) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref size, size, true))
+            return;
 
         Random random = new Random();
 
@@ -105,29 +109,47 @@ public sealed class Task1 : LabTask
             .Request(ConsoleDataConverterFactory.MakeSimpleConverter<Time>(Time.TryParse))
             .As<ConsoleResponseData<Time>>();
         
-        if(buffer) Times.Data().Add(buffer.Data());
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer, true))
+            return;
+        
+        Times.Data().Add(buffer.Data());
     }
 
     public void RemoveItem()
     {
+        if(lab4.Task1.IsValueZeroWithNotify(Times.Data().Count, 
+               "Список объектов пуст"))
+            return;
+        
         ConsoleResponseData<int> buffer = RequestIntData(
             $"Введите номер элемента [1; {Times.Data().Count}]: ", GetIndexValidator());
 
-        if(buffer) Times.Data().RemoveAt(buffer.Data() - 1);
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer, true))
+            return;
+        
+        Times.Data().RemoveAt(buffer.Data() - 1);
     }
     
     public void SetMinutesToTimeObject()
     {
+        if(lab4.Task1.IsValueZeroWithNotify(Times.Data().Count, 
+               "Список объектов пуст"))
+            return;
+        
         ConsoleResponseData<int> buffer = RequestIntData($"Введите номер элемента [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(!buffer) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer))
+            return;
 
         ConsoleResponseData<int> minutes = 
             RequestIntData("Введите количество минут [+/- - добавить/вычесть]: ", 
                 GetMinuteValidator(Times.Data()[buffer.Data() - 1]), false);
         
-        if(minutes) Times.Data()[buffer.Data() - 1] += minutes.Data();
+        if(!lab1.Task1.TryReceiveWithNotify(ref minutes, minutes, true))
+            return;
+        
+        Times.Data()[buffer.Data() - 1] += minutes.Data();
     }
 
     public void DisplayMaxTimeObject()
@@ -136,7 +158,7 @@ public sealed class Task1 : LabTask
 
         if (max == null)
         {
-            Target.Output.WriteLine("Ошибка: Не удалось получить максимальный объект типа Time");
+            Target.Output.WriteLine("Ошибка: Не удалось получить максимальный объект типа Time, список пуст");
             return;
         }
         
@@ -145,11 +167,16 @@ public sealed class Task1 : LabTask
     
     public void RemoveTimeFromTimeObject()
     {
+        if(lab4.Task1.IsValueZeroWithNotify(Times.Data().Count, 
+               "Список объектов пуст"))
+            return;
+        
         ConsoleResponseData<int> buffer = RequestIntData(
             $"Введите номер элемента [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(!buffer) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer))
+            return;
 
         ConsoleResponseData<Time> time = new ConsoleDataRequest<Time>(
                 "Введите отнимаемое время (формат hh:mm): ")
@@ -160,15 +187,23 @@ public sealed class Task1 : LabTask
                 false)
             .As<ConsoleResponseData<Time>>();
         
-        if(time) Times.Data()[buffer.Data() - 1] -= time.Data();
+        if(!lab1.Task1.TryReceiveWithNotify(ref time, time, true))
+            return;
+        
+        Times.Data()[buffer.Data() - 1] -= time.Data();
     }
     
     public void AddTimeToTimeObject()
     {
+        if(lab4.Task1.IsValueZeroWithNotify(Times.Data().Count, 
+               "Список объектов пуст"))
+            return;
+        
         ConsoleResponseData<int> buffer = RequestIntData($"Выберите объект [1; {Times.Data().Count}]: ", 
             GetIndexValidator());
         
-        if(!buffer) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer))
+            return;
 
         ConsoleResponseData<Time> time = new ConsoleDataRequest<Time>(
                 "Введите добавочное время (формат hh:mm): ")
@@ -176,7 +211,10 @@ public sealed class Task1 : LabTask
                 .MakeSimpleConverter<Time>(Time.TryParse), sendRejectMessage: false)
             .As<ConsoleResponseData<Time>>();
         
-        if(time) Times.Data()[buffer.Data() - 1] += time.Data();
+        if(!lab1.Task1.TryReceiveWithNotify(ref time, time, true))
+            return;
+        
+        Times.Data()[buffer.Data() - 1] += time.Data();
     }
 
     private ConsoleResponseData<int> 

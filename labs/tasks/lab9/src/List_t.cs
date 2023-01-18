@@ -2,40 +2,41 @@ using System.Collections;
 
 namespace labs.lab9.src;
 
-public class List_t<T> :
-    IList<T>
+public class ListT<T> :
+    IList<T>,
+    ICloneable
 {
-    private T[] m_array;
+    private T[] mArray;
     
     private static readonly T[] Empty = Array.Empty<T>();
 
-    public List_t(int capacity = 0)
+    public ListT(int capacity = 0)
     {
         ThrowableInRange(0, capacity, Int32.MaxValue);
 
         if (capacity == 0)
-            m_array = Empty;
+            mArray = Empty;
 
-        else m_array = new T[capacity];
+        else mArray = new T[capacity];
     }
 
-    public List_t(T[] data)
+    public ListT(T[] data)
     {
-        m_array = data ?? throw new ArgumentNullException();
+        mArray = data ?? throw new ArgumentNullException();
     }
 
-    public IEnumerator<T> GetEnumerator() => new Enumerator(m_array);
+    public IEnumerator<T> GetEnumerator() => new Enumerator(mArray);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void Add(T item) => Insert(m_array.Length, item);
+    public void Add(T item) => Insert(mArray.Length, item);
 
-    public void Clear() => Array.Clear(m_array);
+    public void Clear() => Array.Clear(mArray);
 
     public bool Contains(T item) => IndexOf(item) != -1;
 
     public void CopyTo(T[] array, int arrayIndex) =>
-        Array.Copy(m_array, 0, array, arrayIndex, m_array.Length);
+        Array.Copy(mArray, 0, array, arrayIndex, mArray.Length);
 
     public bool Remove(T item)
     {
@@ -48,32 +49,32 @@ public class List_t<T> :
         return true;
     }
 
-    public int Count => m_array.Length;
+    public int Count => mArray.Length;
     
     public bool IsReadOnly => false;
 
-    public int IndexOf(T item) => Array.IndexOf(m_array, item, 0, m_array.Length);
+    public int IndexOf(T item) => Array.IndexOf(mArray, item, 0, mArray.Length);
 
     public void Insert(int index, T item)
     {
-        int newSize = m_array.Length + 1;
+        int newSize = mArray.Length + 1;
         
         ThrowableInRange(0, index, newSize);
 
         Resize((uint)newSize);
         
-        Array.Copy(m_array, index, m_array, index + 1, newSize - index - 1);
+        Array.Copy(mArray, index, mArray, index + 1, newSize - index - 1);
 
-        m_array[index] = item;
+        mArray[index] = item;
     }
 
     public void RemoveAt(int index)
     {
-        ThrowableInRange(0, index, m_array.Length);
+        ThrowableInRange(0, index, mArray.Length);
 
-        int size = m_array.Length;
+        int size = mArray.Length;
         
-        Array.Copy(m_array, index + 1, m_array, index, size - 1 - index);
+        Array.Copy(mArray, index + 1, mArray, index, size - 1 - index);
         
         Resize((uint)(size - 1));
     }
@@ -82,15 +83,15 @@ public class List_t<T> :
     {
         get
         {
-            ThrowableInRange(0, index, m_array.Length);
-            return m_array[index];
+            ThrowableInRange(0, index, mArray.Length);
+            return mArray[index];
         }
 
         set
         {
-            ThrowableInRange(0, index, m_array.Length);
+            ThrowableInRange(0, index, mArray.Length);
 
-            m_array[index] = value;
+            mArray[index] = value;
         }
     }
 
@@ -130,6 +131,7 @@ public class List_t<T> :
 
         public T Current => current!;
         
+#pragma warning disable CS8603
         object IEnumerator.Current
         {
             get
@@ -139,19 +141,25 @@ public class List_t<T> :
                 return Current;
             }
         }
-
+#pragma warning restore CS8603
+        
         public void Dispose()
         { }
     }
 
     private void Resize(uint size)
     {
-        Array.Resize(ref m_array, (int)size);
+        Array.Resize(ref mArray, (int)size);
     }
     
     private static void ThrowableInRange(int left, int value, int right)
     {
         if (value < left || value >= right)
             throw new ArgumentOutOfRangeException();
+    }
+
+    public object Clone()
+    {
+        return new List<T>(mArray);
     }
 }

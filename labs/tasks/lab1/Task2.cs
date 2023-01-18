@@ -1,7 +1,4 @@
-using System.Text;
-using IO.requests;
 using IO.responses;
-using IO.utils;
 using labs.builders;
 using labs.entities;
 
@@ -20,7 +17,7 @@ public sealed class Task2 : LabTask
         
         Description = description;
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<int>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)
@@ -35,43 +32,29 @@ public sealed class Task2 : LabTask
                 .Build(),
             
             new LabTaskActionBuilder().Name("Вывод данных")
-                .ExecuteAction(OutputData)
+                .ExecuteAction(() => Task1.OutputData(m.Data(), n.Data()))
                 .Build()
         };
     }
-
+    
     public void InputData()
     {
-        m = InputData("Введите M: ");
-        
-        if(!m) return;
-        
-        n = InputData("Введите N: ", false);
+        if (Task1.TryReceiveWithNotify(ref m, Task1.InputData("Введите M")))
+            Task1.TryReceiveWithNotify(ref n, Task1.InputData("Введите N", false), 
+                true);
     }
     
-    private ConsoleResponseData<double> InputData(string message, bool sendReject = true)
-    {
-        return new ConsoleDataRequest<double>(message)
-            .Request(BaseTypeDataConverterFactory.MakeDoubleConverterList(), 
-                sendRejectMessage: sendReject)
-            .As<ConsoleResponseData<double>>();
-    }
-    
-    public void OutputData() => 
-        Target.Output.WriteLine($"M: {m.Data()} \nN: {n.Data()}");
-
     public void TaskExpression(bool receive = false)
     {
         double left = m.Data();
         double right = n.Data();
 
-        StringBuilder builder = 
-            new StringBuilder($"f(m, n): {left++ > --right} \n")
-                .Append($"M: {left} \n")
-                .Append($"N: {right}");
+        Task1.OutputData(left, right);
         
-        Target.Output.WriteLine(builder.ToString());
+        Target.Output.WriteLine($"m++ > --n = {left++ > --right}");
 
+        Task1.OutputData(left, right);
+        
         if (receive)
         {
             m.Data(left);

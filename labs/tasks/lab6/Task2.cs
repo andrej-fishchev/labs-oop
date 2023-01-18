@@ -25,12 +25,19 @@ public sealed class Task2 :
 
             new LabTaskActionBuilder().Name("Выполнить задачу")
                 .ExecuteAction(() => Target.Output.
-                    WriteLine($"f(): {TaskExpression()}"))
+                    WriteLine(TaskExpression()))
                 .Build(),
 
             new LabTaskActionBuilder().Name("Вывод исходной строки")
-                .ExecuteAction(() => Target.Output
-                    .WriteLine($"Строка: {TaskVariable.Data()}"))
+                .ExecuteAction(() =>
+                {
+                    string output = TaskVariable.Data();
+                    
+                    if (output.Length == 0)
+                        output = "Пустая строка";
+                    
+                    Target.Output.WriteLine($"Строка: {output}");
+                })
                 .Build()
         };
     }
@@ -41,7 +48,8 @@ public sealed class Task2 :
             .Request(BaseTypeDataConverterFactory.MakeSimpleStringConverter())
             .As<ConsoleResponseData<string>>();
         
-        if(!buffer) return;
+        if(!lab1.Task1.TryReceiveWithNotify(ref buffer, buffer, true)) 
+            return;
 
         TaskVariable = buffer;
     }
@@ -49,7 +57,7 @@ public sealed class Task2 :
     public string TaskExpression()
     {
         if(TaskVariable.Data().Length == 0)
-            return TaskVariable.Data();
+            return "Пустая строка";
 
         Regex? expression;
 
