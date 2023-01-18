@@ -4,6 +4,9 @@ using labs.lab1;
 
 namespace lab_exec;
 
+// TODO: найти способ получать листинг сигнатур классов иным способом, для автоматизации
+// возможно, это будет json файл, который будет содержать пути до сигнатур подпрограмм 
+// по крайней мере в java это возможно :/
 public static class MetaData
 {
     public static readonly List<ILabEntity<int>> LabList = new()
@@ -24,6 +27,10 @@ public static class MetaData
         new LabBuilder()
             .Name("Лабораторная работа №3")
             .Description("Вычисление функций с использованием их разложения в степенной ряд")
+            .Tasks(new List<LabTask>
+            {
+                new labs.lab3.Task1("Вычисление значения", "Вариант №1")
+            })
             .Build(),
         
         new LabBuilder()
@@ -37,7 +44,7 @@ public static class MetaData
         new LabBuilder()
             .Name("Лабораторная работа №5")
             .Description("Динамические массивы различных типов")
-            .Tasks(new List<LabTask>()
+            .Tasks(new List<LabTask>
             {
                 new labs.lab5.Task1("Действия над одномерным массивом", "Вариант №24"),
                 new labs.lab5.Task2("Действия над двумерным массивом", "Вариант №24"),
@@ -48,7 +55,7 @@ public static class MetaData
         new LabBuilder()
             .Name("Лабораторная работа №6")
             .Description("Класс Array. Строки. Класс String")
-            .Tasks(new List<LabTask>()
+            .Tasks(new List<LabTask>
             {
                 new labs.lab6.Task1("Сортировка элементов рванного массива", "Вариант №23"),
                 new labs.lab6.Task2("Переворот и сортировка слов предложения", "Вариант №24")
@@ -58,7 +65,7 @@ public static class MetaData
         new LabBuilder()
             .Name("Лабораторная работа №9")
             .Description("Классы и объекты")
-            .Tasks(new List<LabTask>()
+            .Tasks(new List<LabTask>
             {
                 new labs.lab9.Task1("Реализация класса Time и TimeArray", "Вариант №14")
             })
@@ -71,6 +78,16 @@ public static class MetaData
             {
                 new labs.lab10.Task1("Демонстрация динамического полиморфизма", "Вариант №16"),
                 new labs.lab10.Task2("Динамическая идентификация типов", "Вариант №16")
+            })
+            .Build(),
+        
+        new LabBuilder()
+            .Name("Лабораторная работа №11")
+            .Description("Коллекции")
+            .Tasks(new List<LabTask>
+            {
+                new labs.lab11.Task1("Реализация списка", "Вариант №28"),
+                new labs.lab11.Task3("StopWatch", "Вариант №28")
             })
             .Build()
     };
