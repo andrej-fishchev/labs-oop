@@ -9,21 +9,30 @@ using labs.utils;
 
 namespace labs.lab5;
 
-public sealed class Task1 :
-    LabTask
+public sealed class Task1 : LabTask
 {
+    private static Task1? instance;
+    
     public ConsoleResponseData<int[]> IntArray
     {
         get; 
         private set;
     }
+    
+    public static Task1 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task1(name, description);
 
-    public Task1(string name = "lab5.task1", string description = "") : 
-        base(1, name, description)
+        return instance;
+    }
+
+    private Task1(string name, string description) : 
+        base(name, description)
     {
         IntArray = new ConsoleResponseData<int[]>(Array.Empty<int>());
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<string>>()
         {
             new LabTaskActionBuilder().Name("Создать массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))

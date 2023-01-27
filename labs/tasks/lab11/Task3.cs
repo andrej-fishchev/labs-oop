@@ -12,14 +12,24 @@ namespace labs.lab11;
 
 public class Task3 : LabTask
 {
+    private static Task3? instance;
+    
     private List<Book> books;
     private List<string> strBooks;
 
     private Dictionary<Book, EducationalBook> dictBooks;
     private Dictionary<string, EducationalBook> dictStrBooks;
     
-    public Task3(string name = "lab11.task3", string description = "") : 
-        base(1, name, description)
+    public static Task3 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task3(name, description);
+
+        return instance;
+    }
+    
+    private Task3(string name, string description) : 
+        base(name, description)
     {
         books = new List<Book>();
         strBooks = new List<string>();
@@ -27,7 +37,7 @@ public class Task3 : LabTask
         dictBooks = new Dictionary<Book, EducationalBook>(comparer: new DescribeEqualityComparer<Book>());
         dictStrBooks = new Dictionary<string, EducationalBook>();
         
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Автоматически заполнить")
                 .ExecuteAction(InitCollections)

@@ -11,21 +11,31 @@ namespace labs.lab5;
 
 public sealed class Task3 : LabTask
 {
+    private static Task3? instance;
+    
     public ConsoleResponseData<int[]>[] IntArray 
     { 
         get; 
         private set; 
     }
+    
+    public static Task3 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task3(name, description);
 
-    public Task3(string name = "lab5.task3", string description = "") : 
-        base(3, name, description)
+        return instance;
+    }
+
+    private Task3(string name, string description) : 
+        base(name, description)
     {
         IntArray = new ConsoleResponseData<int[]>[]
         {
             new(Array.Empty<int>())
         };
 
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Создать рваный массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))

@@ -11,18 +11,28 @@ namespace labs.lab10;
 
 public sealed class Task2 : LabTask
 {
+    private static Task2? instance;
+    
     public List<IDescribe> Describes
     {
         get;
         private set;
     }
     
-    public Task2(string name = "lab10.task1", string description = "") :
-        base(2, name, description)
+    public static Task2 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task2(name, description);
+
+        return instance;
+    }
+    
+    private Task2(string name, string description) :
+        base(name, description)
     {
         Describes = new List<IDescribe>();
         
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Добавить книгу")
                 .ExecuteAction(RequestBook)

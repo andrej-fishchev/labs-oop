@@ -12,14 +12,24 @@ namespace labs.lab11;
 
 public sealed class Task1 : LabTask
 {
+    private static Task1? instance;
+    
     private ConsoleResponseData<ListT<Time>> Times { get; set; }
 
-    public Task1(string name = "lab11.task1", string description = "") : 
-        base(1, name, description)
+    public static Task1 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task1(name, description);
+
+        return instance;
+    }
+    
+    private Task1(string name, string description) : 
+        base(name, description)
     {
         Times = new ConsoleResponseData<ListT<Time>>(new ListT<Time>());
         
-        Actions = new List<ILabEntity<int>>()
+        Actions = new List<ILabEntity<string>>()
         {
             new LabTaskActionBuilder().Name("Ввод множества объектов Time")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))

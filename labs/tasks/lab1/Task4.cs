@@ -6,19 +6,26 @@ using labs.entities;
 
 namespace labs.lab1;
 
-public sealed class Task4 :
-    LabTask
+public sealed class Task4 : LabTask
 {
+    private static Task4? instance;
+    
     private ConsoleResponseData<double> x;
 
-    public Task4(string name = "lab1.task4", string description = "") 
-        : base(4, name, description)
+    public static Task4 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task4(name, description);
+
+        return instance;
+    }
+    
+    private Task4(string name, string description) 
+        : base(name, description)
     {
         x = new ConsoleResponseData<double>();
         
-        Description = description;
-        
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)

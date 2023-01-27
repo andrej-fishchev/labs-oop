@@ -6,18 +6,26 @@ namespace labs.lab1;
 public sealed class Task6 :
     LabTask
 {
+    private static Task6? instance;
+    
     private readonly (float a, float b) floatData;
     private readonly (double a, double b) doubleData;
     
-    public Task6(string name = "lab1.task6", string description = "") 
-        : base(6, name)
+    public static Task6 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task6(name, description);
+
+        return instance;
+    }
+    
+    private Task6(string name, string description) 
+        : base(name, description)
     {
         doubleData = (1000.0, 0.0001);
         floatData = (1000.0f, 0.0001f);
         
-        Description = description;
-        
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Выполнить задачу")
                 .ExecuteAction(() => Target.Output

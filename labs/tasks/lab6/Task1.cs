@@ -9,12 +9,14 @@ using labs.utils;
 
 namespace labs.lab6;
 
-public sealed class Task1 :
-    LabTask
+public sealed class Task1 : LabTask
 {
+    private static Task1? instance;
+    
     public ConsoleResponseData<double[]>[] IntArray
     {
-        get; private set;
+        get; 
+        private set;
     }
 
     private readonly ConsoleDataRequest<double[]> 
@@ -23,8 +25,16 @@ public sealed class Task1 :
     private readonly ConsoleArrayDataConverter<double>
         toDoubleArrayConverter;
 
-    public Task1(string name = "lab6.task1", string description = "") : 
-        base(1, name, description)
+    public static Task1 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task1(name, description);
+
+        return instance;
+    }
+    
+    private Task1(string name, string description) : 
+        base(name, description)
     {
         toDoubleArrayConverter = BaseTypeArrayDataConverterFactory
             .MakeDoubleArrayConverterList();
@@ -34,7 +44,7 @@ public sealed class Task1 :
             new(Array.Empty<double>())
         };
 
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Создать массив")
                 .ExecuteAction(() => InputData(ArrayGenerationType.UserInput))

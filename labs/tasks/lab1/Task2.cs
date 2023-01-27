@@ -6,18 +6,26 @@ namespace labs.lab1;
 
 public sealed class Task2 : LabTask
 {
+    private static Task2? instance;
+    
     private ConsoleResponseData<double> m;
     private ConsoleResponseData<double> n;
 
-    public Task2(string name = "lab1.task2", string description = "") : 
-        base(2, name, description)
+    public static Task2 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task2(name, description);
+
+        return instance;
+    }
+    
+    private Task2(string name, string description) : 
+        base(name, description)
     {
         m = new ConsoleResponseData<double>(); 
         n = new ConsoleResponseData<double>();
         
-        Description = description;
-        
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)

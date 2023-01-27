@@ -9,16 +9,26 @@ namespace labs.lab1;
 // TODO: вынести static методы в класс утилит для текущей лабораторной
 public sealed class Task1 : LabTask
 {
+    private static Task1? instance;
+    
     private ConsoleResponseData<double> m;
     private ConsoleResponseData<double> n;
 
-    public Task1(string name = "lab1.task1", string description = "") : 
-        base(1, name, description)
+    public static Task1 GetInstance(string name, string description)
+    {
+        if (instance == null)
+            instance = new Task1(name, description);
+
+        return instance;
+    }
+    
+    private Task1(string name = "lab1.task1", string description = "") : 
+        base(name, description)
     {
         m = new ConsoleResponseData<double>();
         n = new ConsoleResponseData<double>();
         
-        Actions = new List<ILabEntity<int>>
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Ввод данных")
                 .ExecuteAction(InputData)

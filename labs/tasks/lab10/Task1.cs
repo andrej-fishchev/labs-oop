@@ -6,14 +6,24 @@ namespace labs.lab10;
 
 public sealed class Task1 : LabTask
 {
+    private static Task1? instance;
+    
     private static readonly Book BookInstance = 
         new("Сборник сказок А.С. Пушкина", DateOnly.FromDateTime(DateTime.Now), 
             new List<string> { "А.С. Пушкин" });
     
-    public Task1(string name = "lab10.task1", string description = "") :
-        base(1, name, description)
+    public static Task1 GetInstance(string name, string description)
     {
-        Actions = new List<ILabEntity<int>>
+        if (instance == null)
+            instance = new Task1(name, description);
+
+        return instance;
+    }
+    
+    private Task1(string name, string description) :
+        base(name, description)
+    {
+        Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Позднее связывание")
                 .ExecuteAction(RunTimeLinking)
