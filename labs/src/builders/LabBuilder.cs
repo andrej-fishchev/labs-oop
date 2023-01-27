@@ -3,7 +3,7 @@ using labs.entities;
 namespace labs.builders;
 
 public sealed class LabBuilder :
-    LabEntityBuilder<int>
+    LabEntityBuilder<string>
 {
     public LabBuilder(Lab? lab = default) : 
         base(lab ?? new Lab())
@@ -13,13 +13,13 @@ public sealed class LabBuilder :
     {
         ((Lab)Build()).Tasks = value
                 .Distinct()
-                .Select(x => (ILabEntity<int>)x)
+                .Select(x => (ILabEntity<string>)x)
                 .ToList();
 
         return this;
     }
 
-    public override LabBuilder Id(int value)
+    public override LabBuilder Id(string value)
     {
         return (LabBuilder) base.Id(value);
     }

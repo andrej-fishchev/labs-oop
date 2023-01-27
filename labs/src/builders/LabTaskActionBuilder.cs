@@ -3,7 +3,7 @@ using labs.entities;
 namespace labs.builders;
 
 public sealed class LabTaskActionBuilder :
-    LabEntityBuilder<int>
+    LabEntityBuilder<string>
 {
     public LabTaskActionBuilder(LabTaskAction? labTaskAction = default) :
         base(labTaskAction ?? new LabTaskAction())
@@ -27,7 +27,7 @@ public sealed class LabTaskActionBuilder :
         return (LabTaskActionBuilder) base.Name(value);
     }
 
-    public override LabTaskActionBuilder Id(int value)
+    public override LabTaskActionBuilder Id(string value)
     {
         return (LabTaskActionBuilder) base.Id(value);
     }
