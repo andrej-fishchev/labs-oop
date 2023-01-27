@@ -3,35 +3,26 @@ using IO.targets;
 namespace labs.entities;
 
 public abstract class LabTask :
-    ILabEntity<int>
+    ILabEntity<string>
 {
     public static readonly ConsoleTarget Target = new();
     
-    private readonly ILabEntity<int> entity;
+    private readonly ILabEntity<string> entity;
     
-    public IList<ILabEntity<int>> Actions
+    // must be initialized from parent sealed class and cannot be changed outside
+    public IList<ILabEntity<string>> Actions
     {
         get; 
         protected init;
     }
-    
-    private LabTask(ILabEntity<int>? iface = default, IList<LabTaskAction>? actions = default)
+
+    protected LabTask(string name = "", string description = "")
     {
-        entity = iface ?? new IntLabEntity();
-        
-        // TODO: продумать
-        Actions = (actions != null)
-            ? actions.Distinct()
-                .Select(x => (ILabEntity<int>)x)
-                .ToList()
-            : new List<ILabEntity<int>>();
+        entity = new StringLabEntity(
+            Guid.NewGuid().ToString(), name, description);
     }
-
-    protected LabTask(int id, string name = "", string description = "") :
-        this(new IntLabEntity(id, name, description))
-    { }
-
-    public int Id
+    
+    public string Id
     {
         get => entity.Id; 
         set => entity.Id = value;
