@@ -3,7 +3,7 @@ using tier1;
 namespace labs.entities;
 
 public sealed class LabTaskAction :
-    ILabEntity<int>,
+    ILabEntity<string>,
     IExecutable
 {
     public Action ExecuteAction
@@ -12,19 +12,19 @@ public sealed class LabTaskAction :
         set;
     }
 
-    private ILabEntity<int> entity;
+    private ILabEntity<string> entity;
 
-    public LabTaskAction(ILabEntity<int>? iface = default, Action? excute = default)
+    public LabTaskAction(ILabEntity<string> ent)
     {
-        entity = iface ?? new IntLabEntity();
-        ExecuteAction = excute ?? (() => {});
+        entity = ent;
+        ExecuteAction = () => { };
     }
 
-    public LabTaskAction(int id, string name = "", string description = "") :
-        this(new IntLabEntity(id, name, description))
+    public LabTaskAction(string name = "", string description = "") :
+        this(new StringLabEntity(Guid.NewGuid().ToString(), name, description))
     { }
 
-    public int Id
+    public string Id
     {
         get => entity.Id; 
         set => entity.Id = value;
@@ -42,8 +42,5 @@ public sealed class LabTaskAction :
         set => entity.Description = value;
     }
     
-    public void Execute()
-    {
-        ExecuteAction.Invoke();
-    }
+    public void Execute() => ExecuteAction.Invoke();
 }

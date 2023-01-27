@@ -1,33 +1,27 @@
 namespace labs.entities;
 
 public sealed class Lab :
-    ILabEntity<int>
+    ILabEntity<string>
 {
-    public IList<ILabEntity<int>> Tasks
+    public IList<ILabEntity<string>> Tasks
     {
-        get; 
+        get;
         set;
     }
 
-    private readonly ILabEntity<int> entity;
-
-    public Lab(ILabEntity<int>? iface = default, IList<LabTask>? tasks = default)
-    {
-        entity = iface ?? new IntLabEntity();
-        
-        // TODO: продумать
-        Tasks = (tasks != null)
-            ? tasks.Distinct()
-                .Select(x => (ILabEntity<int>)x)
-                .ToList()
-            : new List<ILabEntity<int>>();
-    }
-
-    public Lab(int id, string name = "", string description = "") :
-        this(new IntLabEntity(id, name, description))
+    private readonly ILabEntity<string> entity;
+    
+    public Lab(string name = "", string description = "") :
+        this(new StringLabEntity(Guid.NewGuid().ToString(), name, description))
     { }
-
-    public int Id
+    
+    private Lab(ILabEntity<string> ent)
+    {
+        entity = ent;
+        Tasks = new List<ILabEntity<string>>();
+    }
+    
+    public string Id
     {
         get => entity.Id; 
         set => entity.Id = value;
