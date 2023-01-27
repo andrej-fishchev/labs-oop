@@ -1,4 +1,6 @@
+using System.Reflection;
 using System.Text;
+using System.Text.Json.Nodes;
 using IO.targets;
 using labs.adapters;
 using labs.entities;
@@ -10,14 +12,16 @@ namespace lab_exec;
 
 public static class Program
 {
-    public static MenuKeyGenerator<ILabEntity<int>, string> KeyGen = 
+    public static MenuKeyGenerator<ILabEntity<string>, string> KeyGen = 
         (_, index) => (index + 1).ToString();
 
     public static string ExitSay = "...";
-    
-    public static ConsoleMenuAction<ILabEntity<int>> LabEntityMenuAction =
-        (ConsoleMenuAction<ILabEntity<int>>)
-        new ConsoleMenuActionBuilder<ILabEntity<int>>()
+
+    public static IList<ILabEntity<string>> labs;
+
+    public static ConsoleMenuAction<ILabEntity<string>> LabEntityMenuAction =
+        (ConsoleMenuAction<ILabEntity<string>>)
+        new ConsoleMenuActionBuilder<ILabEntity<string>>()
             .OnDisplay(MenuActionDisplay)
             .OnSelect(MenuActionSelect)
             .OnClose(MenuActionClose)
@@ -27,20 +31,26 @@ public static class Program
     
     public static void Main()
     {
+        // TODO: #
+        labs = JsonToEntityListAdapter.Adapt(
+            ((JsonArray)JsonNode.Parse(File.ReadAllText(
+                Directory.GetParent(Environment.CurrentDirectory)!.Parent!.Parent!.FullName 
+                + "/data/labs.json"))!["labs"]!)!, Test().ToArray());
+        
         GetMenu("Лабораторные работы", 
-                MetaData.LabList)
+                labs)
             .Display(LabEntityMenuAction);
     }
 
-    public static ConsoleMenu<ILabEntity<int>> GetMenu(string title, IList<ILabEntity<int>> entities)
+    public static ConsoleMenu<ILabEntity<string>> GetMenu(string title, IList<ILabEntity<string>> entities)
     {
         return ConsoleMenuFactory.MakeConsoleMenu(title, ExitSay, 
-            (ConsoleMenuItemDictionary<ILabEntity<int>>)
-            LabEntityToConsoleMenuItemAdapter<ILabEntity<int>>
+            (ConsoleMenuItemDictionary<ILabEntity<string>>)
+            LabEntityToConsoleMenuItemAdapter<ILabEntity<string>>
                 .Adapt(entities, KeyGen));
     }
 
-    public static void MenuActionDisplay(IMenu<string, ILabEntity<int>> obj)
+    public static void MenuActionDisplay(IMenu<string, ILabEntity<string>> obj)
     {
         StringBuilder builder =
             new StringBuilder($"\n\n{obj.Title}: \n");
@@ -57,9 +67,9 @@ public static class Program
         );
     }
     
-    public static void MenuActionSelect(IMenu<string, ILabEntity<int>> arg1, string arg2)
+    public static void MenuActionSelect(IMenu<string, ILabEntity<string>> arg1, string arg2)
     {
-        ILabEntity<int> item = arg1.Items[arg2];
+        ILabEntity<string> item = arg1.Items[arg2];
         
         if (item is LabTaskAction action)
         {
@@ -67,7 +77,7 @@ public static class Program
             return;
         }
         
-        IList<ILabEntity<int>> ents =
+        IList<ILabEntity<string>> ents =
             (item is LabTask
                 ? ((LabTask) item).Actions
                 : ((Lab) item).Tasks);
@@ -75,8 +85,29 @@ public static class Program
         GetMenu($"{item.Name} \n{item.Description}", ents).Display(LabEntityMenuAction);
     }
     
-    public static void MenuActionClose(IMenu<string, ILabEntity<int>> obj)
+    public static void MenuActionClose(IMenu<string, ILabEntity<string>> obj)
     {
         ConsoleTarget.Output.WriteLine($"Закрытие: {obj.Title}");
+    }
+
+    // TODO: #
+    private static IList<Type> Test()
+    {
+        Assembly assembly = Assembly.LoadFrom("labs.dll");
+        Console.Out.WriteLine($"Asm: {assembly.FullName}");
+
+        List<Type> buffer = new List<Type>();
+        foreach (var type in assembly.GetTypes())
+        {
+            if (type.FullName == null || !type.FullName.StartsWith("labs.lab")
+                || type.IsAbstract || type.BaseType == null || !type.BaseType.Name.Equals("LabTask"))
+                continue;
+
+            Console.Out.WriteLine($"Type: {type.FullName}");
+            
+            buffer.Add(type);
+        }
+        
+        return buffer;
     }
 }

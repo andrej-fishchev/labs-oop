@@ -1,0 +1,154 @@
+{
+  "name": "Объектно-ориентированное программирование",
+  "description": "Листинг лабораторных работ",
+  "dynamic-library": "labs.dll",
+  "signature": "labs",
+  "labs": [
+    {
+      "name": "Лабораторная работа №1",
+      "description": "Организация ввода и вывода данных",
+      "signature": "lab1",
+      "tasks": [
+        {
+          "name": "Вычислить значение выражения: m - ++n",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        },
+        {
+          "name": "Вычислить значение выражения: m++ > --n",
+          "description": "Вариант №24",
+          "signature": "Task2"
+        },
+        {
+          "name": "Вычислить значение выражения: m-- < ++n",
+          "description": "Вариант №24",
+          "signature": "Task3"
+        },
+        {
+          "name": "Вычислить значение выражения: arcsin(|x+1|)",
+          "description": "Вариант №24",
+          "signature": "Task4"
+        },
+        {
+          "name": "Принадлежность точки заштрихованной области",
+          "description": "Вариант №24",
+          "signature": "Task5"
+        },
+        {
+          "name": "Тип данных с плавающей точкой",
+          "description": "Вариант №24",
+          "signature": "Task6"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №3",
+      "description": "Вычисление функций с использованием их разложения в степенной ряд",
+      "signature": "lab3",
+      "tasks": [
+        {
+          "name": "Вычислить точное и приближенное значение функции",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №4",
+      "description": "Работа с одномерными массивами",
+      "signature": "lab4",
+      "tasks": [
+        {
+          "name": "Работа с целочисленным одномерным массивом",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №5",
+      "description": "Динамические массивы различных типов",
+      "signature": "lab5",
+      "tasks": [
+        {
+          "name": "Действия над одномерным массивом",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        },
+        {
+          "name": "Действия над двумерным массивом",
+          "description": "Вариант №24",
+          "signature": "Task2"
+        },
+        {
+          "name": "Действия над рваным массивом",
+          "description": "Вариант №24",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №6",
+      "description": "Класс Array. Строки. Класс String",
+      "signature": "lab6",
+      "tasks": [
+        {
+          "name": "Сортировка элементов рванного массива",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        },
+        {
+          "name": "Переворот и сортировка слов предложения",
+          "description": "Вариант №24",
+          "signature": "Task2"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №9",
+      "description": "Классы и объекты",
+      "signature": "lab9",
+      "tasks": [
+        {
+          "name": "Реализация класса Time и TimeArray",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №10",
+      "description": "Наследование и виртуальные функции",
+      "signature": "lab10",
+      "tasks": [
+        {
+          "name": "Демонстрация динамического полиморфизма",
+          "description": "Вариант №16",
+          "signature": "Task1"
+        },
+        {
+          "name": "Динамическая идентификация типов",
+          "description": "Вариант №16",
+          "signature": "Task2"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №11",
+      "description": "Коллекции",
+      "signature": "lab11",
+      "tasks": [
+        {
+          "name": "Реализация списка",
+          "description": "Вариант №28",
+          "signature": "Task1"
+        },
+        {
+          "name": "StopWatch",
+          "description": "Вариант №28",
+          "signature": "Task3"
+        }
+      ]
+    }
+  ]
+}
