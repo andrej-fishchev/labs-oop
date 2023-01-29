@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Nodes;
 using IO.targets;
+using lab_exec.loader;
 using labs.adapters;
 using labs.entities;
 using SimpleMenu;
@@ -12,13 +12,8 @@ namespace lab_exec;
 
 public static class Program
 {
-    public static MenuKeyGenerator<ILabEntity<string>, string> KeyGen = 
-        (_, index) => (index + 1).ToString();
-
-    public static string ExitSay = "...";
-
-    public static IList<ILabEntity<string>> labs;
-
+    public static readonly ConsoleTarget ConsoleTarget = new();
+    
     public static ConsoleMenuAction<ILabEntity<string>> LabEntityMenuAction =
         (ConsoleMenuAction<ILabEntity<string>>)
         new ConsoleMenuActionBuilder<ILabEntity<string>>()
@@ -26,29 +21,21 @@ public static class Program
             .OnSelect(MenuActionSelect)
             .OnClose(MenuActionClose)
             .Build();
-
-    public static readonly ConsoleTarget ConsoleTarget = new();
     
-    public static void Main()
+    public static void Main(string[] args)
     {
-        // TODO: #
-        labs = JsonToEntityListAdapter.Adapt(
-            ((JsonArray)JsonNode.Parse(File.ReadAllText(
-                Directory.GetParent(Environment.CurrentDirectory)!.Parent!.Parent!.FullName 
-                + "/data/labs.json"))!["labs"]!)!, Test().ToArray());
-        
-        GetMenu("Лабораторные работы", 
-                labs)
+        Console.Out.WriteLine("v = {0}", args[0]);
+
+        GetMenu("Лабораторные работы", new LabNodeLoader(args[0])
+                .TryLoadTasksFromMemory(Assembly.LoadFrom("labs.dll")))
             .Display(LabEntityMenuAction);
     }
 
-    public static ConsoleMenu<ILabEntity<string>> GetMenu(string title, IList<ILabEntity<string>> entities)
-    {
-        return ConsoleMenuFactory.MakeConsoleMenu(title, ExitSay, 
-            (ConsoleMenuItemDictionary<ILabEntity<string>>)
+    public static ConsoleMenu<ILabEntity<string>> GetMenu(string title, IList<ILabEntity<string>> entities) => 
+        ConsoleMenuFactory.MakeConsoleMenu(title, "...", 
             LabEntityToConsoleMenuItemAdapter<ILabEntity<string>>
-                .Adapt(entities, KeyGen));
-    }
+                .Adapt(entities, (_, index) => (index + 1).ToString())
+                .As<ConsoleMenuItemDictionary<ILabEntity<string>>>());
 
     public static void MenuActionDisplay(IMenu<string, ILabEntity<string>> obj)
     {
@@ -77,37 +64,13 @@ public static class Program
             return;
         }
         
-        IList<ILabEntity<string>> ents =
-            (item is LabTask
-                ? ((LabTask) item).Actions
-                : ((Lab) item).Tasks);
+        IList<ILabEntity<string>> ents = item is LabTask
+            ? item.As<LabTask>().Actions
+            : item.As<Lab>().Tasks;
 
         GetMenu($"{item.Name} \n{item.Description}", ents).Display(LabEntityMenuAction);
     }
     
-    public static void MenuActionClose(IMenu<string, ILabEntity<string>> obj)
-    {
+    public static void MenuActionClose(IMenu<string, ILabEntity<string>> obj) => 
         ConsoleTarget.Output.WriteLine($"Закрытие: {obj.Title}");
-    }
-
-    // TODO: #
-    private static IList<Type> Test()
-    {
-        Assembly assembly = Assembly.LoadFrom("labs.dll");
-        Console.Out.WriteLine($"Asm: {assembly.FullName}");
-
-        List<Type> buffer = new List<Type>();
-        foreach (var type in assembly.GetTypes())
-        {
-            if (type.FullName == null || !type.FullName.StartsWith("labs.lab")
-                || type.IsAbstract || type.BaseType == null || !type.BaseType.Name.Equals("LabTask"))
-                continue;
-
-            Console.Out.WriteLine($"Type: {type.FullName}");
-            
-            buffer.Add(type);
-        }
-        
-        return buffer;
-    }
 }
