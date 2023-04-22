@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>UserDataRequester</Title>
+        <Authors>rejchev</Authors>
+        <Copyright>@rejchev</Copyright>
+        <RepositoryType>github</RepositoryType>
+        <RootNamespace>UserDataRequester</RootNamespace>
+    </PropertyGroup>
+
+</Project>
