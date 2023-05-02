@@ -15,7 +15,7 @@ public class ConsoleResponseData<T> :
 
     public T? Data() => data;
     
-    public void Date(T? value) => data = value;
+    public void Data(T? value) => data = value;
     
     public ResponseStatusCode StatusCode() => code;
     

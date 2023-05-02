@@ -9,6 +9,9 @@ public static class BaseDataConverterFactory
     public static ConsoleSimpleDataConverter MakeObjectConverter(MethodInfo? signature) =>
         ConsoleDataConverterFactory.MakeSimpleObjectConverter(BaseParser.TryParseObject, signature);
 
+    public static ConsoleSimpleDataConverter MakeSimpleIntConverter() =>
+        MakeObjectConverter(BaseParser.GetTypeParser<int>(BaseParser.BaseParserSignature));
+    
     public static ConsoleSimpleNumberConverter MakeNumberConverter(
         MethodInfo? signature,
         NumberStyles styles = NumberStyles.Any,

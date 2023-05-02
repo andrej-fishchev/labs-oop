@@ -1,16 +1,29 @@
-// using System.Globalization;
-// using ConsoleDataRequester.validators;
-//
-// namespace ConsoleDataRequester.converters.console.utils;
-//
-// public static class BaseTypeArrayDataConverterFactory
-// {
-//     public static ConsoleArrayDataConverter<int>
-//         MakeIntArrayConverter(IValidatableData<int>? nestedValidator = default, string delimiter = ";")
-//     {
-//         return new ConsoleArrayDataConverter<int>(BaseTypeDataConverterFactory.MakeSimpleIntConverter(),
-//             nestedValidator, delimiter);
-//     }
+using UserDataRequester.converters.console;
+using UserDataRequester.validators;
+
+namespace UserDataRequester.converters.console.utils;
+
+public static class BaseArrayDataConverterFactory
+{
+    public static ConsoleArrayDataConverter
+        MakeIntArrayConverter(IValidatableData? nestedValidator = default, string delimiter = ";")
+    {
+        return new ConsoleArrayDataConverter(
+            delimiter,
+            BaseDataConverterFactory.MakeSimpleIntConverter(),
+            nestedValidator
+        );
+    }
+    
+    public static ConsoleArrayDataConverter
+        MakeStringArrayConverter(IValidatableData? nestedValidator = default, string delimiter = ";")
+    {
+        return new ConsoleArrayDataConverter(
+            delimiter,
+            default,
+            nestedValidator
+        );
+    }
 //
 //     public static ConsoleArrayDataConverter<double>
 //         MakeDoubleArrayConverter(IValidatableData<double>? nestedValidator = default, string delimiter = ";")
@@ -50,4 +63,4 @@
 //             nestedValidator,
 //             delimiter);
 //     }
-// }
+}

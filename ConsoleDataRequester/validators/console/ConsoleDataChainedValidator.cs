@@ -1,4 +1,5 @@
 using UserDataRequester.responses;
+using UserDataRequester.validators.delegates;
 
 namespace UserDataRequester.validators.console;
 
@@ -7,8 +8,8 @@ public class ConsoleDataChainedValidator :
 {
     public IList<IValidatableData> Validators { get; set; }
     
-    public ConsoleDataChainedValidator(IList<IValidatableData> validators) =>
-        Validators = validators;
+    public ConsoleDataChainedValidator(IList<IValidatableData>? validators = default) =>
+        Validators = validators ?? new List<IValidatableData>();
     
     public bool Valid(IResponsibleData<object> responsibleData)
     {
@@ -22,6 +23,12 @@ public class ConsoleDataChainedValidator :
     public ConsoleDataChainedValidator And(IValidatableData validator)
     {
         Validators.Add(validator);
+        return this;
+    }
+    
+    public ConsoleDataChainedValidator And(Validator expression)
+    {
+        Validators.Add(new ConsoleDataValidator(expression));
         return this;
     }
 
