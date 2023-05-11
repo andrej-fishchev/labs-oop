@@ -10,17 +10,17 @@ public static class BaseDataTypeRequester
         string what, 
         IValidatableData? validator = default,
         string? terminateString = "..."
-    ) => BaseRequester.While(what, validator: validator, terminateString: terminateString);
+    ) => ConsoleBaseRequester.RepeatableGetApprovedData(what, validator: validator, terminateString: terminateString);
     
     public static IResponsibleData<object> RequestInt(
         string what,
         IValidatableData? validator = default,
         string? terminateString = "..."
-    ) => BaseRequester.While(what, BaseDataConverterFactory.MakeSimpleIntConverter(), validator, terminateString);
+    ) => ConsoleBaseRequester.RepeatableGetApprovedData(what, BaseDataConverterFactory.MakeSimpleIntConverter(), validator, terminateString);
 
     public static IResponsibleData<object> RequestDouble(
         string what,
         IValidatableData? validator = default,
         string? terminateString = "..."
-    ) => BaseRequester.While(what, BaseDataConverterFactory.MakeDoubleConverterList(), validator, terminateString);
+    ) => ConsoleBaseRequester.RepeatableGetApprovedData(what, BaseDataConverterFactory.MakeDoubleConverterList(), validator, terminateString);
 }

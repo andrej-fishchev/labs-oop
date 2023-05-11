@@ -6,9 +6,9 @@ using UserDataRequester.validators.console;
 
 namespace UserDataRequester.requests.console.utils;
 
-public static class BaseRequester
+public static class ConsoleBaseRequester
 {
-    public static IResponsibleData<object> While(
+    public static IResponsibleData<object> RepeatableGetApprovedData(
         string what, 
         IConvertibleData? converter = default,
         IValidatableData? validator = default, 
@@ -26,19 +26,20 @@ public static class BaseRequester
             if (terminateString != null && response.Data()!.Equals(terminateString))
             {
                 response.StatusCode(ResponseStatusCodeFactory.Create(ConsoleDataCode.ConsoleInputRejected));
+                return response;
             }
             
             if (response.IsOk() && converter != null)
                 if(!(response = converter.Convert(response).As<ConsoleResponseData<object>>()).IsOk())
-                    Console.Error.WriteLine("Не удалось выполнить преобразование типов");
+                    Console.Error.WriteLine("Не удалось преобразовать значение, повторите ввод");
 
             if (response.IsOk() && validator != null && !validator.Valid(response))
             {
                 response.StatusCode(ResponseStatusCodeFactory.Create(ConsoleDataValidatorCode.InvalidInputObjectData));
-                Console.Error.WriteLine("Ввод не удовлетворяет условиям");
-            }
                 
-
+                Console.Error.WriteLine("Ввод не удовлетворяет условиям, повторите ввод");
+            }
+            
         } while (!response.IsOk());
         
         return response;
