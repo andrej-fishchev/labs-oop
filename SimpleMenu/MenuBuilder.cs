@@ -1,5 +1,4 @@
 using SimpleMenu.items;
-using tier1;
 
 namespace SimpleMenu;
 
