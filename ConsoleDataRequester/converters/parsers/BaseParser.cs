@@ -6,12 +6,7 @@ namespace UserDataRequester.converters.parsers;
 public static class BaseParser
 {
     public const string BaseParserSignature = "TryParse";
-
-    public static MethodInfo? GetTypeParser<T>(
-        string signature,
-        BindingFlags flags = BindingFlags.Public | BindingFlags.Static) => 
-        typeof(T).GetMethod(signature, flags);
-
+    
     public static MethodInfo? GetTypeParser<T>(
         string signature,
         Type[] paramTypes,

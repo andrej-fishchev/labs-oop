@@ -10,7 +10,7 @@ public static class BaseDataConverterFactory
         ConsoleDataConverterFactory.MakeSimpleObjectConverter(BaseParser.TryParseObject, signature);
 
     public static ConsoleSimpleDataConverter MakeSimpleIntConverter() =>
-        MakeObjectConverter(BaseParser.GetTypeParser<int>(BaseParser.BaseParserSignature));
+        MakeObjectConverter(BaseParser.TryParseSignature<int>());
     
     public static ConsoleSimpleNumberConverter MakeNumberConverter(
         MethodInfo? signature,
