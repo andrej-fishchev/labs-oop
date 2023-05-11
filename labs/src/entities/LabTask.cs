@@ -1,27 +1,21 @@
-using IO.targets;
-
 namespace labs.entities;
 
 public abstract class LabTask :
     ILabEntity<string>
 {
-    public static readonly ConsoleTarget Target = new();
-    
     private readonly ILabEntity<string> entity;
     
     // must be initialized from parent sealed class and cannot be changed outside
+    
     public IList<ILabEntity<string>> Actions
     {
         get; 
         protected init;
     }
 
-    protected LabTask(string name = "", string description = "")
-    {
-        entity = new StringLabEntity(
-            Guid.NewGuid().ToString(), name, description);
-    }
-    
+    protected LabTask(string name = "", string description = "") => 
+        entity = new StringLabEntity(Guid.NewGuid().ToString(), name, description);
+
     public string Id
     {
         get => entity.Id; 
