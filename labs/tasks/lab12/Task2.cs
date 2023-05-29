@@ -3,24 +3,26 @@ using labs.entities;
 using labs.lab10.src;
 using labs.lab10.src.requests;
 using labs.shared.data.abstracts;
+using labs.shared.data.algorithms.BinaryTree.walks;
+using labs.shared.data.algorithms.BinaryTree.walks.linq;
 using labs.shared.utils;
 using UserDataRequester.responses;
 
 namespace labs.lab12;
 
-public sealed class Task1 : LabTask
+public sealed class Task2 : LabTask
 {
-    private static Task1? instance;
+    private static Task2? instance;
 
-    private Deque<Publication> Publications { get; }
+    private BinaryTree<Publication> Publications { get; }
 
-    public static Task1 GetInstance(string name = "lab12.task1", string description = "var. 24")
-        => instance ??= new Task1(name, description);
+    public static Task2 GetInstance(string name = "lab12.task2", string description = "var. 24")
+        => instance ??= new Task2(name, description);
 
-    private Task1(string name, string description) :
+    private Task2(string name, string description) :
         base(name, description)
     {
-        Publications = new Deque<Publication>();
+        Publications = new BinaryTree<Publication>(new PreOrderTreeWalk<Publication>());
 
         Actions = new List<ILabEntity<string>>
         {
@@ -36,6 +38,10 @@ public sealed class Task1 : LabTask
                 .ExecuteAction(GetAndSaveEduBook)
                 .Build(),
 
+            new LabTaskActionBuilder().Name("Получить публикацию с минимальным количеством авторов")
+                .ExecuteAction(GetPublicationMinByName)
+                .Build(),
+            
             new LabTaskActionBuilder().Name("Удалить публикацию по названию")
                 .ExecuteAction(DeletePublicationByName)
                 .Build(),
@@ -56,6 +62,30 @@ public sealed class Task1 : LabTask
     public void GetAndSaveJournal() => 
         GetAndSavePublication<Journal>(PublicationRequester.GetJournal);
 
+    public void GetPublicationMinByName()
+    {
+        var buffer = Publications
+            .InternalNode()
+            .DataWalk(Publications.TreeWalkAlgorithm)
+            .MinBy(x => x.Authors.Count);
+            
+        Console.WriteLine($"CONSOLE| Публикация с минимальным количеством авторов:" +
+                          $"\n {(buffer != null ? buffer : "не существует")}");
+    }
+
+    public void GetAndSavePublication<T>(Func<string, IResponsibleData<object>> getRequester, string terminate = "...") 
+        where T : Publication
+    {
+        Publication? obj;
+        if ((obj = PublicationRequester.GetRequest<T>(getRequester, terminate)) != null)
+            Console.WriteLine("CONSOLE| Публикация '{0}' {1}",
+                obj.Name,
+                Publications.Add(obj)
+                    ? "добавлена"
+                    : "не добавлена"
+            );
+    }
+    
     public void DeletePublicationByName()
     {
         IResponsibleData<object> response;
@@ -71,16 +101,5 @@ public sealed class Task1 : LabTask
         {
             Console.WriteLine($"CONSOLE| Публикаций с названием {response.Data()} не найдено");
         }
-    }
-
-    public void GetAndSavePublication<T>(Func<string, IResponsibleData<object>> func, string terminate = "...") 
-        where T : Publication
-    {
-        Publication? obj;
-        if ((obj = PublicationRequester.GetRequest<T>(func, terminate)) != null)
-            Publications.Back(obj);
-
-        if (obj != null)
-            Console.WriteLine($"CONSOLE| Публикация '{obj.Name}' добавлена.");
     }
 }
