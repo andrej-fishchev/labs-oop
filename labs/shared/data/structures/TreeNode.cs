@@ -1,12 +1,13 @@
 namespace labs.shared.data.structures;
 
-public class TreeNode<T>
+public class TreeNode<T> : IComparable<T> 
+    where T : IComparable<T>
 {
-    private TreeNode<T>? m_Head;
-    private TreeNode<T>? m_Left;
-    private TreeNode<T>? m_Right;
+    private TreeNode<T>? mHead;
+    private TreeNode<T>? mLeft;
+    private TreeNode<T>? mRight;
 
-    private T m_Data;
+    private readonly T mData;
 
     public TreeNode(T data, 
         TreeNode<T>? left = null, 
@@ -14,52 +15,54 @@ public class TreeNode<T>
         TreeNode<T>? right = null
     )
     {
-        m_Head = head;
-        m_Left = left;
-        m_Right = right;
+        mHead = head;
+        mLeft = left;
+        mRight = right;
 
-        m_Data = data;
+        mData = data;
     }
 
     public void Head(TreeNode<T>? value)
     {
-        if (m_Head != null)
+        if (mHead != null)
         {
-            if (m_Head.Left() is { } left && left == this)
-                m_Head.Left(null);
+            if (mHead.Left() is { } left && ReferenceEquals(this, left))
+                mHead.mLeft = null;
 
-            if (m_Head.Right() is { } right && right == this)
-                m_Head.Right(null);
+            if (mHead.Right() is { } right && ReferenceEquals(this, right))
+                mHead.mRight = null;
         }
 
-        m_Head = value;
+        mHead = value;
     }
 
     public void Left(TreeNode<T>? value)
     {
-        if(ReferenceEquals(m_Left, value))
+        if(ReferenceEquals(mLeft, value))
             return;
         
-        if (m_Left is { } left)
+        if (mLeft is { } left)
             left.Head(null);
 
-        m_Left = value;
+        mLeft = value;
     }
 
     public void Right(TreeNode<T>? value)
     {
-        if(ReferenceEquals(m_Right, value))
+        if(ReferenceEquals(mRight, value))
             return;
         
-        if (m_Right is { } right)
+        if (mRight is { } right)
             right.Head(null);
 
-        m_Right = value;
+        mRight = value;
     }
 
-    public TreeNode<T>? Head() => m_Head;
-    public TreeNode<T>? Left() => m_Left;
-    public TreeNode<T>? Right() => m_Right;
+    public TreeNode<T>? Head() => mHead;
+    public TreeNode<T>? Left() => mLeft;
+    public TreeNode<T>? Right() => mRight;
 
-    public T Data() => m_Data;
+    public T Data() => mData;
+    
+    public int CompareTo(T? other) => mData.CompareTo(other);
 }
