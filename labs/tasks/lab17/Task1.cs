@@ -7,7 +7,7 @@ using labs.shared.data.algorithms.Graph.walks;
 using labs.shared.data.algorithms.Graph.walks.linq;
 using labs.shared.data.requests.graph.requesters;
 
-namespace labs.lab17;
+namespace labs.tasks.lab17;
 
 public class Task1 : LabTask
 {

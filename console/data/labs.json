@@ -2,7 +2,7 @@
   "name": "Объектно-ориентированное программирование",
   "description": "Листинг лабораторных работ",
   "dynamic-library": "labs.dll",
-  "signature": "labs",
+  "signature": "labs.tasks",
   "labs": [
     {
       "name": "Лабораторная работа №12",

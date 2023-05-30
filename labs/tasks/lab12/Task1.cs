@@ -6,7 +6,7 @@ using labs.shared.data.abstracts;
 using labs.shared.utils;
 using UserDataRequester.responses;
 
-namespace labs.lab12;
+namespace labs.tasks.lab12;
 
 public sealed class Task1 : LabTask
 {

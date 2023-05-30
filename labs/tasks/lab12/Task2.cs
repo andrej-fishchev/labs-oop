@@ -8,7 +8,7 @@ using labs.shared.data.algorithms.BinaryTree.walks.linq;
 using labs.shared.utils;
 using UserDataRequester.responses;
 
-namespace labs.lab12;
+namespace labs.tasks.lab12;
 
 public sealed class Task2 : LabTask
 {
