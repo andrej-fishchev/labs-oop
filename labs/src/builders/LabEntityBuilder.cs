@@ -1,5 +1,5 @@
 using labs.entities;
-using tier1;
+using SimpleMenu;
 
 namespace labs.builders;
 
