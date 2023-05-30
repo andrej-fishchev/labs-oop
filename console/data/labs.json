@@ -105,8 +105,8 @@
           "signature": "Task1"
         },
         {
-          "name": "Теория автоматов",
-          "description": "Вариант ?",
+          "name": "Распознающий автомат",
+          "description": "Вариант №19",
           "signature": "Task2"
         }
       ]
