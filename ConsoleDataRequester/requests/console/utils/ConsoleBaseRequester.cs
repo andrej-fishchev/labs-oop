@@ -31,13 +31,13 @@ public static class ConsoleBaseRequester
             
             if (response.IsOk() && converter != null)
                 if(!(response = converter.Convert(response).As<ConsoleResponseData<object>>()).IsOk())
-                    Console.Error.WriteLine("Не удалось преобразовать значение, повторите ввод");
+                    Console.Error.WriteLine("Не удалось преобразовать значение, повторите ввод\n");
 
             if (response.IsOk() && validator != null && !validator.Valid(response))
             {
                 response.StatusCode(ResponseStatusCodeFactory.Create(ConsoleDataValidatorCode.InvalidInputObjectData));
                 
-                Console.Error.WriteLine("Ввод не удовлетворяет условиям, повторите ввод");
+                Console.Error.WriteLine("Ввод не удовлетворяет условиям, повторите ввод\n");
             }
             
         } while (!response.IsOk());
