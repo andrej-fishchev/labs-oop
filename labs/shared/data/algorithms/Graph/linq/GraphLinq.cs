@@ -23,7 +23,7 @@ public static class GraphLinq
             ].Keys;
 
             for (int j = 0; j < graph.VertexCount; j++)
-                matrix.SetLink(i, j, adj.Contains(vertexes[j]));
+                matrix.SetRelation(i, j, Convert.ToInt32(adj.Contains(vertexes[j])));
         }
 
         return matrix;
@@ -43,7 +43,7 @@ public static class GraphLinq
         
         for(int i = 0; i < graph.VertexCount; i++)
             for(int j = 0; j < graph.VertexCount; j++)
-                if (matrix.GetLink(i, j))
+                if (matrix.GetRelation(i, j) != 0)
                     graph.AddEdge(vertexes[i].ShortName, vertexes[j].ShortName);
 
         return graph;

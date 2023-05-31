@@ -10,7 +10,7 @@ namespace labs.shared.data.requests.graph.requesters;
 
 public static class GraphRequester
 {
-    public static GraphMatrix? GetGraphAdjacencyMatrix(string? terminate = "...")
+    public static GraphMatrix? GetGraphMatrix(string? terminate = "...")
     {
         Console.WriteLine($"\nВвод может быть прекращен в любой момент, используйте '{terminate}')\n");
         
@@ -28,19 +28,19 @@ public static class GraphRequester
             for (int j = 0; j < vertexes.Count; j++)
             {
                 if (!(response = GetRelation(
-                            $"Связать {vertexes[i]} и {vertexes[j]} (1 или 0): ",
+                            $"Вес {vertexes[i].ShortName} и {vertexes[j].ShortName}: ",
                             terminate: terminate))
                         .IsOk() || response.Data() is not int value)
                     return null;
                 
-                matrix.SetLink(i, j, Convert.ToBoolean(value));
+                matrix.SetRelation(i, j, value);
             }
         }
 
         return matrix;
     }
     
-    public static GraphMatrix? GetGraphAdjacencyMatrixInline(string? terminate = "...")
+    public static GraphMatrix? GetGraphBitMatrix(string? terminate = "...")
     {
         Console.WriteLine($"\nВвод может быть прекращен в любой момент, используйте '{terminate}')\n");
         
@@ -87,7 +87,7 @@ public static class GraphRequester
         string? terminate = "...") =>
         GetInt(msg, terminate, new ConsoleDataChainedValidator()
             .And(data => data != null)
-            .And(data => data is 0 or 1));
+            .And(data => data is int));
 
     public static IResponsibleData<object> RequestVertex(
         string msg = "Введите количество вершин: ",
