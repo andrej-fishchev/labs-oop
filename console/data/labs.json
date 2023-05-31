@@ -1,0 +1,115 @@
+{
+  "name": "Объектно-ориентированное программирование",
+  "description": "Листинг лабораторных работ",
+  "dynamic-library": "labs.dll",
+  "signature": "labs.tasks",
+  "labs": [
+    {
+      "name": "Лабораторная работа №12",
+      "description": "Пользовательские классы-коллекции",
+      "signature": "lab12",
+      "tasks": [
+        {
+          "name": "Двусторонняя очередь",
+          "description": "Вариант №24",
+          "signature": "Task1"
+        },
+        {
+          "name": "Бинарное дерево",
+          "description": "Вариант №24",
+          "signature": "Task2"
+        },
+        {
+          "name": "Хеш-таблица",
+          "description": "Вариант №24",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №13",
+      "description": "",
+      "signature": "lab13",
+      "tasks": [
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task1"
+        },
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №14",
+      "description": "",
+      "signature": "lab14",
+      "tasks": [
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task1"
+        },
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №15",
+      "description": "",
+      "signature": "lab15",
+      "tasks": [
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task1"
+        },
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №16",
+      "description": "",
+      "signature": "lab16",
+      "tasks": [
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task1"
+        },
+        {
+          "name": "",
+          "description": "Вариант №28",
+          "signature": "Task3"
+        }
+      ]
+    },
+    {
+      "name": "Лабораторная работа №17",
+      "description": "Дискретная математика",
+      "signature": "lab17",
+      "tasks": [
+        {
+          "name": "Теория графов",
+          "description": "Вариант №19",
+          "signature": "Task1"
+        },
+        {
+          "name": "Распознающий автомат",
+          "description": "Вариант №19",
+          "signature": "Task2"
+        }
+      ]
+    }
+  ]
+}
