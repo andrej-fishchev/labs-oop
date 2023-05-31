@@ -56,7 +56,7 @@ public sealed class Task2 : LabTask
         path
     );
     
-    public static bool IsWordCorrect(string? str, out StringBuilder path)
+    private static bool IsWordCorrect(string? str, out StringBuilder path)
     {
         path = new StringBuilder();
 
@@ -89,7 +89,7 @@ public sealed class Task2 : LabTask
                 },
                   
                 "L" => str[i] == 'a' ? "KN" : "E",
-                  
+
                 "KN" => str[i] switch
                 {
                     '+' => "M",
