@@ -48,4 +48,19 @@ public static class GraphLinq
 
         return graph;
     }
+
+    public static IEnumerable<GraphVertex> StreamVertexes(this GraphMatrix matrix) => 
+        matrix.GetVertexes();
+
+    public static IEnumerable<(int i, int j, int value)> StreamRelations(this GraphMatrix matrix)
+    {
+        if(matrix.VertexCount == 0)
+            yield break;
+        
+        for(int i = 0, size = matrix.VertexCount; i < size; i++)
+            for (int j = 0; j < size; j++)
+                yield return (i, j, matrix.GetRelation(i, j));
+    }
+    
+    
 }
