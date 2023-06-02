@@ -1,5 +1,3 @@
-using UserDataRequester.responses;
-
 namespace UserDataRequester.validators.console;
 
 public enum ConsoleDataValidatorCode

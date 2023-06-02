@@ -1,5 +1,4 @@
 using System.Collections;
-using UserDataRequester.requests.console;
 using UserDataRequester.responses;
 using UserDataRequester.responses.console;
 

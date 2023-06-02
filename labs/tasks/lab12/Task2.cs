@@ -1,11 +1,11 @@
 using labs.builders;
 using labs.entities;
-using labs.lab10.src;
-using labs.lab10.src.requests;
 using labs.shared.data.abstracts;
 using labs.shared.data.algorithms.BinaryTree.walks;
 using labs.shared.data.algorithms.BinaryTree.walks.linq;
 using labs.shared.utils;
+using labs.tasks.lab10.src;
+using labs.tasks.lab10.src.requests;
 using UserDataRequester.responses;
 
 namespace labs.tasks.lab12;

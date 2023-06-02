@@ -1,10 +1,10 @@
 using System.Text;
 using labs.builders;
 using labs.entities;
-using labs.lab10.src;
-using labs.lab10.src.requests;
 using labs.shared.data.abstracts;
 using labs.shared.data.algorithms.CustomHashTable.linq;
+using labs.tasks.lab10.src;
+using labs.tasks.lab10.src.requests;
 using UserDataRequester.responses;
 
 namespace labs.tasks.lab12;
@@ -110,24 +110,21 @@ public sealed class Task3 : LabTask
         if (!(response = PublicationRequester.GetString(terminate: "...")).IsOk())
             return;
 
-        try
-        {
-            Predicate<Publication> condition =
-                obj => obj.Name == (string)response.Data()!;
+        Predicate<Publication> condition =
+            obj => obj.Name == (string)response.Data()!;
 
-            IEnumerable<Publication>? subContainer =
-                Publications.ChooseContainer(condition);
+        var subContainer =
+            Publications.ChooseContainer(condition);
 
-            Publication? buffer = subContainer.First(condition.Invoke);
-            
+        var buffer = subContainer?.FirstOrDefault(condition.Invoke);
+
+        if(buffer != null)
             Publications.Remove(buffer);
-
-            Console.WriteLine($"CONSOLE| Публикация с названием {response.Data()} удалена");
-        }
-        catch
-        {
-            Console.WriteLine($"CONSOLE| Публикация с названием {response.Data()} не найдена");
-        }
+        
+        Console.WriteLine("Публикация с названием '{0}' {1}",
+            response.Data(),
+            buffer != null ? "удалена" : "не удалена"
+        );
     }
 
     public void PrintCustomHashTable()

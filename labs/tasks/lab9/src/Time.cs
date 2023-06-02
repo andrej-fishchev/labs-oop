@@ -1,4 +1,4 @@
-namespace labs.lab9.src;
+namespace labs.tasks.lab9.src;
 
 public class Time :
     IComparable,

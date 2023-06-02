@@ -1,4 +1,5 @@
 using labs.shared.data.abstracts.graph;
+using labs.shared.data.algorithms.Graph.searches;
 
 namespace labs.shared.data.algorithms.Graph.linq;
 
@@ -52,7 +53,7 @@ public static class GraphLinq
     public static IEnumerable<GraphVertex> StreamVertexes(this GraphMatrix matrix) => 
         matrix.GetVertexes();
 
-    public static IEnumerable<(int i, int j, int value)> StreamRelations(this GraphMatrix matrix)
+    public static IEnumerable<(int i, int j, int value)> StreamEdges(this GraphMatrix matrix)
     {
         if(matrix.VertexCount == 0)
             yield break;
@@ -61,6 +62,15 @@ public static class GraphLinq
             for (int j = 0; j < size; j++)
                 yield return (i, j, matrix.GetRelation(i, j));
     }
-    
+
+    public static IEnumerable<TO> Search<T, TO>(this GraphMatrix? graphMatrix, T algo) 
+        where T : IGraphSearchAlgorithm<TO>
+    {
+        if(graphMatrix == null)
+            yield break;
+
+        foreach (var tuple in algo.Search(graphMatrix)) 
+            yield return tuple;
+    }
     
 }

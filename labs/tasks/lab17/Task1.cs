@@ -4,6 +4,7 @@ using labs.shared.data.abstracts.graph;
 using labs.shared.data.algorithms.Graph.linq;
 using labs.shared.data.algorithms.Graph.searches;
 using labs.shared.data.algorithms.Graph.sorts;
+using labs.shared.data.algorithms.Graph.utils;
 using labs.shared.data.algorithms.Graph.walks;
 using labs.shared.data.algorithms.Graph.walks.linq;
 using labs.shared.data.requests.graph.requesters;
@@ -53,8 +54,16 @@ public class Task1 : LabTask
                 .ExecuteAction(TopologicalSort)
                 .Build(),
             
+            new LabTaskActionBuilder().Name("Алгоритм Дейкстры")
+                .ExecuteAction(DijkstraAlgo)
+                .Build(),
+            
             new LabTaskActionBuilder().Name("Вывод компонент графа")
                 .ExecuteAction(OutputGraphComponents)
+                .Build(),
+            
+            new LabTaskActionBuilder().Name("Вывод остова наименьшего веса (Краскал)")
+                .ExecuteAction(OutputKruskalAlgo)
                 .Build(),
 
             new LabTaskActionBuilder().Name("Вывод матрицы графа")
@@ -91,7 +100,8 @@ public class Task1 : LabTask
             return;
         }
         
-        foreach (var component in adjacencyMatrix.Components())
+        foreach (var component in adjacencyMatrix
+                     .Search<GraphComponentSearcher, List<GraphVertex>>(new GraphComponentSearcher()))
         {
             for(var i = 0; i < component.Count; i++)
                 Console.Write("{0}{1}{2}", 
@@ -104,16 +114,16 @@ public class Task1 : LabTask
 
     private void TopologicalSort()
     {
-        if (adjacencyMatrix == null)
+        if (GraphUtils.IsUnOriented(adjacencyMatrix))
         {
-            Console.WriteLine("Ожидается ввод матрицы смежностей");
+            Console.WriteLine("Ожидался ориентированный граф");
             return;
         }
 
         List<(int level, GraphVertex vertex)> vertexes =
-            adjacencyMatrix.TopologicalSort().ToList();
-
-        if (vertexes.Count != adjacencyMatrix.VertexCount)
+            adjacencyMatrix!.TopologicalSort().ToList();
+ 
+        if (vertexes.Count != adjacencyMatrix!.VertexCount)
         {
             Console.WriteLine($"Невозможно привести к ярусно-параллельной форме");
             return;
@@ -123,6 +133,43 @@ public class Task1 : LabTask
             Console.Write("\t{0}{1}",
                 $"{vertexes[i].level} : {vertexes[i].vertex.ShortName}", 
                 (i + 1 == vertexes.Count || (vertexes[i].level < vertexes[i+1].level)) ? "\n" : "");
+    }
+
+    private void OutputKruskalAlgo()
+    {
+        if (GraphUtils.IsUnWeighted(adjacencyMatrix) || !GraphUtils.IsUnOriented(adjacencyMatrix))
+        {
+            Console.WriteLine("Ожидался неориентированный взвешенный граф");
+            return;
+        }
+
+        var weight = 0;
+        foreach (var edge in adjacencyMatrix!
+                     .Search<KruskalАlgorithm, (GraphVertex, GraphVertex, int)>(new KruskalАlgorithm()))
+        {
+            Console.Write("{0}{1}", weight == 0 ? "" : ", ", 
+                (edge.Item1.ShortName, edge.Item2.ShortName, edge.Item3)
+            );
+            
+            weight += edge.Item3;
+        }
+        
+        Console.WriteLine("\nВес: {0}", weight);
+    }
+
+    private void DijkstraAlgo()
+    {
+        if (GraphUtils.IsUnWeighted(adjacencyMatrix) || GraphUtils.IsUnOriented(adjacencyMatrix))
+        {
+            Console.WriteLine("Ожидался ориентированный взвешенный граф");
+            return;
+        }
+        
+        foreach (var edge in adjacencyMatrix!
+                     .Search<DijkstraAlgorithm, (GraphVertex, int)>(new DijkstraAlgorithm()))
+        {
+            Console.Write(" -> {0}", (edge.Item1.ShortName, edge.Item2));
+        }
     }
 
     private static void GraphWalk(GraphMatrix? matrix, IGraphWalkAlgorithm algorithm)

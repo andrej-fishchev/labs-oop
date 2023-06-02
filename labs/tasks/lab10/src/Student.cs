@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace labs.lab10.src;
+namespace labs.tasks.lab10.src;
 
 public class Student :
     IDescribe,

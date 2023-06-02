@@ -1,4 +1,4 @@
-namespace labs.lab10;
+namespace labs.tasks.lab10;
 
 public interface IDescribe :
     IComparer<IDescribe>,

@@ -6,7 +6,7 @@ using UserDataRequester.responses;
 using UserDataRequester.responses.console;
 using UserDataRequester.validators.console;
 
-namespace labs.lab10.src.requests;
+namespace labs.tasks.lab10.src.requests;
 
 public static class PublicationRequester
 {

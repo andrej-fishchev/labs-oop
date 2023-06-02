@@ -1,4 +1,4 @@
-namespace labs.lab10.src.comparators;
+namespace labs.tasks.lab10.src.comparators;
 
 public class DescribeEqualityComparer<T> :
     IEqualityComparer<T> where T : IDescribe

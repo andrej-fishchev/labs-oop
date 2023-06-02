@@ -1,9 +1,9 @@
 using labs.builders;
 using labs.entities;
-using labs.lab10.src;
-using labs.lab10.src.requests;
 using labs.shared.data.abstracts;
 using labs.shared.utils;
+using labs.tasks.lab10.src;
+using labs.tasks.lab10.src.requests;
 using UserDataRequester.responses;
 
 namespace labs.tasks.lab12;
@@ -25,15 +25,19 @@ public sealed class Task1 : LabTask
         Actions = new List<ILabEntity<string>>
         {
             new LabTaskActionBuilder().Name("Добавить книгу")
-                .ExecuteAction(GetAndSaveBook)
+                .ExecuteAction(() => GetAndSavePublication<Book>(Publications, PublicationRequester.GetBook))
                 .Build(),
             
             new LabTaskActionBuilder().Name("Добавить журнал")
-                .ExecuteAction(GetAndSaveJournal)
+                .ExecuteAction(() => GetAndSavePublication<Journal>(
+                    Publications, PublicationRequester.GetJournal
+                ))
                 .Build(),
             
             new LabTaskActionBuilder().Name("Добавить учебник")
-                .ExecuteAction(GetAndSaveEduBook)
+                .ExecuteAction(() => GetAndSavePublication<EducationalBook>(
+                    Publications, PublicationRequester.GetEduBook
+                ))
                 .Build(),
 
             new LabTaskActionBuilder().Name("Удалить публикацию по названию")
@@ -46,25 +50,17 @@ public sealed class Task1 : LabTask
                 ).Build()
         };
     }
-
-    public void GetAndSaveBook() => 
-        GetAndSavePublication<Book>(PublicationRequester.GetBook);
-   
-    public void GetAndSaveEduBook() => 
-        GetAndSavePublication<EducationalBook>(PublicationRequester.GetEduBook);
     
-    public void GetAndSaveJournal() => 
-        GetAndSavePublication<Journal>(PublicationRequester.GetJournal);
-
     public void DeletePublicationByName()
     {
         IResponsibleData<object> response;
-        if (!(response = PublicationRequester.GetString(terminate: "...")).IsOk())
+        if (!(response = PublicationRequester.GetString(terminate: "...")).IsOk() 
+            || response.Data() is not string value)
             return;
-
+        
         try
         {
-            Publications.Remove(Publications.Last(x => x.Name == (string)response.Data()!));
+            Publications.Remove(Publications.Last(x => x.Name == value));
             Console.WriteLine($"CONSOLE| Последняя публикация (в списке) с названием {response.Data()} удалена");
         }
         catch (InvalidOperationException)
@@ -73,12 +69,13 @@ public sealed class Task1 : LabTask
         }
     }
 
-    public void GetAndSavePublication<T>(Func<string, IResponsibleData<object>> func, string terminate = "...") 
-        where T : Publication
+    public void GetAndSavePublication<T>(
+        ICollection<Publication> collection, Func<string, IResponsibleData<object>> func, string terminate = "..."
+    ) where T : Publication
     {
-        Publication? obj;
+        T? obj;
         if ((obj = PublicationRequester.GetRequest<T>(func, terminate)) != null)
-            Publications.Back(obj);
+            collection.Add(obj);
 
         if (obj != null)
             Console.WriteLine($"CONSOLE| Публикация '{obj.Name}' добавлена.");
