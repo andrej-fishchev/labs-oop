@@ -108,7 +108,7 @@ public sealed class Task1 : LabTask
         ICollection<Publication> collection, Func<string, IResponsibleData<object>> func, string terminate = "..."
     ) where T : Publication
     {
-        T? obj;
+        Publication? obj;
         if ((obj = PublicationRequester.GetRequest<T>(func, terminate)) != null)
             collection.Add(obj);
 
