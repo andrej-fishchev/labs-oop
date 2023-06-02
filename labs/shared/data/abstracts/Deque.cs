@@ -3,7 +3,7 @@ using labs.shared.data.structures;
 
 namespace labs.shared.data.abstracts;
 
-public class Deque<T> : IEnumerable<T>
+public class Deque<T> : ICollection<T>, IDeque<T>
 {
     private Node<T>? head;
     private Node<T>? tail;
@@ -50,14 +50,22 @@ public class Deque<T> : IEnumerable<T>
     {
         ThrowableInRange(0, 0, size);
 
-        return head!.Data;
+        var data = head!.Data;
+
+        RemoveAt(0);
+
+        return data;
     }
 
     public T Back()
     {
         ThrowableInRange(0, size - 1, size);
 
-        return tail!.Data;
+        var data = tail!.Data;
+        
+        RemoveAt(size - 1);
+
+        return data;
     }
 
     public void RemoveAt(int index)
@@ -67,52 +75,65 @@ public class Deque<T> : IEnumerable<T>
         
         ThrowableInRange(0, index, size);
 
-        if (head != tail)
-        {
-            Node<T> buffer = head!;
-
-            for (int i = 0; i < size; i++)
-            {
-                if (i > index)
-                    buffer.Prev()!.Data = buffer.Data;
-                
-                buffer = buffer!.Next()!;
-            }
-
-            tail = tail!.Prev();
-            tail!.Next(null);
-        } else Clear();
-
-        if(Count != 0) size--;
+        Remove(this[index]);
     }
 
-    public void Remove(T obj)
+    protected IEnumerable<T> GetItems()
     {
-        if(Count == 0)
-            return;
+        if(ReferenceEquals(head, null))
+            yield break;
+        
+        if (ReferenceEquals(head, tail))
+        {
+            yield return head.Data;
+            yield break;
+        }
+        
+        var buffer = head;
+
+        while (!ReferenceEquals(buffer, null) && !ReferenceEquals(head, tail))
+        {
+            yield return buffer.Data;
+
+            buffer = buffer.Next();
+        }
+    }
+
+    public void CopyTo(T[] array, int arrayIndex) => Array.Copy(
+        this.ToArray(), 0, array, arrayIndex, size
+    );
+
+    public bool Remove(T item)
+    {
+        if (Count == 0)
+            return false;
 
         Node<T>? buffer = head;
 
         while (buffer != tail)
         {
-            if(buffer!.Data!.Equals(obj))
+            if(buffer!.Data!.Equals(item))
                 break;
 
             buffer = buffer.Next();
         }
 
-        if (buffer == null) 
-            return;
+        if (buffer == null)
+            return false;
         
         if(buffer.Prev() != null)
-            buffer.Prev().Next(buffer.Next());
+            buffer.Prev()!.Next(buffer.Next());
 
         if (buffer.Next() != null)
-            buffer.Next().Prev(buffer.Prev());
+            buffer.Next()!.Prev(buffer.Prev());
 
         if (Count != 0)
             size--;
+
+        return true;
     }
+
+    public void Add(T item) => Back(item);
 
     public void Clear()
     {
@@ -130,7 +151,10 @@ public class Deque<T> : IEnumerable<T>
         tail = head = null;
         size = 0;
     }
-    
+
+    public bool Contains(T item) => this.ToList()
+        .Contains(item);
+
     protected Node<T>? At(int offset)
     {
         ThrowableInRange(0, offset, size);
@@ -145,12 +169,14 @@ public class Deque<T> : IEnumerable<T>
     
     public T this[int index]
     {
-        get => At(index).Data;
+        get => At(index)!.Data;
 
-        set => At(index).Data = value;
+        set => At(index)!.Data = value;
     }
     
     public int Count => size;
+
+    public bool IsReadOnly => false;
 
     private static void ThrowableInRange(int left, int value, int right)
     {
