@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="shared\data\algorithms\Graph\converters\" />
+      <Folder Include="shared\data\abstracts\linq\" />
     </ItemGroup>
 
 </Project>
