@@ -13,7 +13,7 @@ public static class PublicationRequester
     public static Publication? GetRequest<T>(Func<string, IResponsibleData<object>> func, string terminate = "...") 
         where T : Publication
     {
-        Console.WriteLine($"\nВвод может быть прекращен в любой момент, используйте '{terminate}')");
+        Console.WriteLine($"\nВвод может быть прекращен в любой момент, используйте '{terminate}')\n");
         
         IResponsibleData<object> response;
         if(!(response = func.Invoke(terminate)).IsOk())

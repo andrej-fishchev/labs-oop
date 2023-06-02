@@ -10,7 +10,7 @@ public static class EnumerableItemsPrinter
         int pos = 0;
         while (items.MoveNext())
         {
-            writer.WriteLine($"{++pos}. {items.Current} \n");
+            writer.WriteLine($"{++pos}. {items.Current}");
         }
 
         if(pos == 0)
