@@ -25,72 +25,15 @@
           "signature": "Task3"
         }
       ]
-    },
-    {
+    },{
       "name": "Лабораторная работа №13",
-      "description": "",
+      "description": "Разработка программы, управляемой событиями",
       "signature": "lab13",
       "tasks": [
         {
-          "name": "",
-          "description": "Вариант №28",
+          "name": "Перехват действий над двусторонней очередью",
+          "description": "",
           "signature": "Task1"
-        },
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task3"
-        }
-      ]
-    },
-    {
-      "name": "Лабораторная работа №14",
-      "description": "",
-      "signature": "lab14",
-      "tasks": [
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task1"
-        },
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task3"
-        }
-      ]
-    },
-    {
-      "name": "Лабораторная работа №15",
-      "description": "",
-      "signature": "lab15",
-      "tasks": [
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task1"
-        },
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task3"
-        }
-      ]
-    },
-    {
-      "name": "Лабораторная работа №16",
-      "description": "",
-      "signature": "lab16",
-      "tasks": [
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task1"
-        },
-        {
-          "name": "",
-          "description": "Вариант №28",
-          "signature": "Task3"
         }
       ]
     },
@@ -101,12 +44,12 @@
       "tasks": [
         {
           "name": "Теория графов",
-          "description": "Вариант №19",
+          "description": "",
           "signature": "Task1"
         },
         {
           "name": "Распознающий автомат",
-          "description": "Вариант №19",
+          "description": "",
           "signature": "Task2"
         }
       ]
